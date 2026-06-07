@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>TRIOFIT · Admin</title>
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --surface: #141414;
+      --surface2: #1c1c1c;
+      --gold: #d4a853;
+      --text: #f0f0f0;
+      --text-muted: #999;
+      --border-subtle: rgba(255,255,255,0.06);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      height: 100dvh;
+      -webkit-font-smoothing: antialiased;
+    }
+    .admin-app {
+      max-width: 500px;
+      margin: 0 auto;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+    }
+    .admin-header {
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .admin-header h2 {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--gold);
+    }
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #4ade80;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: #4ade80;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    .session-scroll {
+      display: flex;
+      gap: 8px;
+      padding: 12px;
+      overflow-x: auto;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .session-scroll::-webkit-scrollbar { display: none; }
+    .session-pill {
+      flex-shrink: 0;
+      padding: 10px 16px;
+      border-radius: 24px;
+      font-size: 12px;
+      font-weight: 500;
+      background: var(--surface2);
+      border: 1px solid rgba(255,255,255,0.06);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .session-pill.active {
+      background: var(--gold);
+      color: #0a0a0a;
+      border-color: var(--gold);
+      font-weight: 600;
+    }
+    .session-pill.unread {
+      border-color: rgba(212,168,83,0.5);
+      animation: subtleGlow 2s ease-in-out infinite;
+    }
+    @keyframes subtleGlow {
+      0%, 100% { box-shadow: 0 0 0 rgba(212,168,83,0); }
+      50% { box-shadow: 0 0 12px rgba(212,168,83,0.2); }
+    }
+    .chat-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .no-session {
+      text-align: center;
+      color: var(--text-muted);
+      padding: 40px;
+      font-size: 14px;
+    }
+    .bubble {
+      max-width: 85%;
+      padding: 12px 16px;
+      border-radius: 20px;
+      word-break: break-word;
+      line-height: 1.5;
+      font-size: 15px;
+    }
+    .bubble.user {
+      align-self: flex-end;
+      background: var(--surface2);
+      border-bottom-right-radius: 4px;
+    }
+    .bubble.admin {
+      align-self: flex-start;
+      background: linear-gradient(135deg, #1c1410, #2a1f14);
+      border: 1px solid rgba(212,168,83,0.2);
+      border-bottom-left-radius: 4px;
+    }
+    .bubble .meta {
+      font-size: 10px;
+      opacity: 0.5;
+      margin-top: 4px;
+    }
+    .input-area {
+      display: flex;
+      gap: 8px;
+      padding: 12px 16px;
+      padding-bottom: max(12px, env(safe-area-inset-bottom));
+      background: var(--surface);
+      border-top: 1px solid var(--border-subtle);
+    }
+    .input-area input {
+      flex: 1;
+      padding: 12px 18px;
+      border-radius: 24px;
+      background: var(--surface2);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--text);
+      font-size: 15px;
+      outline: none;
+      font-family: inherit;
+    }
+    .input-area input:focus {
+      border-color: var(--gold);
+    }
+    .input-area button {
+      padding: 12px 20px;
+      border-radius: 24px;
+      background: var(--gold);
+      color: #0a0a0a;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .input-area button:active {
+      transform: scale(0.95);
+      opacity: 0.8;
+    }
+    .refresh-btn {
+      background: none;
+      border: 1px solid rgba(255,255,255,0.15);
+      color: var(--text-muted);
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .refresh-btn:active {
+      background: rgba(255,255,255,0.05);
+    }
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1c1c1c;
+      color: white;
+      padding: 10px 24px;
+      border-radius: 30px;
+      font-size: 13px;
+      z-index: 100;
+      border: 1px solid rgba(255,255,255,0.1);
+      animation: toastIn 0.3s ease, toastOut 0.3s ease 1.5s forwards;
+      pointer-events: none;
+    }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+    @keyframes toastOut {
+      from { opacity: 1; }
+      to { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-app" id="adminApp">
+    <div class="admin-header">
+      <h2>✦ TRIOFIT Admin</h2>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div class="status-row">
+          <div class="status-dot"></div>
+          <span>Live</span>
+        </div>
+        <button class="refresh-btn" onclick="location.reload()">Refresh</button>
+      </div>
+    </div>
+    <div class="session-scroll" id="sessionList">
+      <div style="color: var(--text-muted); font-size: 13px; padding: 8px;">Waiting for messages...</div>
+    </div>
+    <div class="chat-area" id="chatArea">
+      <div class="no-session">👈 Select a conversation to reply</div>
+    </div>
+    <div class="input-area" id="inputArea" style="display: none;">
+      <input type="text" id="replyInput" placeholder="Type reply as stylist..." autocomplete="off">
+      <button id="sendReplyBtn">Send</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // ==================== YOUR SUPABASE CREDENTIALS ====================
+    const SUPABASE_URL = 'https://ahckbchulymvbhrpynyy.supabase.co';
+    const SUPABASE_KEY = '';
+    
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let activeSession = null;
+    let allSessions = [];
+    let lastSeenMessageIds = new Set();
+
+    // ==================== LOAD ALL SESSIONS ====================
+    async function loadSessions() {
+      const { data, error } = await supabase
+        .from('messages')
+        .select('id, session_id, message, sender, created_at')
+        .order('created_at', { ascending: false })
+        .limit(500);
+
+      if (error) {
+        console.error('Load error:', error);
+        showToast('Error loading messages. Check your Supabase keys.');
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        document.getElementById('sessionList').innerHTML = '<div style="color: var(--text-muted); font-size: 13px; padding: 8px;">No messages yet</div>';
+        return;
+      }
+
+      // Group by session_id, keep latest message
+      const map = new Map();
+      data.forEach(row => {
+        if (!map.has(row.session_id)) {
+          map.set(row.session_id, {
+            id: row.session_id,
+            lastMessage: row.message,
+            lastSender: row.sender,
+            lastTime: row.created_at,
+            hasUnread: row.sender === 'user' && !lastSeenMessageIds.has(row.id)
+          });
+        }
+      });
+
+      allSessions = Array.from(map.values());
+      renderSessionPills();
+    }
+
+    function renderSessionPills() {
+      const container = document.getElementById('sessionList');
+      container.innerHTML = allSessions.map(s => {
+        const shortId = s.id.replace('user_', '').substring(0, 12);
+        const isActive = s.id === activeSession;
+        const unreadClass = s.hasUnread && !isActive ? ' unread' : '';
+        return `<div class="session-pill${isActive ? ' active' : ''}${unreadClass}" onclick="openSession('${s.id}')">
+          👤 ${shortId}
+        </div>`;
+      }).join('');
+    }
+
+    // ==================== OPEN A SESSION ====================
+    async function openSession(sessionId) {
+      activeSession = sessionId;
+      document.getElementById('inputArea').style.display = 'flex';
+      document.querySelector('.no-session')?.remove();
+
+      const chatArea = document.getElementById('chatArea');
+      chatArea.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 20px;">Loading conversation...</div>';
+
+      const { data, error } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('session_id', sessionId)
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        chatArea.innerHTML = '<div class="no-session">Error loading messages</div>';
+        return;
+      }
+
+      chatArea.innerHTML = '';
+      if (data && data.length > 0) {
+        data.forEach(msg => {
+          addBubble(msg);
+          lastSeenMessageIds.add(msg.id);
+        });
+      } else {
+        chatArea.innerHTML = '<div class="no-session">No messages in this conversation</div>';
+      }
+
+      chatArea.scrollTop = chatArea.scrollHeight;
+      renderSessionPills();
+      document.getElementById('replyInput').focus();
+    }
+
+    function addBubble(msg) {
+      const chatArea = document.getElementById('chatArea');
+      // Remove "no session" placeholder if present
+      const placeholder = chatArea.querySelector('.no-session');
+      if (placeholder) placeholder.remove();
+
+      const div = document.createElement('div');
+      div.className = 'bubble ' + msg.sender;
+      const senderLabel = msg.sender === 'user' ? 'User' : 'You (Stylist)';
+      div.innerHTML = msg.message + '<div class="meta">' + senderLabel + ' · ' + new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + '</div>';
+      chatArea.appendChild(div);
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    // ==================== SEND REPLY ====================
+    async function sendReply() {
+      if (!activeSession) {
+        showToast('Select a conversation first');
+        return;
+      }
+      const input = document.getElementById('replyInput');
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+
+      const { error } = await supabase.from('messages').insert({
+        session_id: activeSession,
+        sender: 'admin',
+        message: text
+      });
+
+      if (error) {
+        showToast('Failed to send. Try again.');
+        console.error(error);
+      } else {
+        // Show locally
+        addBubble({
+          sender: 'admin',
+          message: text,
+          created_at: new Date().toISOString()
+        });
+        showToast('Reply sent ✨');
+      }
+    }
+
+    document.getElementById('sendReplyBtn').addEventListener('click', sendReply);
+    document.getElementById('replyInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendReply();
+    });
+
+    // ==================== REAL-TIME SUBSCRIPTION ====================
+    supabase
+      .channel('admin-realtime')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'messages'
+      }, (payload) => {
+        const msg = payload.new;
+        
+        // Update session list
+        const existing = allSessions.find(s => s.id === msg.session_id);
+        if (!existing) {
+          allSessions.unshift({
+            id: msg.session_id,
+            lastMessage: msg.message,
+            lastSender: msg.sender,
+            lastTime: msg.created_at,
+            hasUnread: msg.sender === 'user'
+          });
+        } else {
+          existing.lastMessage = msg.message;
+          existing.lastSender = msg.sender;
+          existing.lastTime = msg.created_at;
+          if (msg.sender === 'user' && msg.session_id !== activeSession) {
+            existing.hasUnread = true;
+          }
+        }
+        renderSessionPills();
+
+        // If this message belongs to the currently open session, display it
+        if (msg.session_id === activeSession) {
+          addBubble(msg);
+          lastSeenMessageIds.add(msg.id);
+          renderSessionPills();
+        }
+      })
+      .subscribe();
+
+    // ==================== TOAST ====================
+    function showToast(message) {
+      const existing = document.querySelector('.toast');
+      if (existing) existing.remove();
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 2000);
+    }
+
+    // ==================== INITIAL LOAD ====================
+    loadSessions();
+  </script>
+</body>
+</html>
