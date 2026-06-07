@@ -17,348 +17,209 @@
   --text: #efefef;
   --text-muted: #555;
   --text-dim: #888;
-  --radius: 16px;
 }
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 html, body { height:100%; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
-  background: var(--bg);
-  color: var(--text);
+  background: var(--bg); color: var(--text);
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
 }
 
-/* ════════════════════════════
-   SCREENS
-════════════════════════════ */
+/* ── SCREENS ── */
 .screen {
-  position: fixed; inset: 0;
-  display: flex; flex-direction: column;
-  transition: opacity 0.45s cubic-bezier(.4,0,.2,1),
-              transform 0.45s cubic-bezier(.4,0,.2,1);
+  position:fixed; inset:0; display:flex; flex-direction:column;
+  transition: opacity .42s cubic-bezier(.4,0,.2,1), transform .42s cubic-bezier(.4,0,.2,1);
 }
 .screen.hidden { opacity:0; pointer-events:none; transform:translateY(14px); }
 .screen.out    { opacity:0; pointer-events:none; transform:translateY(-14px); }
 
-/* ════════════════════════════
-   LANG TOGGLE
-════════════════════════════ */
+/* ── LANG ── */
 .lang-toggle {
-  position: fixed; top:16px; right:16px; z-index:1000;
-  display: flex;
-  background: rgba(16,16,16,.95);
-  border: 1px solid rgba(255,255,255,.07);
-  border-radius: 20px; padding: 3px; gap: 2px;
-  backdrop-filter: blur(12px);
+  position:fixed; top:16px; right:16px; z-index:1000;
+  display:flex; background:rgba(14,14,14,.95);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:20px; padding:3px; gap:2px;
+  backdrop-filter:blur(12px);
 }
 .lang-btn {
-  padding: 5px 13px; border-radius: 14px;
-  font-size: 11px; font-weight: 600; letter-spacing:.04em;
-  border: none; background: none;
-  color: var(--text-muted); cursor: pointer; transition: all .2s;
+  padding:5px 13px; border-radius:14px;
+  font-size:11px; font-weight:600; letter-spacing:.04em;
+  border:none; background:none; color:var(--text-muted); cursor:pointer; transition:all .2s;
 }
-.lang-btn.on { background: var(--gold); color: #0a0a0a; }
+.lang-btn.on { background:var(--gold); color:#0a0a0a; }
 
-/* ════════════════════════════
-   SPLASH
-════════════════════════════ */
+/* ── SPLASH ── */
 #splash {
-  align-items: center; justify-content: center;
-  padding: 40px 28px; overflow: hidden;
-  background: var(--bg);
+  align-items:center; justify-content:center;
+  padding:40px 28px; overflow:hidden; background:var(--bg);
 }
-.orb {
-  position: absolute; border-radius: 50%;
-  filter: blur(90px); opacity: .1;
-  animation: drift 10s ease-in-out infinite alternate;
-}
-.orb1 { width:420px;height:420px;background:var(--gold);top:-100px;right:-100px; }
-.orb2 { width:300px;height:300px;background:#6b4a18;bottom:-60px;left:-80px;animation-delay:-4s; }
-.orb3 { width:200px;height:200px;background:var(--gold-light);top:50%;left:20%;animation-delay:-7s; }
-@keyframes drift { from{transform:translate(0,0) scale(1)} to{transform:translate(16px,22px) scale(1.08)} }
+.orb { position:absolute; border-radius:50%; filter:blur(90px); opacity:.1; animation:drift 10s ease-in-out infinite alternate; }
+.orb1{width:420px;height:420px;background:var(--gold);top:-100px;right:-100px;}
+.orb2{width:300px;height:300px;background:#6b4a18;bottom:-60px;left:-80px;animation-delay:-4s;}
+.orb3{width:200px;height:200px;background:var(--gold-light);top:50%;left:20%;animation-delay:-7s;}
+@keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(16px,22px) scale(1.08)}}
 
 .splash-inner {
-  position: relative; z-index:1;
+  position:relative; z-index:1;
   width:100%; max-width:340px; margin:auto;
-  text-align: center; display:flex; flex-direction:column; align-items:center;
+  text-align:center; display:flex; flex-direction:column; align-items:center;
 }
-
-.logo-lockup { margin-bottom: 36px; }
 .logo-mark {
-  width: 64px; height: 64px; border-radius: 16px;
-  background: linear-gradient(145deg, var(--gold-light), #7a5418);
-  display: flex; align-items:center; justify-content:center;
-  margin: 0 auto 16px;
-  box-shadow: 0 0 48px rgba(184,137,58,.25), 0 8px 28px rgba(0,0,0,.6);
+  width:64px; height:64px; border-radius:16px;
+  background:linear-gradient(145deg,var(--gold-light),#7a5418);
+  display:flex; align-items:center; justify-content:center;
+  margin:0 auto 16px;
+  box-shadow:0 0 48px rgba(184,137,58,.25),0 8px 28px rgba(0,0,0,.6);
 }
-.logo-mark span {
-  font-size: 22px; font-weight: 900; color: #fff;
-  letter-spacing: -1px;
-}
-.logo-wordmark { font-size: 22px; font-weight: 800; letter-spacing: .18em; color: var(--text); }
-.logo-descriptor {
-  font-size: 10px; letter-spacing: .22em; text-transform: uppercase;
-  color: var(--gold); margin-top: 6px; font-weight: 500;
-}
-
-.splash-headline { margin-bottom: 32px; }
-.splash-headline h1 {
-  font-size: clamp(22px, 6.5vw, 34px);
-  font-weight: 700; line-height: 1.2; color: var(--text);
-}
-.splash-headline h1 em {
-  font-style: normal;
-  background: linear-gradient(90deg, var(--gold-light), var(--gold));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-}
-.splash-headline p {
-  margin-top: 14px; font-size: 14px;
-  color: var(--text-dim); line-height: 1.65;
-  max-width: 280px; margin-left:auto; margin-right:auto;
-}
-
+.logo-mark span { font-size:22px; font-weight:900; color:#fff; letter-spacing:-1px; }
+.logo-wordmark  { font-size:22px; font-weight:800; letter-spacing:.18em; }
+.logo-descriptor{ font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); margin-top:6px; font-weight:500; }
+.splash-headline { margin:30px 0 28px; }
+.splash-headline h1 { font-size:clamp(22px,6.5vw,34px); font-weight:700; line-height:1.2; }
+.splash-headline h1 em { font-style:normal; background:linear-gradient(90deg,var(--gold-light),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.splash-headline p { margin-top:14px; font-size:14px; color:var(--text-dim); line-height:1.65; max-width:280px; margin-left:auto; margin-right:auto; }
 .btn-primary {
-  width: 100%; padding: 15px 24px;
-  background: linear-gradient(135deg, var(--gold-light), var(--gold));
-  border: none; border-radius: 50px;
-  color: #080808; font-size: 14px; font-weight: 700;
-  letter-spacing: .04em; cursor: pointer;
-  box-shadow: 0 4px 28px rgba(184,137,58,.3);
-  transition: all .2s;
+  width:100%; padding:15px 24px;
+  background:linear-gradient(135deg,var(--gold-light),var(--gold));
+  border:none; border-radius:50px; color:#080808;
+  font-size:14px; font-weight:700; letter-spacing:.04em;
+  cursor:pointer; box-shadow:0 4px 28px rgba(184,137,58,.3); transition:all .2s;
 }
-.btn-primary:active { transform: scale(.97); opacity:.9; }
+.btn-primary:active { transform:scale(.97); opacity:.9; }
+.splash-trust { display:flex; align-items:center; gap:10px; margin-top:22px; font-size:11px; color:var(--text-muted); }
+.sep { width:1px; height:11px; background:var(--surface3); }
 
-.splash-trust {
-  display: flex; align-items: center; gap: 10px;
-  margin-top: 22px; font-size: 11px; color: var(--text-muted);
-  letter-spacing: .02em;
+/* ── NAME SCREEN ── */
+#namescreen {
+  align-items:center; justify-content:center;
+  padding:40px 28px; background:var(--bg); overflow:hidden;
 }
-.sep { width:1px; height:11px; background: var(--surface3); }
-
-/* ════════════════════════════
-   ONBOARDING
-════════════════════════════ */
-#onboarding {
-  background: var(--bg);
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+.namescreen-inner {
+  position:relative; z-index:1;
+  width:100%; max-width:340px;
+  display:flex; flex-direction:column; gap:28px;
 }
-.ob-scroll {
-  min-height: 100%; display:flex;
-  flex-direction:column; align-items:center; justify-content:center;
-  padding: 72px 24px 40px;
-}
-.ob-card { width:100%; max-width:380px; }
-
-.step { display:none; flex-direction:column; gap:26px; animation: fadeUp .35s ease both; }
-.step.active { display:flex; }
-@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-
-.step-label {
-  font-size: 10px; font-weight: 700; letter-spacing:.16em;
-  color: var(--gold); text-transform: uppercase;
-}
-.step-title { font-size: 21px; font-weight: 700; line-height: 1.25; margin-top: 4px; }
-.step-sub { font-size: 13px; color: var(--text-dim); margin-top: 6px; line-height: 1.6; }
-
-.field-label {
-  display: block; font-size: 10px; font-weight: 700;
-  letter-spacing: .1em; color: var(--text-muted);
-  text-transform: uppercase; margin-bottom: 8px;
-}
+.ns-label { font-size:10px; font-weight:700; letter-spacing:.16em; color:var(--gold); text-transform:uppercase; }
+.ns-title { font-size:24px; font-weight:700; line-height:1.2; margin-top:6px; }
+.ns-sub   { font-size:14px; color:var(--text-dim); line-height:1.6; margin-top:8px; }
 .field-input {
-  width: 100%; padding: 14px 18px;
-  background: var(--surface2);
-  border: 1.5px solid rgba(255,255,255,.06);
-  border-radius: 12px; color: var(--text);
-  font-size: 15px; font-family: inherit; outline: none;
-  transition: border-color .2s; -webkit-appearance: none;
+  width:100%; padding:14px 18px;
+  background:var(--surface2);
+  border:1.5px solid rgba(255,255,255,.06);
+  border-radius:12px; color:var(--text);
+  font-size:16px; font-family:inherit; outline:none;
+  transition:border-color .2s; -webkit-appearance:none;
 }
-.field-input:focus { border-color: var(--gold-border); }
-.field-input::placeholder { color: var(--text-muted); }
+.field-input:focus { border-color:var(--gold-border); }
+.field-input::placeholder { color:var(--text-muted); }
 
-.choice-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-.choice-btn {
-  padding: 16px 12px;
-  background: var(--surface2);
-  border: 1.5px solid rgba(255,255,255,.05);
-  border-radius: 12px; cursor: pointer;
-  text-align: left; transition: all .2s;
-  -webkit-appearance: none; display:flex; flex-direction:column; gap:4px;
-}
-.choice-btn:active { transform: scale(.97); }
-.choice-btn.selected { background: var(--gold-pale); border-color: var(--gold); }
-.choice-name {
-  font-size: 13px; font-weight: 700; color: var(--text);
-  pointer-events: none;
-}
-.choice-desc {
-  font-size: 11px; color: var(--text-muted); line-height:1.4;
-  pointer-events: none;
-}
-
-.nav-row { display:flex; gap:10px; align-items:center; }
-.btn-back {
-  padding: 13px 18px; border-radius: 50px;
-  background: var(--surface2);
-  border: 1px solid rgba(255,255,255,.06);
-  color: var(--text-dim); font-size: 13px; cursor: pointer;
-  -webkit-appearance: none; transition: all .2s;
-}
-.btn-next {
-  flex:1; padding: 14px;
-  background: linear-gradient(135deg, var(--gold-light), var(--gold));
-  border: none; border-radius: 50px;
-  color: #080808; font-size: 14px; font-weight: 700;
-  cursor: pointer; transition: all .2s; -webkit-appearance: none;
-  letter-spacing: .03em;
-}
-.btn-next:disabled { opacity:.25; cursor:not-allowed; background: var(--surface3); }
-.btn-next:not(:disabled):active { transform: scale(.97); }
-
-.progress {
-  display: flex; gap: 5px; justify-content: center; margin-top: 6px;
-}
-.prog-dot { width:5px; height:5px; border-radius:3px; background:var(--surface3); transition:all .3s; }
-.prog-dot.on { background:var(--gold); width:16px; }
-
-/* ════════════════════════════
-   CHAT
-════════════════════════════ */
-#chat { background: var(--bg); }
+/* ── CHAT ── */
+#chat { background:var(--bg); }
 
 .chat-header {
-  display: flex; align-items: center; gap: 12px;
-  padding: 13px 18px;
-  padding-top: max(13px, env(safe-area-inset-top));
-  background: var(--surface);
-  border-bottom: 1px solid rgba(255,255,255,.04);
-  flex-shrink: 0;
+  display:flex; align-items:center; gap:12px;
+  padding:13px 18px;
+  padding-top:max(13px, env(safe-area-inset-top));
+  background:var(--surface);
+  border-bottom:1px solid rgba(255,255,255,.04);
+  flex-shrink:0;
 }
 .chat-avatar {
-  width: 36px; height: 36px; border-radius: 50%;
-  background: linear-gradient(145deg, var(--gold-light), #7a5520);
-  display: flex; align-items:center; justify-content:center;
-  flex-shrink: 0;
-  box-shadow: 0 0 14px rgba(184,137,58,.2);
+  width:36px; height:36px; border-radius:50%;
+  background:linear-gradient(145deg,var(--gold-light),#7a5520);
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; box-shadow:0 0 14px rgba(184,137,58,.2);
 }
-.avatar-mark { font-size:13px; font-weight:800; color:#fff; letter-spacing:-.5px; }
-.chat-hname { font-size: 13px; font-weight: 700; letter-spacing:.02em; }
-.chat-hstatus {
-  display: flex; align-items:center; gap:5px;
-  font-size: 11px; color: #4ade80; margin-top: 2px;
-}
+.avatar-mark { font-size:12px; font-weight:800; color:#fff; letter-spacing:-.5px; }
+.chat-hname  { font-size:13px; font-weight:700; letter-spacing:.02em; }
+.chat-hstatus{ display:flex; align-items:center; gap:5px; font-size:11px; color:#4ade80; margin-top:2px; }
 .s-dot { width:5px; height:5px; background:#4ade80; border-radius:50%; animation:pulse 2s infinite; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
 .messages {
   flex:1; overflow-y:auto; overflow-x:hidden;
-  padding: 18px 16px 10px;
-  display: flex; flex-direction:column; gap:10px;
-  -webkit-overflow-scrolling: touch;
+  padding:18px 16px 10px;
+  display:flex; flex-direction:column; gap:10px;
+  -webkit-overflow-scrolling:touch;
 }
-.messages::-webkit-scrollbar { display:none; }
+.messages::-webkit-scrollbar{display:none;}
 
 .mrow { display:flex; flex-direction:column; }
-.mrow.user  { align-items: flex-end; }
-.mrow.admin { align-items: flex-start; }
+.mrow.user  { align-items:flex-end; }
+.mrow.admin { align-items:flex-start; }
 
 .bubble {
-  max-width: 78%; padding: 11px 15px;
-  border-radius: 16px; font-size: 14px; line-height: 1.58;
-  word-break: break-word;
-  animation: bIn .28s ease both;
+  max-width:78%; padding:11px 15px;
+  border-radius:16px; font-size:14px; line-height:1.58;
+  word-break:break-word; animation:bIn .28s ease both;
 }
-@keyframes bIn { from{opacity:0;transform:scale(.96) translateY(5px)} to{opacity:1;transform:scale(1) translateY(0)} }
-
+@keyframes bIn{from{opacity:0;transform:scale(.96) translateY(5px)}to{opacity:1;transform:scale(1) translateY(0)}}
 .bubble.user {
-  background: var(--gold-pale);
-  border: 1px solid var(--gold-border);
-  border-bottom-right-radius: 3px;
+  background:var(--gold-pale); border:1px solid var(--gold-border);
+  border-bottom-right-radius:3px;
 }
 .bubble.admin {
-  background: var(--surface2);
-  border: 1px solid rgba(255,255,255,.04);
-  border-bottom-left-radius: 3px;
+  background:var(--surface2); border:1px solid rgba(255,255,255,.04);
+  border-bottom-left-radius:3px;
 }
 .bubble img { max-width:100%; border-radius:8px; display:block; cursor:pointer; }
 .bmeta { font-size:10px; color:var(--text-muted); margin-top:4px; padding:0 2px; letter-spacing:.02em; }
 
-/* Typing */
 .typing-bub {
-  background: var(--surface2);
-  border: 1px solid rgba(255,255,255,.04);
-  border-radius: 16px; border-bottom-left-radius:3px;
-  padding: 13px 17px;
-  display: inline-flex; gap:5px; align-items:center;
-  animation: bIn .28s ease both;
+  background:var(--surface2); border:1px solid rgba(255,255,255,.04);
+  border-radius:16px; border-bottom-left-radius:3px;
+  padding:13px 17px; display:inline-flex; gap:5px; align-items:center;
+  animation:bIn .28s ease both;
 }
 .tdot { width:6px; height:6px; background:var(--text-muted); border-radius:50%; animation:td 1.2s ease infinite; }
-.tdot:nth-child(2){animation-delay:.15s} .tdot:nth-child(3){animation-delay:.3s}
-@keyframes td { 0%,60%,100%{transform:translateY(0);opacity:.35} 30%{transform:translateY(-5px);opacity:1} }
+.tdot:nth-child(2){animation-delay:.15s}.tdot:nth-child(3){animation-delay:.3s}
+@keyframes td{0%,60%,100%{transform:translateY(0);opacity:.35}30%{transform:translateY(-5px);opacity:1}}
 
-/* Quick replies */
 .qr-row { display:flex; flex-wrap:wrap; gap:7px; padding:2px 0 4px; }
 .qr-btn {
-  padding: 8px 15px;
-  background: var(--surface2);
-  border: 1px solid var(--gold-border);
-  border-radius: 20px; font-size: 12px; font-weight:500;
-  color: var(--gold); cursor: pointer;
-  font-family: inherit; -webkit-appearance:none;
-  letter-spacing: .02em; transition: all .2s;
+  padding:8px 15px; background:var(--surface2);
+  border:1px solid var(--gold-border); border-radius:20px;
+  font-size:12px; font-weight:500; color:var(--gold);
+  cursor:pointer; font-family:inherit; -webkit-appearance:none;
+  letter-spacing:.02em; transition:all .2s;
 }
-.qr-btn:active { background: var(--gold-pale); transform:scale(.97); }
+.qr-btn:active { background:var(--gold-pale); transform:scale(.97); }
 
-/* Input */
 .chat-input-area {
-  padding: 10px 14px;
-  padding-bottom: max(10px, env(safe-area-inset-bottom));
-  background: var(--surface);
-  border-top: 1px solid rgba(255,255,255,.04);
-  flex-shrink: 0;
+  padding:10px 14px;
+  padding-bottom:max(10px, env(safe-area-inset-bottom));
+  background:var(--surface);
+  border-top:1px solid rgba(255,255,255,.04);
+  flex-shrink:0;
 }
 .input-row { display:flex; gap:8px; align-items:flex-end; }
 .chat-ta {
-  flex:1; padding: 11px 16px;
-  background: var(--surface2);
-  border: 1.5px solid rgba(255,255,255,.06);
-  border-radius: 22px; color: var(--text);
-  font-size: 14px; font-family: inherit; outline: none;
-  resize: none; max-height: 100px; line-height: 1.45;
-  transition: border-color .2s; -webkit-appearance:none;
+  flex:1; padding:11px 16px;
+  background:var(--surface2);
+  border:1.5px solid rgba(255,255,255,.06);
+  border-radius:22px; color:var(--text);
+  font-size:14px; font-family:inherit; outline:none;
+  resize:none; max-height:100px; line-height:1.45;
+  transition:border-color .2s; -webkit-appearance:none;
 }
-.chat-ta:focus { border-color: var(--gold-border); }
-.chat-ta::placeholder { color: var(--text-muted); }
+.chat-ta:focus { border-color:var(--gold-border); }
+.chat-ta::placeholder { color:var(--text-muted); }
 .send-btn {
-  width: 40px; height: 40px; border-radius:50%;
-  background: linear-gradient(135deg, var(--gold-light), var(--gold));
-  border: none; color: #080808;
-  display: flex; align-items:center; justify-content:center;
-  cursor: pointer; flex-shrink:0; transition: all .2s;
-  box-shadow: 0 2px 10px rgba(184,137,58,.28);
-  -webkit-appearance:none;
+  width:40px; height:40px; border-radius:50%;
+  background:linear-gradient(135deg,var(--gold-light),var(--gold));
+  border:none; color:#080808;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; flex-shrink:0; transition:all .2s;
+  box-shadow:0 2px 10px rgba(184,137,58,.28); -webkit-appearance:none;
 }
-.send-btn:active { transform:scale(.9); }
-.send-btn svg { width:16px; height:16px; fill:#080808; }
+.send-btn:active{transform:scale(.9);}
+.send-btn svg{width:16px;height:16px;fill:#080808;}
 
-/* Divider */
-.date-div {
-  text-align:center; font-size:10px;
-  color: var(--text-muted); letter-spacing:.06em;
-  display:flex; align-items:center; gap:10px;
-  margin: 4px 0;
-}
-.date-div::before, .date-div::after {
-  content:''; flex:1; height:1px;
-  background: rgba(255,255,255,.04);
-}
-
-/* Lightbox */
-.lightbox { display:none; position:fixed; inset:0; background:rgba(0,0,0,.93); z-index:9999; align-items:center; justify-content:center; cursor:pointer; }
-.lightbox.open { display:flex; }
-.lightbox img { max-width:92vw; max-height:88vh; border-radius:10px; }
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:9999;align-items:center;justify-content:center;cursor:pointer;}
+.lightbox.open{display:flex;}
+.lightbox img{max-width:92vw;max-height:88vh;border-radius:10px;}
 </style>
 </head>
 <body>
@@ -370,127 +231,41 @@ body {
 
 <!-- ══ SPLASH ══ -->
 <div class="screen" id="splash">
-  <div class="orb orb1"></div>
-  <div class="orb orb2"></div>
-  <div class="orb orb3"></div>
+  <div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
   <div class="splash-inner">
-    <div class="logo-lockup">
-      <div class="logo-mark"><span>TF</span></div>
-      <div class="logo-wordmark">TRIOFIT</div>
-      <div class="logo-descriptor" id="s-tag">Styliste Personnel</div>
-    </div>
+    <div class="logo-mark"><span>TF</span></div>
+    <div class="logo-wordmark">TRIOFIT</div>
+    <div class="logo-descriptor" id="s-tag">Styliste Personnel</div>
     <div class="splash-headline">
       <h1 id="s-h1">Habillez-vous<br>comme vous <em>méritez</em></h1>
       <p id="s-p">Un conseil stylistique sur mesure, disponible à tout moment, pour la clientèle de Yaoundé.</p>
     </div>
-    <button class="btn-primary" id="s-cta" onclick="goTo('onboarding')">Commencer</button>
+    <button class="btn-primary" id="s-cta" onclick="goTo('namescreen')">Commencer</button>
     <div class="splash-trust">
-      <span id="s-t1">Conseil personnalisé</span>
-      <span class="sep"></span>
-      <span id="s-t2">Réponse rapide</span>
-      <span class="sep"></span>
+      <span id="s-t1">Conseil personnalisé</span><span class="sep"></span>
+      <span id="s-t2">Réponse rapide</span><span class="sep"></span>
       <span id="s-t3">Yaoundé</span>
     </div>
   </div>
 </div>
 
-<!-- ══ ONBOARDING ══ -->
-<div class="screen hidden" id="onboarding">
-  <div class="ob-scroll">
-    <div class="ob-card">
-
-      <div class="step active" id="s1">
-        <div>
-          <div class="step-label" id="ob-eye1">Étape 1 sur 3</div>
-          <div class="step-title" id="ob-t1">Comment vous appelez-vous ?</div>
-          <div class="step-sub"  id="ob-s1">Votre styliste vous appellera par votre prénom.</div>
-        </div>
-        <div>
-          <label class="field-label" id="ob-l1">Prénom</label>
-          <input class="field-input" id="nameInput" type="text"
-            placeholder="Votre prénom" autocomplete="given-name" autocorrect="off" autocapitalize="words">
-        </div>
-        <div>
-          <button class="btn-next" id="n1" disabled onclick="goStep(2)">
-            <span id="ob-n1">Continuer</span>
-          </button>
-          <div class="progress" style="margin-top:14px;">
-            <div class="prog-dot on"></div><div class="prog-dot"></div><div class="prog-dot"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="step" id="s2">
-        <div>
-          <div class="step-label" id="ob-eye2">Étape 2 sur 3</div>
-          <div class="step-title" id="ob-t2">Quel est votre style ?</div>
-          <div class="step-sub"  id="ob-s2">Sélectionnez le style qui vous correspond le mieux.</div>
-        </div>
-        <div class="choice-grid">
-          <button class="choice-btn" onclick="pick(this,'style')" data-v="Classique">
-            <div class="choice-name" id="c-cl">Classique</div>
-            <div class="choice-desc" id="c-cls">Élégant, sobre, intemporel</div>
-          </button>
-          <button class="choice-btn" onclick="pick(this,'style')" data-v="Streetwear">
-            <div class="choice-name">Streetwear</div>
-            <div class="choice-desc" id="c-sws">Urbain, moderne, affirmé</div>
-          </button>
-          <button class="choice-btn" onclick="pick(this,'style')" data-v="Afro-chic">
-            <div class="choice-name">Afro-chic</div>
-            <div class="choice-desc" id="c-acs">Tissus, couleur, identité</div>
-          </button>
-          <button class="choice-btn" onclick="pick(this,'style')" data-v="Casual">
-            <div class="choice-name" id="c-ca">Décontracté</div>
-            <div class="choice-desc" id="c-cas">Simple, confortable, net</div>
-          </button>
-        </div>
-        <div>
-          <div class="nav-row">
-            <button class="btn-back" onclick="goStep(1)">&#8592;</button>
-            <button class="btn-next" id="n2" disabled onclick="goStep(3)"><span id="ob-n2">Continuer</span></button>
-          </div>
-          <div class="progress" style="margin-top:14px;">
-            <div class="prog-dot"></div><div class="prog-dot on"></div><div class="prog-dot"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="step" id="s3">
-        <div>
-          <div class="step-label" id="ob-eye3">Étape 3 sur 3</div>
-          <div class="step-title" id="ob-t3">Votre budget pour une tenue ?</div>
-          <div class="step-sub"  id="ob-s3">Nous adaptons nos recommandations à votre budget.</div>
-        </div>
-        <div class="choice-grid">
-          <button class="choice-btn" onclick="pick(this,'budget')" data-v="10 000 – 25 000 FCFA">
-            <div class="choice-name">10k – 25k</div>
-            <div class="choice-desc">FCFA</div>
-          </button>
-          <button class="choice-btn" onclick="pick(this,'budget')" data-v="25 000 – 50 000 FCFA">
-            <div class="choice-name">25k – 50k</div>
-            <div class="choice-desc">FCFA</div>
-          </button>
-          <button class="choice-btn" onclick="pick(this,'budget')" data-v="50 000 – 100 000 FCFA">
-            <div class="choice-name">50k – 100k</div>
-            <div class="choice-desc">FCFA</div>
-          </button>
-          <button class="choice-btn" onclick="pick(this,'budget')" data-v="100 000 FCFA et plus">
-            <div class="choice-name">100k +</div>
-            <div class="choice-desc">FCFA</div>
-          </button>
-        </div>
-        <div>
-          <div class="nav-row">
-            <button class="btn-back" onclick="goStep(2)">&#8592;</button>
-            <button class="btn-next" id="n3" disabled onclick="saveAndStartChat()"><span id="ob-n3">Accéder au styliste</span></button>
-          </div>
-          <div class="progress" style="margin-top:14px;">
-            <div class="prog-dot"></div><div class="prog-dot"></div><div class="prog-dot on"></div>
-          </div>
-        </div>
-      </div>
-
+<!-- ══ NAME SCREEN ══ -->
+<div class="screen hidden" id="namescreen">
+  <div class="orb orb1"></div><div class="orb orb2"></div>
+  <div class="namescreen-inner">
+    <div>
+      <div class="ns-label" id="ns-label">Bienvenue</div>
+      <div class="ns-title" id="ns-title">Comment vous appelez-vous ?</div>
+      <div class="ns-sub"   id="ns-sub">Votre styliste personnel vous attend.</div>
     </div>
+    <div>
+      <input class="field-input" id="nameInput" type="text"
+        placeholder="Votre prénom" autocomplete="given-name"
+        autocorrect="off" autocapitalize="words">
+    </div>
+    <button class="btn-primary" id="nameBtn" disabled onclick="submitName()">
+      <span id="nameBtn-label">Continuer</span>
+    </button>
   </div>
 </div>
 
@@ -500,10 +275,7 @@ body {
     <div class="chat-avatar"><span class="avatar-mark">TF</span></div>
     <div>
       <div class="chat-hname">TRIOFIT Styliste</div>
-      <div class="chat-hstatus">
-        <div class="s-dot"></div>
-        <span id="ch-status">En ligne</span>
-      </div>
+      <div class="chat-hstatus"><div class="s-dot"></div><span id="ch-status">En ligne</span></div>
     </div>
   </div>
   <div class="messages" id="messages"></div>
@@ -511,7 +283,7 @@ body {
     <div class="input-row">
       <textarea class="chat-ta" id="chatInput" rows="1" placeholder="Écrivez un message…"></textarea>
       <button class="send-btn" onclick="sendMsg()">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
       </button>
     </div>
   </div>
@@ -527,46 +299,141 @@ const SUPABASE_URL = 'https://ahckbchulymvbhrpynyy.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFoY2tiY2h1bHltdmJocnB5bnl5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4MTI5MTQsImV4cCI6MjA5NjM4ODkxNH0.aBq-qHBBTrzWf_OHpkYmQLLPeS1iywBbX47tLRqRQ1k';
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// ── STATE ──
 let lang = 'fr';
 let sessionId = null;
-let userName = '', userStyle = '', userBudget = '';
 let typingRow = null;
+let profileComplete = false;
+
+const profile = {
+  name:'', age:'', style:'', colors:'',
+  height:'', bodyType:'', town:''
+};
+
+// ── PROFILING FLOW ──
+// Each step: key to save, question fn, optional quick replies fn, delay
+const FLOW = {
+  fr: [
+    {
+      key: 'age',
+      q: (p) => `Bonjour ${p.name}. Je suis votre styliste TRIOFIT.\n\nPour vous proposer des tenues vraiment adaptées, j'ai besoin de vous connaître un peu mieux.\n\nQuel est votre âge ?`,
+      qr: () => ['18 – 24 ans','25 – 34 ans','35 – 44 ans','45 ans et plus'],
+      delay: 1600,
+    },
+    {
+      key: 'style',
+      q: (p) => `Merci. Quel style vous correspond le mieux au quotidien ?`,
+      qr: () => ['Classique & élégant','Streetwear & urbain','Afro-chic','Décontracté & casual','Mixte selon les occasions'],
+      delay: 1200,
+    },
+    {
+      key: 'colors',
+      q: (p) => `Très bien. Quelles couleurs portez-vous habituellement ou souhaitez-vous explorer ?`,
+      qr: () => ['Tons neutres (noir, blanc, gris)','Tons chauds (beige, marron, camel)','Couleurs vives','Tons foncés','Pas de préférence'],
+      delay: 1200,
+    },
+    {
+      key: 'height',
+      q: (p) => `Quelle est votre taille approximative ? Cela m'aide à orienter les coupes et proportions.`,
+      qr: () => ['Moins de 165 cm','165 – 170 cm','171 – 175 cm','176 – 180 cm','Plus de 180 cm'],
+      delay: 1200,
+    },
+    {
+      key: 'bodyType',
+      q: (p) => `Et votre morphologie ? Ne vous inquiétez pas, c'est strictement pour affiner mes recommandations.`,
+      qr: () => ['Mince / Élancé','Athlétique / Musclé','Corpulent / Fort','Intermédiaire'],
+      delay: 1300,
+    },
+    {
+      key: 'town',
+      q: (p) => `Dans quelle ville ou quel quartier êtes-vous basé ? Cela me permet de vous orienter vers des boutiques accessibles.`,
+      qr: () => ['Yaoundé Centre','Bastos / Omnisports','Ngousso / Mvan','Biyem-Assi / Mimboman','Autre ville'],
+      delay: 1200,
+    },
+    {
+      key: '__done__',
+      q: (p) => `Parfait, ${p.name}. Votre profil est complet.\n\nStyle *${p.style}*, morphologie *${p.bodyType}*, basé à *${p.town}*. Je connais maintenant vos préférences et votre silhouette.\n\nDites-moi : pour quelle occasion cherchez-vous une tenue ?`,
+      qr: () => ['Un entretien professionnel','Une sortie en soirée','Un mariage ou cérémonie','Le quotidien au bureau','Un événement décontracté'],
+      delay: 1500,
+    },
+  ],
+  en: [
+    {
+      key: 'age',
+      q: (p) => `Good day, ${p.name}. I am your TRIOFIT personal stylist.\n\nTo recommend outfits that truly fit you, I need to learn a bit more about you.\n\nHow old are you?`,
+      qr: () => ['18 – 24','25 – 34','35 – 44','45 and over'],
+      delay: 1600,
+    },
+    {
+      key: 'style',
+      q: (p) => `Thank you. Which style best describes your everyday look?`,
+      qr: () => ['Classic & elegant','Streetwear & urban','Afro-chic','Casual & relaxed','Mixed — depends on the occasion'],
+      delay: 1200,
+    },
+    {
+      key: 'colors',
+      q: (p) => `Noted. Which colours do you usually wear or would like to explore?`,
+      qr: () => ['Neutral tones (black, white, grey)','Warm tones (beige, brown, camel)','Bright colours','Dark tones','No preference'],
+      delay: 1200,
+    },
+    {
+      key: 'height',
+      q: (p) => `What is your approximate height? This helps me recommend the right cuts and proportions.`,
+      qr: () => ['Under 165 cm','165 – 170 cm','171 – 175 cm','176 – 180 cm','Over 180 cm'],
+      delay: 1200,
+    },
+    {
+      key: 'bodyType',
+      q: (p) => `And your body type? This is strictly to refine my recommendations.`,
+      qr: () => ['Slim / Lean','Athletic / Muscular','Large / Full-figured','In between'],
+      delay: 1300,
+    },
+    {
+      key: 'town',
+      q: (p) => `Which city or neighbourhood are you based in? This helps me point you to accessible boutiques.`,
+      qr: () => ['Yaoundé Centre','Bastos / Omnisports','Ngousso / Mvan','Biyem-Assi / Mimboman','Other city'],
+      delay: 1200,
+    },
+    {
+      key: '__done__',
+      q: (p) => `Perfect, ${p.name}. Your profile is complete.\n\n*${p.style}* style, *${p.bodyType}* build, based in *${p.town}*. I now have everything I need.\n\nTell me: what occasion are you dressing for?`,
+      qr: () => ['A professional interview','An evening out','A wedding or ceremony','Everyday office wear','A casual event'],
+      delay: 1500,
+    },
+  ]
+};
+
+let flowStep = 0; // index into FLOW[lang]
 
 // ── COPY ──
 const COPY = {
   fr: {
-    'splash-tag'  : 'Styliste Personnel',
-    'splash-h1'   : 'Habillez-vous<br>comme vous <em>méritez</em>',
-    'splash-p'    : 'Un conseil stylistique sur mesure, disponible à tout moment, pour la clientèle de Yaoundé.',
-    'splash-cta'  : 'Commencer',
+    'splash-tag':'Styliste Personnel',
+    'splash-h1':'Habillez-vous<br>comme vous <em>méritez</em>',
+    'splash-p':'Un conseil stylistique sur mesure, disponible à tout moment, pour la clientèle de Yaoundé.',
+    'splash-cta':'Commencer',
     't1':'Conseil personnalisé','t2':'Réponse rapide','t3':'Yaoundé',
-    'eye1':'Étape 1 sur 3','t-t1':'Comment vous appelez-vous ?','sub1':'Votre styliste vous appellera par votre prénom.',
-    'l1':'Prénom','ph1':'Votre prénom','n1':'Continuer',
-    'eye2':'Étape 2 sur 3','t-t2':'Quel est votre style ?','sub2':'Sélectionnez le style qui vous correspond le mieux.','n2':'Continuer',
-    'eye3':'Étape 3 sur 3','t-t3':'Votre budget pour une tenue ?','sub3':'Nous adaptons nos recommandations à votre budget.','n3':'Accéder au styliste',
-    'cl':'Classique','cls':'Élégant, sobre, intemporel','sws':'Urbain, moderne, affirmé','acs':'Tissus, couleur, identité','ca':'Décontracté','cas':'Simple, confortable, net',
+    'ns-label':'Bienvenue','ns-title':'Comment vous appelez-vous ?',
+    'ns-sub':'Votre styliste personnel vous attend.',
+    'nameBtn':'Continuer',
     'status':'En ligne',
-    'ph-chat':'Écrivez un message…',
-    welcome: (n,s,b) => `Bonjour ${n}. Je suis votre styliste TRIOFIT.\n\nJ'ai enregistré votre profil : style *${s}*, budget *${b}*. Comment puis-je vous aider aujourd'hui ?`,
-    returning: (n) => `Bienvenue de retour, ${n}. Comment puis-je vous assister aujourd'hui ?`,
-    qr: ['Une tenue professionnelle','Une tenue pour sortir','Un look afro-chic','Une tenue décontractée'],
+    'ph-chat':'Écrivez votre réponse…',
+    returning: (p) => `Bienvenue de retour, ${p.name}.\n\nPour quelle occasion cherchez-vous une tenue aujourd'hui ?`,
+    ret_qr: () => ['Un entretien professionnel','Une sortie en soirée','Un mariage ou cérémonie','Le quotidien au bureau','Un événement décontracté'],
   },
   en: {
-    'splash-tag'  : 'Personal Stylist',
-    'splash-h1'   : 'Dress the way<br>you <em>deserve</em>',
-    'splash-p'    : 'Bespoke style advice, available at any time, for Yaoundé clientele.',
-    'splash-cta'  : 'Get Started',
+    'splash-tag':'Personal Stylist',
+    'splash-h1':'Dress the way<br>you <em>deserve</em>',
+    'splash-p':'Bespoke style advice, available at any time, for Yaoundé clientele.',
+    'splash-cta':'Get Started',
     't1':'Personalised advice','t2':'Fast reply','t3':'Yaoundé',
-    'eye1':'Step 1 of 3','t-t1':'What is your name?','sub1':'Your stylist will address you by your first name.',
-    'l1':'First name','ph1':'Your first name','n1':'Continue',
-    'eye2':'Step 2 of 3','t-t2':'What is your style?','sub2':'Select the style that fits you best.','n2':'Continue',
-    'eye3':'Step 3 of 3','t-t3':'Your budget per outfit?','sub3':'We tailor our recommendations to your budget.','n3':'Meet my stylist',
-    'cl':'Classic','cls':'Elegant, refined, timeless','sws':'Urban, bold, current','acs':'Fabric, colour, identity','ca':'Casual','cas':'Clean, simple, relaxed',
+    'ns-label':'Welcome','ns-title':'What is your name?',
+    'ns-sub':'Your personal stylist is ready for you.',
+    'nameBtn':'Continue',
     'status':'Online',
-    'ph-chat':'Type a message…',
-    welcome: (n,s,b) => `Good day, ${n}. I am your TRIOFIT stylist.\n\nI have your profile on file: *${s}* style, budget *${b}*. How may I assist you today?`,
-    returning: (n) => `Welcome back, ${n}. How may I assist you today?`,
-    qr: ['A professional outfit','An outfit for a night out','An afro-chic look','A casual look'],
+    'ph-chat':'Type your answer…',
+    returning: (p) => `Welcome back, ${p.name}.\n\nWhat occasion are you dressing for today?`,
+    ret_qr: () => ['A professional interview','An evening out','A wedding or ceremony','Everyday office wear','A casual event'],
   }
 };
 
@@ -578,87 +445,67 @@ function setLang(l) {
   const map = {
     's-tag':c['splash-tag'],'s-h1':c['splash-h1'],'s-p':c['splash-p'],
     's-cta':c['splash-cta'],'s-t1':c['t1'],'s-t2':c['t2'],'s-t3':c['t3'],
-    'ob-eye1':c['eye1'],'ob-t1':c['t-t1'],'ob-s1':c['sub1'],'ob-l1':c['l1'],
-    'ob-n1':c['n1'],
-    'ob-eye2':c['eye2'],'ob-t2':c['t-t2'],'ob-s2':c['sub2'],'ob-n2':c['n2'],
-    'ob-eye3':c['eye3'],'ob-t3':c['t-t3'],'ob-s3':c['sub3'],'ob-n3':c['n3'],
-    'c-cl':c['cl'],'c-cls':c['cls'],'c-sws':c['sws'],
-    'c-acs':c['acs'],'c-ca':c['ca'],'c-cas':c['cas'],
-    'ch-status':c['status'],
+    'ns-label':c['ns-label'],'ns-title':c['ns-title'],'ns-sub':c['ns-sub'],
+    'nameBtn-label':c['nameBtn'],'ch-status':c['status'],
   };
-  for (const [id, val] of Object.entries(map)) {
-    const el = document.getElementById(id);
-    if (el) el.innerHTML = val;
+  for (const [id,val] of Object.entries(map)) {
+    const el=document.getElementById(id); if(el) el.innerHTML=val;
   }
-  const ni = document.getElementById('nameInput');
-  const ci = document.getElementById('chatInput');
-  if (ni) ni.placeholder = c['ph1'];
-  if (ci) ci.placeholder = c['ph-chat'];
+  const ci=document.getElementById('chatInput');
+  if(ci) ci.placeholder=c['ph-chat'];
 }
 
 // ── SCREENS ──
 function goTo(id) {
   document.querySelectorAll('.screen').forEach(s => {
-    if (s.id === id) { s.classList.remove('hidden','out'); }
-    else { s.classList.add('out'); setTimeout(()=>s.classList.add('hidden'), 450); }
+    if (s.id===id) { s.classList.remove('hidden','out'); }
+    else { s.classList.add('out'); setTimeout(()=>s.classList.add('hidden'),450); }
   });
 }
 
-// ── ONBOARDING ──
-function goStep(n) {
-  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
-  document.getElementById('s'+n).classList.add('active');
-  document.getElementById('onboarding').scrollTop = 0;
-}
-
-document.getElementById('nameInput').addEventListener('input', function(){
-  document.getElementById('n1').disabled = this.value.trim().length < 2;
+// ── NAME SCREEN ──
+const nameInput = document.getElementById('nameInput');
+nameInput.addEventListener('input', function(){
+  document.getElementById('nameBtn').disabled = this.value.trim().length < 2;
 });
-document.getElementById('nameInput').addEventListener('keydown', function(e){
-  if (e.key==='Enter'){ e.preventDefault(); if(!document.getElementById('n1').disabled) goStep(2); }
+nameInput.addEventListener('keydown', function(e){
+  if (e.key==='Enter'){ e.preventDefault(); if(!document.getElementById('nameBtn').disabled) submitName(); }
 });
 
-function pick(btn, group) {
-  btn.closest('.choice-grid').querySelectorAll('.choice-btn').forEach(b=>b.classList.remove('selected'));
-  btn.classList.add('selected');
-  if (group==='style')  { userStyle=btn.dataset.v;  document.getElementById('n2').disabled=false; }
-  if (group==='budget') { userBudget=btn.dataset.v; document.getElementById('n3').disabled=false; }
+function submitName() {
+  profile.name = nameInput.value.trim();
+  beginSession();
 }
 
-// ── SAVE PROFILE + START ──
-function saveAndStartChat() {
-  userName = document.getElementById('nameInput').value.trim();
-  localStorage.setItem('tf_name',   userName);
-  localStorage.setItem('tf_style',  userStyle);
-  localStorage.setItem('tf_budget', userBudget);
-  beginSession(false);
-}
-
-// ── SESSION INIT ──
-function beginSession(isReturn) {
+// ── SESSION ──
+function beginSession() {
   sessionId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2,8);
+  flowStep  = 0;
   goTo('chat');
 
-  // Send profile context as first user message (invisible handshake for admin)
-  const meta = `[PROFIL] Nom: ${userName} | Style: ${userStyle} | Budget: ${userBudget}`;
-  sb.from('messages').insert({
-    session_id: sessionId, sender: 'user',
-    message: meta, message_type: 'meta'
-  });
+  // Send silent meta to admin immediately
+  pushMeta();
 
-  setTimeout(()=>{
-    showTyping();
+  const saved = loadProfile();
+  if (saved && saved.name === profile.name) {
+    // Returning user — profile already complete
+    Object.assign(profile, saved);
+    profileComplete = true;
     setTimeout(()=>{
-      removeTyping();
-      const txt = isReturn
-        ? COPY[lang].returning(userName)
-        : COPY[lang].welcome(userName, userStyle, userBudget);
-      addAdminBubble(txt);
-      setTimeout(()=>showQR(COPY[lang].qr), 320);
-    }, 1400);
-  }, 500);
+      showTyping();
+      setTimeout(()=>{
+        removeTyping();
+        addAdminBubble(COPY[lang].returning(profile));
+        showQR(COPY[lang].ret_qr());
+      }, 1400);
+    }, 500);
+  } else {
+    // New user — start profiling flow
+    profileComplete = false;
+    askNext();
+  }
 
-  // Realtime
+  // Realtime: admin replies
   sb.channel('chat-'+sessionId)
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'}, payload=>{
       const m = payload.new;
@@ -669,6 +516,39 @@ function beginSession(isReturn) {
       }
     })
     .subscribe();
+}
+
+// ── FLOW ──
+function askNext() {
+  const steps = FLOW[lang];
+  if (flowStep >= steps.length) return;
+  const step = steps[flowStep];
+  setTimeout(()=>{
+    showTyping();
+    setTimeout(()=>{
+      removeTyping();
+      addAdminBubble(step.q(profile));
+      if (step.qr) showQR(step.qr());
+    }, step.delay);
+  }, flowStep === 0 ? 600 : 300);
+}
+
+function handleFlowAnswer(text) {
+  const steps = FLOW[lang];
+  if (flowStep >= steps.length) return; // profile done, admin handles it
+  const step = steps[flowStep];
+
+  if (step.key !== '__done__') {
+    profile[step.key] = text;
+  }
+
+  flowStep++;
+
+  if (flowStep < steps.length) {
+    askNext();
+  } else {
+    // Shouldn't happen — __done__ is the last step
+  }
 }
 
 // ── SEND ──
@@ -687,38 +567,64 @@ async function sendMsg(text) {
   chatInput.value=''; chatInput.style.height='auto';
   removeQR();
   addUserBubble(t);
+
+  // Save to supabase
   await sb.from('messages').insert({
     session_id:sessionId, sender:'user',
     message:t, message_type:'text'
   });
-  setTimeout(()=>showTyping(), 250);
+
+  if (!profileComplete) {
+    const steps = FLOW[lang];
+    const currentStep = steps[flowStep - 1] ?? steps[flowStep];
+
+    // If we just answered the last real question (__done__ step fires)
+    if (flowStep < steps.length) {
+      handleFlowAnswer(t);
+      // Check if we've now reached __done__
+      if (FLOW[lang][flowStep] && FLOW[lang][flowStep].key === '__done__') {
+        // Save profile before firing __done__
+        saveProfile();
+        pushMeta();
+        profileComplete = true;
+        // Let askNext fire the done message
+        askNext();
+        flowStep++; // move past __done__
+      }
+    } else if (!profileComplete) {
+      // user typed after __done__ showed — treat as live chat
+      profileComplete = true;
+      setTimeout(()=>showTyping(), 300);
+    }
+  } else {
+    // Profile complete — typing indicator, admin will reply
+    setTimeout(()=>showTyping(), 300);
+  }
 }
 
 // ── BUBBLES ──
 function addUserBubble(text) {
   const m = document.getElementById('messages');
   const row = document.createElement('div');
-  row.className = 'mrow user';
-  row.innerHTML = `<div class="bubble user">${esc(text)}</div><div class="bmeta">${now()}</div>`;
+  row.className='mrow user';
+  row.innerHTML=`<div class="bubble user">${esc(text)}</div><div class="bmeta">${now()}</div>`;
   m.appendChild(row); scrollM();
 }
 
 function addAdminBubble(text) {
   const m = document.getElementById('messages');
   const row = document.createElement('div');
-  row.className = 'mrow admin';
-  const html = esc(text)
-    .replace(/\n/g,'<br>')
-    .replace(/\*(.*?)\*/g,'<strong>$1</strong>');
-  row.innerHTML = `<div class="bubble admin">${html}</div><div class="bmeta">Styliste &middot; ${now()}</div>`;
+  row.className='mrow admin';
+  const html = esc(text).replace(/\n/g,'<br>').replace(/\*(.*?)\*/g,'<strong>$1</strong>');
+  row.innerHTML=`<div class="bubble admin">${html}</div><div class="bmeta">Styliste &middot; ${now()}</div>`;
   m.appendChild(row); scrollM();
 }
 
 function addAdminImg(url) {
   const m = document.getElementById('messages');
   const row = document.createElement('div');
-  row.className = 'mrow admin';
-  row.innerHTML = `<div class="bubble admin"><img src="${url}" alt="Suggestion" onclick="openLb('${url}')"></div><div class="bmeta">Styliste &middot; ${now()}</div>`;
+  row.className='mrow admin';
+  row.innerHTML=`<div class="bubble admin"><img src="${url}" alt="Suggestion" onclick="openLb('${url}')"></div><div class="bmeta">Styliste &middot; ${now()}</div>`;
   m.appendChild(row); scrollM();
 }
 
@@ -746,30 +652,43 @@ function showQR(list) {
 }
 function removeQR() { const e=document.getElementById('qrRow'); if(e) e.remove(); }
 
+// ── META MESSAGE (silent handshake for admin) ──
+async function pushMeta() {
+  const meta = `[PROFIL] Nom: ${profile.name} | Âge: ${profile.age||'—'} | Style: ${profile.style||'—'} | Couleurs: ${profile.colors||'—'} | Taille: ${profile.height||'—'} | Morpho: ${profile.bodyType||'—'} | Ville: ${profile.town||'—'}`;
+  await sb.from('messages').insert({
+    session_id:sessionId, sender:'user',
+    message:meta, message_type:'meta'
+  });
+}
+
+// ── PROFILE PERSISTENCE ──
+function saveProfile() { localStorage.setItem('tf_profile', JSON.stringify(profile)); }
+function loadProfile() {
+  try { return JSON.parse(localStorage.getItem('tf_profile')); } catch { return null; }
+}
+
+// ── HELPERS ──
 function scrollM() { const m=document.getElementById('messages'); m.scrollTop=m.scrollHeight; }
 function now()     { return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
 function esc(s)    { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-// ── LIGHTBOX ──
 function openLb(src){ document.getElementById('lbImg').src=src; document.getElementById('lightbox').classList.add('open'); }
 function closeLb()  { document.getElementById('lightbox').classList.remove('open'); }
 
-// ══════════════════════════════════
-//  INIT — check localStorage
-// ══════════════════════════════════
-(function init() {
-  const savedName   = localStorage.getItem('tf_name');
-  const savedStyle  = localStorage.getItem('tf_style');
-  const savedBudget = localStorage.getItem('tf_budget');
+// ── LIGHTBOX ──
+document.getElementById('lightbox').addEventListener('click', closeLb);
 
-  if (savedName && savedStyle && savedBudget) {
-    // Returning user — skip onboarding entirely
-    userName   = savedName;
-    userStyle  = savedStyle;
-    userBudget = savedBudget;
-    beginSession(true);
+// ── INIT ──
+(function init() {
+  const saved = loadProfile();
+  if (saved && saved.name) {
+    // Skip splash — go straight to name screen pre-filled
+    // Actually skip name screen too — go direct to chat
+    Object.assign(profile, saved);
+    goTo('namescreen');
+    // Pre-fill name and auto-submit
+    document.getElementById('nameInput').value = saved.name;
+    document.getElementById('nameBtn').disabled = false;
   }
-  // else: show splash as normal, onboarding will run
 })();
 </script>
 </body>
