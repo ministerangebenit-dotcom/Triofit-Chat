@@ -440,17 +440,9 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ── STATE ──
 let lang = 'fr';
-let sessionId = localStorage.getItem('triofit_session') || null;
+let sessionId = null;
 let userName = '', userStyle = '', userBudget = '';
 let typingRow = null;
-
-// Check if returning user — skip onboarding
-if (sessionId) {
-  const parts = sessionId.split('_');
-  userName = parts[0] || '';
-  userStyle = localStorage.getItem('triofit_style') || 'classique';
-  userBudget = localStorage.getItem('triofit_budget') || '25k-50k';
-}
 
 // ── LANG ──
 const COPY = {
@@ -470,7 +462,6 @@ const COPY = {
     'status':'En ligne · Répond en quelques minutes',
     'ph-chat':'Écrivez un message…',
     welcome:(n,s,b)=>`Bonjour ${n} ! 👋 Je suis votre styliste TRIOFIT. J'ai noté votre style *${s}* avec un budget *${b} FCFA*. Qu'est-ce que vous cherchez aujourd'hui ?`,
-    welcomeBack:(n)=>`Content de vous revoir, ${n} ! 😊 Que cherchez-vous aujourd'hui ?`,
     qr:['👔 Tenue pour le bureau','🎉 Sortie ce weekend','🌍 Look afro-chic','👟 Look casual tendance'],
   },
   en: {
@@ -489,7 +480,6 @@ const COPY = {
     'status':'Online · Replies in minutes',
     'ph-chat':'Type a message…',
     welcome:(n,s,b)=>`Hi ${n}! 👋 I'm your TRIOFIT stylist. I noted your *${s}* style with a *${b} FCFA* budget. What are you looking for today?`,
-    welcomeBack:(n)=>`Welcome back, ${n}! 😊 What are you looking for today?`,
     qr:['👔 Work outfit','🎉 Weekend outing','🌍 Afro-chic look','👟 Casual trendy look'],
   }
 };
@@ -542,6 +532,7 @@ function goTo(id) {
 function goStep(n) {
   document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
   document.getElementById('s'+n).classList.add('active');
+  // scroll to top of onboarding
   const os = document.getElementById('onboarding');
   if (os) os.scrollTop = 0;
 }
@@ -563,49 +554,11 @@ function pick(btn, group) {
   if (group==='budget') { userBudget=btn.dataset.v; document.getElementById('n3').disabled=false; }
 }
 
-// ── SETUP REALTIME ──
-function setupRealtime() {
-  sb.channel('chat-'+sessionId)
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},payload=>{
-      const m = payload.new;
-      if (m.session_id===sessionId && m.sender==='admin') {
-        removeTyping();
-        if (m.message_type==='image') addAdminImg(m.message);
-        else addAdminBubble(m.message);
-      }
-    })
-    .subscribe();
-}
-
-// ── LOAD HISTORY ──
-async function loadHistory() {
-  if (!sessionId) return;
-  const { data } = await sb.from('messages')
-    .select('*')
-    .eq('session_id', sessionId)
-    .order('created_at', { ascending: true })
-    .limit(100);
-  if (data && data.length > 0) {
-    data.forEach(m => {
-      if (m.sender==='user') addUserBubble(m.message);
-      else if (m.message_type==='image') addAdminImg(m.message);
-      else addAdminBubble(m.message);
-    });
-  }
-}
-
 // ── START CHAT ──
 async function startChat() {
   userName  = document.getElementById('nameInput').value.trim();
-  // Save style & budget for return visits
-  localStorage.setItem('triofit_style', userStyle);
-  localStorage.setItem('triofit_budget', userBudget);
-  // Session ID includes user's name
-  sessionId = userName.replace(/\s+/g,'_') + '_' + Date.now();
-  localStorage.setItem('triofit_session', sessionId);
-
+  sessionId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2,6);
   goTo('chat');
-  setupRealtime();
 
   setTimeout(()=>{
     showTyping();
@@ -616,26 +569,18 @@ async function startChat() {
       setTimeout(()=>showQR(COPY[lang].qr), 350);
     }, 1500);
   }, 500);
-}
 
-// ── RETURNING USER: SKIP ONBOARDING ──
-if (sessionId && userName) {
-  // Jump straight to chat
-  setTimeout(() => {
-    goTo('chat');
-    setupRealtime();
-    loadHistory().then(() => {
-      setTimeout(() => {
-        showTyping();
-        setTimeout(() => {
-          removeTyping();
-          const txt = COPY[lang].welcomeBack(userName);
-          addAdminBubble(txt);
-          setTimeout(() => showQR(COPY[lang].qr), 350);
-        }, 1200);
-      }, 400);
-    });
-  }, 200);
+  // Realtime: listen for admin replies
+  sb.channel('chat-'+sessionId)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},payload=>{
+      const m = payload.new;
+      if (m.session_id===sessionId && m.sender==='admin') {
+        removeTyping();
+        if (m.message_type==='image') addAdminImg(m.message);
+        else addAdminBubble(m.message);
+      }
+    })
+    .subscribe();
 }
 
 // ── SEND ──
