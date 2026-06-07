@@ -3,280 +3,366 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>TRIOFIT · Votre Styliste Personnelle</title>
+<title>TRIOFIT · Styliste Personnel</title>
 <style>
 :root {
-  --bg: #080808;
-  --surface: #111;
-  --surface2: #1a1a1a;
-  --surface3: #222;
-  --gold: #c9993a;
-  --gold-light: #e8b84b;
-  --gold-pale: rgba(201,153,58,0.12);
-  --gold-border: rgba(201,153,58,0.25);
-  --text: #f2f2f2;
-  --text-muted: #666;
-  --text-dim: #999;
+  --bg: #070707;
+  --surface: #101010;
+  --surface2: #181818;
+  --surface3: #202020;
+  --gold: #b8893a;
+  --gold-light: #d4a84b;
+  --gold-pale: rgba(184,137,58,0.1);
+  --gold-border: rgba(184,137,58,0.22);
+  --text: #efefef;
+  --text-muted: #555;
+  --text-dim: #888;
+  --radius: 16px;
 }
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-html { height:100%; }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body { height:100%; }
 body {
-  height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
   background: var(--bg);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
 }
 
-/* ── SCREENS ── */
+/* ════════════════════════════
+   SCREENS
+════════════════════════════ */
 .screen {
   position: fixed; inset: 0;
   display: flex; flex-direction: column;
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  transition: opacity 0.45s cubic-bezier(.4,0,.2,1),
+              transform 0.45s cubic-bezier(.4,0,.2,1);
 }
-.screen.hidden  { opacity:0; pointer-events:none; transform:translateY(16px); }
-.screen.out     { opacity:0; pointer-events:none; transform:translateY(-16px); }
+.screen.hidden { opacity:0; pointer-events:none; transform:translateY(14px); }
+.screen.out    { opacity:0; pointer-events:none; transform:translateY(-14px); }
 
-/* ══════════════ SPLASH ══════════════ */
+/* ════════════════════════════
+   LANG TOGGLE
+════════════════════════════ */
+.lang-toggle {
+  position: fixed; top:16px; right:16px; z-index:1000;
+  display: flex;
+  background: rgba(16,16,16,.95);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 20px; padding: 3px; gap: 2px;
+  backdrop-filter: blur(12px);
+}
+.lang-btn {
+  padding: 5px 13px; border-radius: 14px;
+  font-size: 11px; font-weight: 600; letter-spacing:.04em;
+  border: none; background: none;
+  color: var(--text-muted); cursor: pointer; transition: all .2s;
+}
+.lang-btn.on { background: var(--gold); color: #0a0a0a; }
+
+/* ════════════════════════════
+   SPLASH
+════════════════════════════ */
 #splash {
   align-items: center; justify-content: center;
-  padding: 32px 28px; overflow: hidden;
+  padding: 40px 28px; overflow: hidden;
+  background: var(--bg);
 }
 .orb {
-  position:absolute; border-radius:50%; filter:blur(80px); opacity:.15;
-  animation: drift 8s ease-in-out infinite alternate;
+  position: absolute; border-radius: 50%;
+  filter: blur(90px); opacity: .1;
+  animation: drift 10s ease-in-out infinite alternate;
 }
-.orb1{width:380px;height:380px;background:var(--gold);top:-80px;right:-80px;}
-.orb2{width:280px;height:280px;background:#7a5010;bottom:-40px;left:-60px;animation-delay:-3s;}
-.orb3{width:180px;height:180px;background:var(--gold-light);top:45%;left:25%;animation-delay:-5s;}
-@keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(18px,24px) scale(1.1)}}
+.orb1 { width:420px;height:420px;background:var(--gold);top:-100px;right:-100px; }
+.orb2 { width:300px;height:300px;background:#6b4a18;bottom:-60px;left:-80px;animation-delay:-4s; }
+.orb3 { width:200px;height:200px;background:var(--gold-light);top:50%;left:20%;animation-delay:-7s; }
+@keyframes drift { from{transform:translate(0,0) scale(1)} to{transform:translate(16px,22px) scale(1.08)} }
 
-.splash-inner{position:relative;z-index:1;width:100%;max-width:360px;margin:auto;text-align:center;display:flex;flex-direction:column;align-items:center;gap:0;}
+.splash-inner {
+  position: relative; z-index:1;
+  width:100%; max-width:340px; margin:auto;
+  text-align: center; display:flex; flex-direction:column; align-items:center;
+}
 
-.logo-mark{width:68px;height:68px;border-radius:18px;background:linear-gradient(135deg,#e8b84b,#8b6418);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;box-shadow:0 0 40px rgba(201,153,58,.35),0 8px 32px rgba(0,0,0,.5);}
-.logo-mark span{font-size:24px;font-weight:900;color:#fff;letter-spacing:-1px;}
-.logo-name{font-size:26px;font-weight:800;letter-spacing:.14em;}
-.logo-sub{font-size:11px;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;margin-top:5px;font-weight:500;}
-.splash-headline{margin:28px 0 30px;}
-.splash-headline h1{font-size:clamp(24px,7vw,36px);font-weight:700;line-height:1.2;}
-.splash-headline h1 em{font-style:normal;background:linear-gradient(90deg,var(--gold-light),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.splash-headline p{margin-top:12px;font-size:14px;color:var(--text-dim);line-height:1.6;max-width:300px;margin-left:auto;margin-right:auto;}
-.btn-primary{width:100%;max-width:320px;padding:15px;background:linear-gradient(135deg,var(--gold-light),var(--gold));border:none;border-radius:50px;color:#0a0a0a;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 4px 24px rgba(201,153,58,.35);transition:all .2s;}
-.btn-primary:active{transform:scale(.97);opacity:.9;}
-.trust{display:flex;align-items:center;gap:10px;margin-top:20px;font-size:11px;color:var(--text-muted);}
-.trust-sep{width:1px;height:11px;background:var(--surface3);}
+.logo-lockup { margin-bottom: 36px; }
+.logo-mark {
+  width: 64px; height: 64px; border-radius: 16px;
+  background: linear-gradient(145deg, var(--gold-light), #7a5418);
+  display: flex; align-items:center; justify-content:center;
+  margin: 0 auto 16px;
+  box-shadow: 0 0 48px rgba(184,137,58,.25), 0 8px 28px rgba(0,0,0,.6);
+}
+.logo-mark span {
+  font-size: 22px; font-weight: 900; color: #fff;
+  letter-spacing: -1px;
+}
+.logo-wordmark { font-size: 22px; font-weight: 800; letter-spacing: .18em; color: var(--text); }
+.logo-descriptor {
+  font-size: 10px; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--gold); margin-top: 6px; font-weight: 500;
+}
 
-/* ══════════════ ONBOARDING ══════════════ */
+.splash-headline { margin-bottom: 32px; }
+.splash-headline h1 {
+  font-size: clamp(22px, 6.5vw, 34px);
+  font-weight: 700; line-height: 1.2; color: var(--text);
+}
+.splash-headline h1 em {
+  font-style: normal;
+  background: linear-gradient(90deg, var(--gold-light), var(--gold));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.splash-headline p {
+  margin-top: 14px; font-size: 14px;
+  color: var(--text-dim); line-height: 1.65;
+  max-width: 280px; margin-left:auto; margin-right:auto;
+}
+
+.btn-primary {
+  width: 100%; padding: 15px 24px;
+  background: linear-gradient(135deg, var(--gold-light), var(--gold));
+  border: none; border-radius: 50px;
+  color: #080808; font-size: 14px; font-weight: 700;
+  letter-spacing: .04em; cursor: pointer;
+  box-shadow: 0 4px 28px rgba(184,137,58,.3);
+  transition: all .2s;
+}
+.btn-primary:active { transform: scale(.97); opacity:.9; }
+
+.splash-trust {
+  display: flex; align-items: center; gap: 10px;
+  margin-top: 22px; font-size: 11px; color: var(--text-muted);
+  letter-spacing: .02em;
+}
+.sep { width:1px; height:11px; background: var(--surface3); }
+
+/* ════════════════════════════
+   ONBOARDING
+════════════════════════════ */
 #onboarding {
   background: var(--bg);
-  justify-content: flex-start;
-  align-items: stretch;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
-.onboard-scroll {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 24px 32px;
-  min-height: 100%;
+.ob-scroll {
+  min-height: 100%; display:flex;
+  flex-direction:column; align-items:center; justify-content:center;
+  padding: 72px 24px 40px;
 }
-.onboard-card {
-  width: 100%; max-width: 400px;
-  display: flex; flex-direction: column; gap: 28px;
-}
-.step { display:none; flex-direction:column; gap:24px; animation:fadeUp .35s ease both; }
+.ob-card { width:100%; max-width:380px; }
+
+.step { display:none; flex-direction:column; gap:26px; animation: fadeUp .35s ease both; }
 .step.active { display:flex; }
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 
-.step-eyebrow { font-size:11px; font-weight:600; letter-spacing:.14em; color:var(--gold); text-transform:uppercase; }
-.step-title { font-size:22px; font-weight:700; line-height:1.25; }
-.step-sub { font-size:13px; color:var(--text-dim); margin-top:4px; line-height:1.55; }
-
-.field-label { font-size:11px; font-weight:600; letter-spacing:.06em; color:var(--text-dim); margin-bottom:6px; display:block; }
-.field-input {
-  width:100%; padding:14px 18px;
-  background:var(--surface2);
-  border:1.5px solid rgba(255,255,255,.07);
-  border-radius:14px; color:var(--text);
-  font-size:15px; font-family:inherit; outline:none;
-  transition:border-color .2s;
-  -webkit-appearance: none;
+.step-label {
+  font-size: 10px; font-weight: 700; letter-spacing:.16em;
+  color: var(--gold); text-transform: uppercase;
 }
-.field-input:focus { border-color:var(--gold-border); }
-.field-input::placeholder { color:var(--text-muted); }
+.step-title { font-size: 21px; font-weight: 700; line-height: 1.25; margin-top: 4px; }
+.step-sub { font-size: 13px; color: var(--text-dim); margin-top: 6px; line-height: 1.6; }
+
+.field-label {
+  display: block; font-size: 10px; font-weight: 700;
+  letter-spacing: .1em; color: var(--text-muted);
+  text-transform: uppercase; margin-bottom: 8px;
+}
+.field-input {
+  width: 100%; padding: 14px 18px;
+  background: var(--surface2);
+  border: 1.5px solid rgba(255,255,255,.06);
+  border-radius: 12px; color: var(--text);
+  font-size: 15px; font-family: inherit; outline: none;
+  transition: border-color .2s; -webkit-appearance: none;
+}
+.field-input:focus { border-color: var(--gold-border); }
+.field-input::placeholder { color: var(--text-muted); }
 
 .choice-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .choice-btn {
-  padding:14px 10px; background:var(--surface2);
-  border:1.5px solid rgba(255,255,255,.06);
-  border-radius:14px; cursor:pointer;
-  text-align:center; transition:all .2s;
-  -webkit-appearance: none;
+  padding: 16px 12px;
+  background: var(--surface2);
+  border: 1.5px solid rgba(255,255,255,.05);
+  border-radius: 12px; cursor: pointer;
+  text-align: left; transition: all .2s;
+  -webkit-appearance: none; display:flex; flex-direction:column; gap:4px;
 }
-.choice-btn:active { transform:scale(.96); }
-.choice-btn.selected { background:var(--gold-pale); border-color:var(--gold); }
-.choice-icon { font-size:22px; display:block; margin-bottom:6px; pointer-events:none; }
-.choice-label { font-size:13px; font-weight:600; color:var(--text); pointer-events:none; }
-.choice-sub { font-size:11px; color:var(--text-muted); margin-top:2px; pointer-events:none; }
+.choice-btn:active { transform: scale(.97); }
+.choice-btn.selected { background: var(--gold-pale); border-color: var(--gold); }
+.choice-name {
+  font-size: 13px; font-weight: 700; color: var(--text);
+  pointer-events: none;
+}
+.choice-desc {
+  font-size: 11px; color: var(--text-muted); line-height:1.4;
+  pointer-events: none;
+}
 
 .nav-row { display:flex; gap:10px; align-items:center; }
 .btn-back {
-  padding:13px 18px; border-radius:50px;
-  background:var(--surface2); border:1px solid rgba(255,255,255,.07);
-  color:var(--text-dim); font-size:14px; cursor:pointer;
-  -webkit-appearance:none; transition:all .2s;
+  padding: 13px 18px; border-radius: 50px;
+  background: var(--surface2);
+  border: 1px solid rgba(255,255,255,.06);
+  color: var(--text-dim); font-size: 13px; cursor: pointer;
+  -webkit-appearance: none; transition: all .2s;
 }
 .btn-next {
-  flex:1; padding:14px;
-  background:linear-gradient(135deg,var(--gold-light),var(--gold));
-  border:none; border-radius:50px;
-  color:#0a0a0a; font-size:15px; font-weight:700;
-  cursor:pointer; transition:all .2s;
-  -webkit-appearance:none;
+  flex:1; padding: 14px;
+  background: linear-gradient(135deg, var(--gold-light), var(--gold));
+  border: none; border-radius: 50px;
+  color: #080808; font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: all .2s; -webkit-appearance: none;
+  letter-spacing: .03em;
 }
-.btn-next:disabled { opacity:.3; cursor:not-allowed; background:var(--surface3); }
-.btn-next:not(:disabled):active { transform:scale(.97); }
+.btn-next:disabled { opacity:.25; cursor:not-allowed; background: var(--surface3); }
+.btn-next:not(:disabled):active { transform: scale(.97); }
 
-.dots { display:flex; gap:6px; justify-content:center; margin-top:4px; }
-.dot { width:6px; height:6px; border-radius:3px; background:var(--surface3); transition:all .3s; }
-.dot.on { background:var(--gold); width:18px; }
-
-/* ══════════════ LANG TOGGLE ══════════════ */
-.lang-toggle {
-  position:fixed; top:14px; right:14px; z-index:999;
-  display:flex; background:rgba(20,20,20,.9);
-  border:1px solid rgba(255,255,255,.07);
-  border-radius:20px; padding:3px; gap:2px;
-  backdrop-filter:blur(10px);
+.progress {
+  display: flex; gap: 5px; justify-content: center; margin-top: 6px;
 }
-.lang-btn {
-  padding:5px 12px; border-radius:16px;
-  font-size:11px; font-weight:600; border:none;
-  background:none; color:var(--text-muted); cursor:pointer;
-  transition:all .2s;
-}
-.lang-btn.on { background:var(--gold); color:#0a0a0a; }
+.prog-dot { width:5px; height:5px; border-radius:3px; background:var(--surface3); transition:all .3s; }
+.prog-dot.on { background:var(--gold); width:16px; }
 
-/* ══════════════ CHAT ══════════════ */
-#chat { background:var(--bg); }
+/* ════════════════════════════
+   CHAT
+════════════════════════════ */
+#chat { background: var(--bg); }
 
 .chat-header {
-  display:flex; align-items:center; gap:12px;
-  padding:12px 16px;
-  padding-top: max(12px, env(safe-area-inset-top));
-  background:var(--surface);
-  border-bottom:1px solid rgba(255,255,255,.05);
-  flex-shrink:0; z-index:10;
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 18px;
+  padding-top: max(13px, env(safe-area-inset-top));
+  background: var(--surface);
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  flex-shrink: 0;
 }
 .chat-avatar {
-  width:38px; height:38px; border-radius:50%;
-  background:linear-gradient(135deg,var(--gold),#7a5520);
-  display:flex; align-items:center; justify-content:center;
-  font-size:16px; flex-shrink:0;
-  box-shadow:0 0 16px rgba(201,153,58,.25);
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(145deg, var(--gold-light), #7a5520);
+  display: flex; align-items:center; justify-content:center;
+  flex-shrink: 0;
+  box-shadow: 0 0 14px rgba(184,137,58,.2);
 }
-.chat-hname { font-size:14px; font-weight:700; }
-.chat-hstatus { display:flex; align-items:center; gap:5px; font-size:11px; color:#4ade80; margin-top:2px; }
-.sdot { width:6px; height:6px; background:#4ade80; border-radius:50%; animation:pulse 2s infinite; }
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.avatar-mark { font-size:13px; font-weight:800; color:#fff; letter-spacing:-.5px; }
+.chat-hname { font-size: 13px; font-weight: 700; letter-spacing:.02em; }
+.chat-hstatus {
+  display: flex; align-items:center; gap:5px;
+  font-size: 11px; color: #4ade80; margin-top: 2px;
+}
+.s-dot { width:5px; height:5px; background:#4ade80; border-radius:50%; animation:pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
 
 .messages {
   flex:1; overflow-y:auto; overflow-x:hidden;
-  padding:16px 14px 8px;
-  display:flex; flex-direction:column; gap:8px;
-  -webkit-overflow-scrolling:touch;
+  padding: 18px 16px 10px;
+  display: flex; flex-direction:column; gap:10px;
+  -webkit-overflow-scrolling: touch;
 }
-.messages::-webkit-scrollbar{display:none;}
+.messages::-webkit-scrollbar { display:none; }
 
 .mrow { display:flex; flex-direction:column; }
-.mrow.user { align-items:flex-end; }
-.mrow.admin { align-items:flex-start; }
+.mrow.user  { align-items: flex-end; }
+.mrow.admin { align-items: flex-start; }
 
 .bubble {
-  max-width:80%; padding:11px 15px;
-  border-radius:18px; font-size:14px; line-height:1.55;
-  word-break:break-word;
-  animation:bIn .3s ease both;
+  max-width: 78%; padding: 11px 15px;
+  border-radius: 16px; font-size: 14px; line-height: 1.58;
+  word-break: break-word;
+  animation: bIn .28s ease both;
 }
-@keyframes bIn{from{opacity:0;transform:scale(.95) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes bIn { from{opacity:0;transform:scale(.96) translateY(5px)} to{opacity:1;transform:scale(1) translateY(0)} }
+
 .bubble.user {
-  background:linear-gradient(135deg,rgba(201,153,58,.18),rgba(201,153,58,.1));
-  border:1px solid rgba(201,153,58,.2);
-  border-bottom-right-radius:4px;
+  background: var(--gold-pale);
+  border: 1px solid var(--gold-border);
+  border-bottom-right-radius: 3px;
 }
 .bubble.admin {
-  background:var(--surface2);
-  border:1px solid rgba(255,255,255,.05);
-  border-bottom-left-radius:4px;
+  background: var(--surface2);
+  border: 1px solid rgba(255,255,255,.04);
+  border-bottom-left-radius: 3px;
 }
-.bubble img { max-width:100%; border-radius:10px; display:block; cursor:pointer; }
-.bmeta { font-size:10px; color:var(--text-muted); margin-top:3px; padding:0 3px; }
+.bubble img { max-width:100%; border-radius:8px; display:block; cursor:pointer; }
+.bmeta { font-size:10px; color:var(--text-muted); margin-top:4px; padding:0 2px; letter-spacing:.02em; }
 
-.typing-wrap { display:inline-flex; }
+/* Typing */
 .typing-bub {
-  background:var(--surface2); border:1px solid rgba(255,255,255,.05);
-  border-radius:18px; border-bottom-left-radius:4px;
-  padding:12px 16px; display:inline-flex; gap:5px; align-items:center;
-  animation:bIn .3s ease both;
+  background: var(--surface2);
+  border: 1px solid rgba(255,255,255,.04);
+  border-radius: 16px; border-bottom-left-radius:3px;
+  padding: 13px 17px;
+  display: inline-flex; gap:5px; align-items:center;
+  animation: bIn .28s ease both;
 }
-.tdot { width:7px; height:7px; background:var(--text-muted); border-radius:50%; animation:tb 1.2s ease infinite; }
-.tdot:nth-child(2){animation-delay:.15s}.tdot:nth-child(3){animation-delay:.3s}
-@keyframes tb{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
+.tdot { width:6px; height:6px; background:var(--text-muted); border-radius:50%; animation:td 1.2s ease infinite; }
+.tdot:nth-child(2){animation-delay:.15s} .tdot:nth-child(3){animation-delay:.3s}
+@keyframes td { 0%,60%,100%{transform:translateY(0);opacity:.35} 30%{transform:translateY(-5px);opacity:1} }
 
-.qr-row { display:flex; flex-wrap:wrap; gap:7px; padding:2px 0; }
+/* Quick replies */
+.qr-row { display:flex; flex-wrap:wrap; gap:7px; padding:2px 0 4px; }
 .qr-btn {
-  padding:8px 14px; background:var(--surface2);
-  border:1px solid var(--gold-border); border-radius:20px;
-  font-size:13px; color:var(--gold); cursor:pointer;
-  transition:all .2s; font-family:inherit;
-  -webkit-appearance:none;
+  padding: 8px 15px;
+  background: var(--surface2);
+  border: 1px solid var(--gold-border);
+  border-radius: 20px; font-size: 12px; font-weight:500;
+  color: var(--gold); cursor: pointer;
+  font-family: inherit; -webkit-appearance:none;
+  letter-spacing: .02em; transition: all .2s;
 }
-.qr-btn:active { transform:scale(.96); background:var(--gold-pale); }
+.qr-btn:active { background: var(--gold-pale); transform:scale(.97); }
 
+/* Input */
 .chat-input-area {
-  padding:10px 12px;
+  padding: 10px 14px;
   padding-bottom: max(10px, env(safe-area-inset-bottom));
-  background:var(--surface);
-  border-top:1px solid rgba(255,255,255,.04);
-  flex-shrink:0;
+  background: var(--surface);
+  border-top: 1px solid rgba(255,255,255,.04);
+  flex-shrink: 0;
 }
 .input-row { display:flex; gap:8px; align-items:flex-end; }
 .chat-ta {
-  flex:1; padding:11px 15px;
-  background:var(--surface2);
-  border:1.5px solid rgba(255,255,255,.07);
-  border-radius:22px; color:var(--text);
-  font-size:14px; font-family:inherit; outline:none;
-  resize:none; max-height:100px; line-height:1.4;
-  transition:border-color .2s; -webkit-appearance:none;
+  flex:1; padding: 11px 16px;
+  background: var(--surface2);
+  border: 1.5px solid rgba(255,255,255,.06);
+  border-radius: 22px; color: var(--text);
+  font-size: 14px; font-family: inherit; outline: none;
+  resize: none; max-height: 100px; line-height: 1.45;
+  transition: border-color .2s; -webkit-appearance:none;
 }
-.chat-ta:focus { border-color:var(--gold-border); }
-.chat-ta::placeholder { color:var(--text-muted); }
+.chat-ta:focus { border-color: var(--gold-border); }
+.chat-ta::placeholder { color: var(--text-muted); }
 .send-btn {
-  width:42px; height:42px; border-radius:50%;
-  background:linear-gradient(135deg,var(--gold-light),var(--gold));
-  border:none; color:#0a0a0a; font-size:17px;
-  display:flex; align-items:center; justify-content:center;
-  cursor:pointer; flex-shrink:0; transition:all .2s;
-  box-shadow:0 2px 12px rgba(201,153,58,.3);
+  width: 40px; height: 40px; border-radius:50%;
+  background: linear-gradient(135deg, var(--gold-light), var(--gold));
+  border: none; color: #080808;
+  display: flex; align-items:center; justify-content:center;
+  cursor: pointer; flex-shrink:0; transition: all .2s;
+  box-shadow: 0 2px 10px rgba(184,137,58,.28);
   -webkit-appearance:none;
 }
-.send-btn:active { transform:scale(.92); }
-.send-btn:disabled { opacity:.3; cursor:not-allowed; box-shadow:none; }
+.send-btn:active { transform:scale(.9); }
+.send-btn svg { width:16px; height:16px; fill:#080808; }
 
-/* lightbox */
-.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;align-items:center;justify-content:center;cursor:pointer;}
-.lightbox.open{display:flex;}
-.lightbox img{max-width:92vw;max-height:88vh;border-radius:12px;}
+/* Divider */
+.date-div {
+  text-align:center; font-size:10px;
+  color: var(--text-muted); letter-spacing:.06em;
+  display:flex; align-items:center; gap:10px;
+  margin: 4px 0;
+}
+.date-div::before, .date-div::after {
+  content:''; flex:1; height:1px;
+  background: rgba(255,255,255,.04);
+}
+
+/* Lightbox */
+.lightbox { display:none; position:fixed; inset:0; background:rgba(0,0,0,.93); z-index:9999; align-items:center; justify-content:center; cursor:pointer; }
+.lightbox.open { display:flex; }
+.lightbox img { max-width:92vw; max-height:88vh; border-radius:10px; }
 </style>
 </head>
 <body>
 
-<!-- LANG -->
 <div class="lang-toggle">
   <button class="lang-btn on" id="btnFR" onclick="setLang('fr')">FR</button>
   <button class="lang-btn"    id="btnEN" onclick="setLang('en')">EN</button>
@@ -288,119 +374,119 @@ body {
   <div class="orb orb2"></div>
   <div class="orb orb3"></div>
   <div class="splash-inner">
-    <div class="logo-mark"><span>TF</span></div>
-    <div class="logo-name">TRIOFIT</div>
-    <div class="logo-sub" id="s-tag">Votre Styliste Personnel</div>
+    <div class="logo-lockup">
+      <div class="logo-mark"><span>TF</span></div>
+      <div class="logo-wordmark">TRIOFIT</div>
+      <div class="logo-descriptor" id="s-tag">Styliste Personnel</div>
+    </div>
     <div class="splash-headline">
       <h1 id="s-h1">Habillez-vous<br>comme vous <em>méritez</em></h1>
-      <p id="s-p">Un styliste IA disponible 24h/24, des tenues pensées pour vous, à Yaoundé.</p>
+      <p id="s-p">Un conseil stylistique sur mesure, disponible à tout moment, pour la clientèle de Yaoundé.</p>
     </div>
-    <button class="btn-primary" id="s-cta" onclick="goTo('onboarding')">Commencer — C'est gratuit</button>
-    <div class="trust">
-      <span id="s-t1">✦ 100% Personnalisé</span>
-      <span class="trust-sep"></span>
-      <span id="s-t2">✦ Réponse en 5 min</span>
-      <span class="trust-sep"></span>
-      <span id="s-t3">✦ Yaoundé</span>
+    <button class="btn-primary" id="s-cta" onclick="goTo('onboarding')">Commencer</button>
+    <div class="splash-trust">
+      <span id="s-t1">Conseil personnalisé</span>
+      <span class="sep"></span>
+      <span id="s-t2">Réponse rapide</span>
+      <span class="sep"></span>
+      <span id="s-t3">Yaoundé</span>
     </div>
   </div>
 </div>
 
 <!-- ══ ONBOARDING ══ -->
 <div class="screen hidden" id="onboarding">
-  <div class="onboard-scroll">
-    <div class="onboard-card">
+  <div class="ob-scroll">
+    <div class="ob-card">
 
-      <!-- Step 1 -->
       <div class="step active" id="s1">
         <div>
-          <div class="step-eyebrow" id="ob-eye1">Étape 1 sur 3</div>
+          <div class="step-label" id="ob-eye1">Étape 1 sur 3</div>
           <div class="step-title" id="ob-t1">Comment vous appelez-vous ?</div>
-          <div class="step-sub" id="ob-s1">Votre styliste vous appellera par votre prénom.</div>
+          <div class="step-sub"  id="ob-s1">Votre styliste vous appellera par votre prénom.</div>
         </div>
         <div>
-          <label class="field-label" id="ob-l1">PRÉNOM</label>
-          <input class="field-input" id="nameInput" type="text" placeholder="Ex: Kouamé, Ange, Brice…" autocomplete="given-name" autocorrect="off">
+          <label class="field-label" id="ob-l1">Prénom</label>
+          <input class="field-input" id="nameInput" type="text"
+            placeholder="Votre prénom" autocomplete="given-name" autocorrect="off" autocapitalize="words">
         </div>
         <div>
-          <button class="btn-next" id="n1" disabled onclick="goStep(2)" id="ob-n1">Continuer →</button>
-          <div class="dots" style="margin-top:14px;"><div class="dot on"></div><div class="dot"></div><div class="dot"></div></div>
+          <button class="btn-next" id="n1" disabled onclick="goStep(2)">
+            <span id="ob-n1">Continuer</span>
+          </button>
+          <div class="progress" style="margin-top:14px;">
+            <div class="prog-dot on"></div><div class="prog-dot"></div><div class="prog-dot"></div>
+          </div>
         </div>
       </div>
 
-      <!-- Step 2 -->
       <div class="step" id="s2">
         <div>
-          <div class="step-eyebrow" id="ob-eye2">Étape 2 sur 3</div>
+          <div class="step-label" id="ob-eye2">Étape 2 sur 3</div>
           <div class="step-title" id="ob-t2">Quel est votre style ?</div>
-          <div class="step-sub" id="ob-s2">Choisissez ce qui vous ressemble le plus.</div>
+          <div class="step-sub"  id="ob-s2">Sélectionnez le style qui vous correspond le mieux.</div>
         </div>
         <div class="choice-grid">
-          <button class="choice-btn" onclick="pick(this,'style')" data-v="classique">
-            <span class="choice-icon">👔</span>
-            <div class="choice-label" id="c-cl">Classique</div>
-            <div class="choice-sub" id="c-cls">Élégant & sobre</div>
+          <button class="choice-btn" onclick="pick(this,'style')" data-v="Classique">
+            <div class="choice-name" id="c-cl">Classique</div>
+            <div class="choice-desc" id="c-cls">Élégant, sobre, intemporel</div>
           </button>
-          <button class="choice-btn" onclick="pick(this,'style')" data-v="streetwear">
-            <span class="choice-icon">🧢</span>
-            <div class="choice-label">Streetwear</div>
-            <div class="choice-sub" id="c-sws">Urban & tendance</div>
+          <button class="choice-btn" onclick="pick(this,'style')" data-v="Streetwear">
+            <div class="choice-name">Streetwear</div>
+            <div class="choice-desc" id="c-sws">Urbain, moderne, affirmé</div>
           </button>
-          <button class="choice-btn" onclick="pick(this,'style')" data-v="afro">
-            <span class="choice-icon">🌍</span>
-            <div class="choice-label">Afro-chic</div>
-            <div class="choice-sub" id="c-acs">Tissus & modernité</div>
+          <button class="choice-btn" onclick="pick(this,'style')" data-v="Afro-chic">
+            <div class="choice-name">Afro-chic</div>
+            <div class="choice-desc" id="c-acs">Tissus, couleur, identité</div>
           </button>
-          <button class="choice-btn" onclick="pick(this,'style')" data-v="casual">
-            <span class="choice-icon">👕</span>
-            <div class="choice-label" id="c-ca">Décontracté</div>
-            <div class="choice-sub" id="c-cas">Simple & confortable</div>
+          <button class="choice-btn" onclick="pick(this,'style')" data-v="Casual">
+            <div class="choice-name" id="c-ca">Décontracté</div>
+            <div class="choice-desc" id="c-cas">Simple, confortable, net</div>
           </button>
         </div>
         <div>
           <div class="nav-row">
-            <button class="btn-back" onclick="goStep(1)">←</button>
-            <button class="btn-next" id="n2" disabled onclick="goStep(3)">Continuer →</button>
+            <button class="btn-back" onclick="goStep(1)">&#8592;</button>
+            <button class="btn-next" id="n2" disabled onclick="goStep(3)"><span id="ob-n2">Continuer</span></button>
           </div>
-          <div class="dots" style="margin-top:14px;"><div class="dot"></div><div class="dot on"></div><div class="dot"></div></div>
+          <div class="progress" style="margin-top:14px;">
+            <div class="prog-dot"></div><div class="prog-dot on"></div><div class="prog-dot"></div>
+          </div>
         </div>
       </div>
 
-      <!-- Step 3 -->
       <div class="step" id="s3">
         <div>
-          <div class="step-eyebrow" id="ob-eye3">Étape 3 sur 3</div>
-          <div class="step-title" id="ob-t3">Votre budget habituel ?</div>
-          <div class="step-sub" id="ob-s3">Pour une tenue complète. On s'adapte.</div>
+          <div class="step-label" id="ob-eye3">Étape 3 sur 3</div>
+          <div class="step-title" id="ob-t3">Votre budget pour une tenue ?</div>
+          <div class="step-sub"  id="ob-s3">Nous adaptons nos recommandations à votre budget.</div>
         </div>
         <div class="choice-grid">
-          <button class="choice-btn" onclick="pick(this,'budget')" data-v="10k-25k">
-            <span class="choice-icon">💰</span>
-            <div class="choice-label">10k – 25k</div>
-            <div class="choice-sub">FCFA</div>
+          <button class="choice-btn" onclick="pick(this,'budget')" data-v="10 000 – 25 000 FCFA">
+            <div class="choice-name">10k – 25k</div>
+            <div class="choice-desc">FCFA</div>
           </button>
-          <button class="choice-btn" onclick="pick(this,'budget')" data-v="25k-50k">
-            <span class="choice-icon">💎</span>
-            <div class="choice-label">25k – 50k</div>
-            <div class="choice-sub">FCFA</div>
+          <button class="choice-btn" onclick="pick(this,'budget')" data-v="25 000 – 50 000 FCFA">
+            <div class="choice-name">25k – 50k</div>
+            <div class="choice-desc">FCFA</div>
           </button>
-          <button class="choice-btn" onclick="pick(this,'budget')" data-v="50k-100k">
-            <span class="choice-icon">✨</span>
-            <div class="choice-label">50k – 100k</div>
-            <div class="choice-sub">FCFA</div>
+          <button class="choice-btn" onclick="pick(this,'budget')" data-v="50 000 – 100 000 FCFA">
+            <div class="choice-name">50k – 100k</div>
+            <div class="choice-desc">FCFA</div>
           </button>
-          <button class="choice-btn" onclick="pick(this,'budget')" data-v="100k+">
-            <span class="choice-icon">👑</span>
-            <div class="choice-label">100k+</div>
-            <div class="choice-sub">FCFA</div>
+          <button class="choice-btn" onclick="pick(this,'budget')" data-v="100 000 FCFA et plus">
+            <div class="choice-name">100k +</div>
+            <div class="choice-desc">FCFA</div>
           </button>
         </div>
         <div>
           <div class="nav-row">
-            <button class="btn-back" onclick="goStep(2)">←</button>
-            <button class="btn-next" id="n3" disabled onclick="startChat()">Découvrir mon styliste ✦</button>
+            <button class="btn-back" onclick="goStep(2)">&#8592;</button>
+            <button class="btn-next" id="n3" disabled onclick="saveAndStartChat()"><span id="ob-n3">Accéder au styliste</span></button>
           </div>
-          <div class="dots" style="margin-top:14px;"><div class="dot"></div><div class="dot"></div><div class="dot on"></div></div>
+          <div class="progress" style="margin-top:14px;">
+            <div class="prog-dot"></div><div class="prog-dot"></div><div class="prog-dot on"></div>
+          </div>
         </div>
       </div>
 
@@ -411,76 +497,76 @@ body {
 <!-- ══ CHAT ══ -->
 <div class="screen hidden" id="chat">
   <div class="chat-header">
-    <div class="chat-avatar">✦</div>
+    <div class="chat-avatar"><span class="avatar-mark">TF</span></div>
     <div>
-      <div class="chat-hname">TRIOFIT Stylist</div>
-      <div class="chat-hstatus"><div class="sdot"></div><span id="ch-status">En ligne · Répond en quelques minutes</span></div>
+      <div class="chat-hname">TRIOFIT Styliste</div>
+      <div class="chat-hstatus">
+        <div class="s-dot"></div>
+        <span id="ch-status">En ligne</span>
+      </div>
     </div>
   </div>
   <div class="messages" id="messages"></div>
   <div class="chat-input-area">
     <div class="input-row">
       <textarea class="chat-ta" id="chatInput" rows="1" placeholder="Écrivez un message…"></textarea>
-      <button class="send-btn" onclick="sendMsg()">➤</button>
+      <button class="send-btn" onclick="sendMsg()">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
     </div>
   </div>
 </div>
 
-<!-- LIGHTBOX -->
 <div class="lightbox" id="lightbox" onclick="closeLb()">
   <img id="lbImg" src="" alt="">
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// ── CONFIG ──
 const SUPABASE_URL = 'https://ahckbchulymvbhrpynyy.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFoY2tiY2h1bHltdmJocnB5bnl5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4MTI5MTQsImV4cCI6MjA5NjM4ODkxNH0.aBq-qHBBTrzWf_OHpkYmQLLPeS1iywBbX47tLRqRQ1k';
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ── STATE ──
 let lang = 'fr';
 let sessionId = null;
 let userName = '', userStyle = '', userBudget = '';
 let typingRow = null;
 
-// ── LANG ──
+// ── COPY ──
 const COPY = {
   fr: {
-    'splash-tag':'Votre Styliste Personnel',
-    'splash-h1':'Habillez-vous<br>comme vous <em>méritez</em>',
-    'splash-p':'Un styliste IA disponible 24h/24, des tenues pensées pour vous, à Yaoundé.',
-    'splash-cta':'Commencer — C\'est gratuit',
-    't1':'✦ 100% Personnalisé','t2':'✦ Réponse en 5 min','t3':'✦ Yaoundé',
+    'splash-tag'  : 'Styliste Personnel',
+    'splash-h1'   : 'Habillez-vous<br>comme vous <em>méritez</em>',
+    'splash-p'    : 'Un conseil stylistique sur mesure, disponible à tout moment, pour la clientèle de Yaoundé.',
+    'splash-cta'  : 'Commencer',
+    't1':'Conseil personnalisé','t2':'Réponse rapide','t3':'Yaoundé',
     'eye1':'Étape 1 sur 3','t-t1':'Comment vous appelez-vous ?','sub1':'Votre styliste vous appellera par votre prénom.',
-    'l1':'PRÉNOM','ph1':'Ex: Kouamé, Ange, Brice…','n1':'Continuer →',
-    'eye2':'Étape 2 sur 3','t-t2':'Quel est votre style ?','sub2':'Choisissez ce qui vous ressemble le plus.',
-    'n2':'Continuer →',
-    'eye3':'Étape 3 sur 3','t-t3':'Votre budget habituel ?','sub3':'Pour une tenue complète. On s\'adapte.',
-    'n3':'Découvrir mon styliste ✦',
-    'cl':'Classique','cls':'Élégant & sobre','sws':'Urban & tendance','acs':'Tissus & modernité','ca':'Décontracté','cas':'Simple & confortable',
-    'status':'En ligne · Répond en quelques minutes',
+    'l1':'Prénom','ph1':'Votre prénom','n1':'Continuer',
+    'eye2':'Étape 2 sur 3','t-t2':'Quel est votre style ?','sub2':'Sélectionnez le style qui vous correspond le mieux.','n2':'Continuer',
+    'eye3':'Étape 3 sur 3','t-t3':'Votre budget pour une tenue ?','sub3':'Nous adaptons nos recommandations à votre budget.','n3':'Accéder au styliste',
+    'cl':'Classique','cls':'Élégant, sobre, intemporel','sws':'Urbain, moderne, affirmé','acs':'Tissus, couleur, identité','ca':'Décontracté','cas':'Simple, confortable, net',
+    'status':'En ligne',
     'ph-chat':'Écrivez un message…',
-    welcome:(n,s,b)=>`Bonjour ${n} ! 👋 Je suis votre styliste TRIOFIT. J'ai noté votre style *${s}* avec un budget *${b} FCFA*. Qu'est-ce que vous cherchez aujourd'hui ?`,
-    qr:['👔 Tenue pour le bureau','🎉 Sortie ce weekend','🌍 Look afro-chic','👟 Look casual tendance'],
+    welcome: (n,s,b) => `Bonjour ${n}. Je suis votre styliste TRIOFIT.\n\nJ'ai enregistré votre profil : style *${s}*, budget *${b}*. Comment puis-je vous aider aujourd'hui ?`,
+    returning: (n) => `Bienvenue de retour, ${n}. Comment puis-je vous assister aujourd'hui ?`,
+    qr: ['Une tenue professionnelle','Une tenue pour sortir','Un look afro-chic','Une tenue décontractée'],
   },
   en: {
-    'splash-tag':'Your Personal Stylist',
-    'splash-h1':'Dress the way<br>you <em>deserve</em>',
-    'splash-p':'An AI stylist available 24/7, outfits curated just for you in Yaoundé.',
-    'splash-cta':'Get Started — It\'s free',
-    't1':'✦ 100% Personalized','t2':'✦ Reply in 5 min','t3':'✦ Yaoundé',
-    'eye1':'Step 1 of 3','t-t1':'What\'s your name?','sub1':'Your stylist will call you by your first name.',
-    'l1':'FIRST NAME','ph1':'E.g. Kofi, Ange, Brice…','n1':'Continue →',
-    'eye2':'Step 2 of 3','t-t2':'What\'s your style?','sub2':'Pick what fits you most.',
-    'n2':'Continue →',
-    'eye3':'Step 3 of 3','t-t3':'Your usual budget?','sub3':'For a full outfit. We adapt.',
-    'n3':'Meet my stylist ✦',
-    'cl':'Classic','cls':'Elegant & minimal','sws':'Urban & trendy','acs':'Fabric & modernity','ca':'Casual','cas':'Simple & comfy',
-    'status':'Online · Replies in minutes',
+    'splash-tag'  : 'Personal Stylist',
+    'splash-h1'   : 'Dress the way<br>you <em>deserve</em>',
+    'splash-p'    : 'Bespoke style advice, available at any time, for Yaoundé clientele.',
+    'splash-cta'  : 'Get Started',
+    't1':'Personalised advice','t2':'Fast reply','t3':'Yaoundé',
+    'eye1':'Step 1 of 3','t-t1':'What is your name?','sub1':'Your stylist will address you by your first name.',
+    'l1':'First name','ph1':'Your first name','n1':'Continue',
+    'eye2':'Step 2 of 3','t-t2':'What is your style?','sub2':'Select the style that fits you best.','n2':'Continue',
+    'eye3':'Step 3 of 3','t-t3':'Your budget per outfit?','sub3':'We tailor our recommendations to your budget.','n3':'Meet my stylist',
+    'cl':'Classic','cls':'Elegant, refined, timeless','sws':'Urban, bold, current','acs':'Fabric, colour, identity','ca':'Casual','cas':'Clean, simple, relaxed',
+    'status':'Online',
     'ph-chat':'Type a message…',
-    welcome:(n,s,b)=>`Hi ${n}! 👋 I'm your TRIOFIT stylist. I noted your *${s}* style with a *${b} FCFA* budget. What are you looking for today?`,
-    qr:['👔 Work outfit','🎉 Weekend outing','🌍 Afro-chic look','👟 Casual trendy look'],
+    welcome: (n,s,b) => `Good day, ${n}. I am your TRIOFIT stylist.\n\nI have your profile on file: *${s}* style, budget *${b}*. How may I assist you today?`,
+    returning: (n) => `Welcome back, ${n}. How may I assist you today?`,
+    qr: ['A professional outfit','An outfit for a night out','An afro-chic look','A casual look'],
   }
 };
 
@@ -489,90 +575,92 @@ function setLang(l) {
   const c = COPY[l];
   document.getElementById('btnFR').classList.toggle('on', l==='fr');
   document.getElementById('btnEN').classList.toggle('on', l==='en');
-  document.getElementById('s-tag').innerHTML = c['splash-tag'];
-  document.getElementById('s-h1').innerHTML  = c['splash-h1'];
-  document.getElementById('s-p').textContent = c['splash-p'];
-  document.getElementById('s-cta').textContent = c['splash-cta'];
-  document.getElementById('s-t1').textContent = c['t1'];
-  document.getElementById('s-t2').textContent = c['t2'];
-  document.getElementById('s-t3').textContent = c['t3'];
-  document.getElementById('ob-eye1').textContent = c['eye1'];
-  document.getElementById('ob-t1').textContent   = c['t-t1'];
-  document.getElementById('ob-s1').textContent   = c['sub1'];
-  document.getElementById('ob-l1').textContent   = c['l1'];
-  document.getElementById('nameInput').placeholder = c['ph1'];
-  document.getElementById('n1').textContent = c['n1'];
-  document.getElementById('ob-eye2').textContent = c['eye2'];
-  document.getElementById('ob-t2').textContent   = c['t-t2'];
-  document.getElementById('ob-s2').textContent   = c['sub2'];
-  document.getElementById('n2').textContent = c['n2'];
-  document.getElementById('ob-eye3').textContent = c['eye3'];
-  document.getElementById('ob-t3').textContent   = c['t-t3'];
-  document.getElementById('ob-s3').textContent   = c['sub3'];
-  document.getElementById('n3').textContent = c['n3'];
-  document.getElementById('c-cl').textContent  = c['cl'];
-  document.getElementById('c-cls').textContent = c['cls'];
-  document.getElementById('c-sws').textContent = c['sws'];
-  document.getElementById('c-acs').textContent = c['acs'];
-  document.getElementById('c-ca').textContent  = c['ca'];
-  document.getElementById('c-cas').textContent = c['cas'];
-  document.getElementById('ch-status').textContent = c['status'];
-  document.getElementById('chatInput').placeholder  = c['ph-chat'];
+  const map = {
+    's-tag':c['splash-tag'],'s-h1':c['splash-h1'],'s-p':c['splash-p'],
+    's-cta':c['splash-cta'],'s-t1':c['t1'],'s-t2':c['t2'],'s-t3':c['t3'],
+    'ob-eye1':c['eye1'],'ob-t1':c['t-t1'],'ob-s1':c['sub1'],'ob-l1':c['l1'],
+    'ob-n1':c['n1'],
+    'ob-eye2':c['eye2'],'ob-t2':c['t-t2'],'ob-s2':c['sub2'],'ob-n2':c['n2'],
+    'ob-eye3':c['eye3'],'ob-t3':c['t-t3'],'ob-s3':c['sub3'],'ob-n3':c['n3'],
+    'c-cl':c['cl'],'c-cls':c['cls'],'c-sws':c['sws'],
+    'c-acs':c['acs'],'c-ca':c['ca'],'c-cas':c['cas'],
+    'ch-status':c['status'],
+  };
+  for (const [id, val] of Object.entries(map)) {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = val;
+  }
+  const ni = document.getElementById('nameInput');
+  const ci = document.getElementById('chatInput');
+  if (ni) ni.placeholder = c['ph1'];
+  if (ci) ci.placeholder = c['ph-chat'];
 }
 
 // ── SCREENS ──
 function goTo(id) {
   document.querySelectorAll('.screen').forEach(s => {
     if (s.id === id) { s.classList.remove('hidden','out'); }
-    else { s.classList.add('out'); setTimeout(()=>s.classList.add('hidden'),450); }
+    else { s.classList.add('out'); setTimeout(()=>s.classList.add('hidden'), 450); }
   });
 }
 
-// ── ONBOARDING STEPS ──
+// ── ONBOARDING ──
 function goStep(n) {
   document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
   document.getElementById('s'+n).classList.add('active');
-  // scroll to top of onboarding
-  const os = document.getElementById('onboarding');
-  if (os) os.scrollTop = 0;
+  document.getElementById('onboarding').scrollTop = 0;
 }
 
-// Name input
 document.getElementById('nameInput').addEventListener('input', function(){
   document.getElementById('n1').disabled = this.value.trim().length < 2;
 });
 document.getElementById('nameInput').addEventListener('keydown', function(e){
-  if (e.key==='Enter') { e.preventDefault(); if(!document.getElementById('n1').disabled) goStep(2); }
+  if (e.key==='Enter'){ e.preventDefault(); if(!document.getElementById('n1').disabled) goStep(2); }
 });
 
-// Choice selection
 function pick(btn, group) {
-  const grid = btn.closest('.choice-grid');
-  grid.querySelectorAll('.choice-btn').forEach(b=>b.classList.remove('selected'));
+  btn.closest('.choice-grid').querySelectorAll('.choice-btn').forEach(b=>b.classList.remove('selected'));
   btn.classList.add('selected');
   if (group==='style')  { userStyle=btn.dataset.v;  document.getElementById('n2').disabled=false; }
   if (group==='budget') { userBudget=btn.dataset.v; document.getElementById('n3').disabled=false; }
 }
 
-// ── START CHAT ──
-async function startChat() {
-  userName  = document.getElementById('nameInput').value.trim();
-  sessionId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2,6);
+// ── SAVE PROFILE + START ──
+function saveAndStartChat() {
+  userName = document.getElementById('nameInput').value.trim();
+  localStorage.setItem('tf_name',   userName);
+  localStorage.setItem('tf_style',  userStyle);
+  localStorage.setItem('tf_budget', userBudget);
+  beginSession(false);
+}
+
+// ── SESSION INIT ──
+function beginSession(isReturn) {
+  sessionId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2,8);
   goTo('chat');
+
+  // Send profile context as first user message (invisible handshake for admin)
+  const meta = `[PROFIL] Nom: ${userName} | Style: ${userStyle} | Budget: ${userBudget}`;
+  sb.from('messages').insert({
+    session_id: sessionId, sender: 'user',
+    message: meta, message_type: 'meta'
+  });
 
   setTimeout(()=>{
     showTyping();
     setTimeout(()=>{
       removeTyping();
-      const txt = COPY[lang].welcome(userName, userStyle, userBudget);
+      const txt = isReturn
+        ? COPY[lang].returning(userName)
+        : COPY[lang].welcome(userName, userStyle, userBudget);
       addAdminBubble(txt);
-      setTimeout(()=>showQR(COPY[lang].qr), 350);
-    }, 1500);
+      setTimeout(()=>showQR(COPY[lang].qr), 320);
+    }, 1400);
   }, 500);
 
-  // Realtime: listen for admin replies
+  // Realtime
   sb.channel('chat-'+sessionId)
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},payload=>{
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'}, payload=>{
       const m = payload.new;
       if (m.session_id===sessionId && m.sender==='admin') {
         removeTyping();
@@ -594,8 +682,8 @@ chatInput.addEventListener('keydown', function(e){
 });
 
 async function sendMsg(text) {
-  const t = text||chatInput.value.trim();
-  if (!t||!sessionId) return;
+  const t = text || chatInput.value.trim();
+  if (!t || !sessionId) return;
   chatInput.value=''; chatInput.style.height='auto';
   removeQR();
   addUserBubble(t);
@@ -603,7 +691,7 @@ async function sendMsg(text) {
     session_id:sessionId, sender:'user',
     message:t, message_type:'text'
   });
-  setTimeout(()=>showTyping(), 300);
+  setTimeout(()=>showTyping(), 250);
 }
 
 // ── BUBBLES ──
@@ -611,8 +699,7 @@ function addUserBubble(text) {
   const m = document.getElementById('messages');
   const row = document.createElement('div');
   row.className = 'mrow user';
-  const t = now();
-  row.innerHTML = `<div class="bubble user">${esc(text)}</div><div class="bmeta">${t}</div>`;
+  row.innerHTML = `<div class="bubble user">${esc(text)}</div><div class="bmeta">${now()}</div>`;
   m.appendChild(row); scrollM();
 }
 
@@ -620,9 +707,10 @@ function addAdminBubble(text) {
   const m = document.getElementById('messages');
   const row = document.createElement('div');
   row.className = 'mrow admin';
-  const t = now();
-  const html = esc(text).replace(/\*(.*?)\*/g,'<strong>$1</strong>');
-  row.innerHTML = `<div class="bubble admin">${html}</div><div class="bmeta">Styliste · ${t}</div>`;
+  const html = esc(text)
+    .replace(/\n/g,'<br>')
+    .replace(/\*(.*?)\*/g,'<strong>$1</strong>');
+  row.innerHTML = `<div class="bubble admin">${html}</div><div class="bmeta">Styliste &middot; ${now()}</div>`;
   m.appendChild(row); scrollM();
 }
 
@@ -630,8 +718,7 @@ function addAdminImg(url) {
   const m = document.getElementById('messages');
   const row = document.createElement('div');
   row.className = 'mrow admin';
-  const t = now();
-  row.innerHTML = `<div class="bubble admin"><img src="${url}" alt="" onclick="openLb('${url}')"></div><div class="bmeta">Styliste · ${t}</div>`;
+  row.innerHTML = `<div class="bubble admin"><img src="${url}" alt="Suggestion" onclick="openLb('${url}')"></div><div class="bmeta">Styliste &middot; ${now()}</div>`;
   m.appendChild(row); scrollM();
 }
 
@@ -640,7 +727,7 @@ function showTyping() {
   const m = document.getElementById('messages');
   const row = document.createElement('div');
   row.className='mrow admin'; row.id='typingRow';
-  row.innerHTML='<div class="typing-wrap"><div class="typing-bub"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div></div>';
+  row.innerHTML='<div class="typing-bub"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>';
   m.appendChild(row); typingRow=row; scrollM();
 }
 function removeTyping() { if(typingRow){typingRow.remove();typingRow=null;} }
@@ -660,12 +747,30 @@ function showQR(list) {
 function removeQR() { const e=document.getElementById('qrRow'); if(e) e.remove(); }
 
 function scrollM() { const m=document.getElementById('messages'); m.scrollTop=m.scrollHeight; }
-function now() { return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
-function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function now()     { return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
+function esc(s)    { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 // ── LIGHTBOX ──
 function openLb(src){ document.getElementById('lbImg').src=src; document.getElementById('lightbox').classList.add('open'); }
-function closeLb(){ document.getElementById('lightbox').classList.remove('open'); }
+function closeLb()  { document.getElementById('lightbox').classList.remove('open'); }
+
+// ══════════════════════════════════
+//  INIT — check localStorage
+// ══════════════════════════════════
+(function init() {
+  const savedName   = localStorage.getItem('tf_name');
+  const savedStyle  = localStorage.getItem('tf_style');
+  const savedBudget = localStorage.getItem('tf_budget');
+
+  if (savedName && savedStyle && savedBudget) {
+    // Returning user — skip onboarding entirely
+    userName   = savedName;
+    userStyle  = savedStyle;
+    userBudget = savedBudget;
+    beginSession(true);
+  }
+  // else: show splash as normal, onboarding will run
+})();
 </script>
 </body>
 </html>
