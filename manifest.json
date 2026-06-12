@@ -1,8 +1,11 @@
 {
   "name": "TRIOFIT Stylist",
   "short_name": "TRIOFIT",
+  "description": "AI Personal Stylist — decide what to wear",
   "start_url": ".",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#080808",
   "theme_color": "#080808",
   "icons": [
