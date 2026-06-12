@@ -324,10 +324,21 @@ body {
 .lightbox img { max-width:90vw; max-height:90vh; border-radius:10px; }
 
 /* ── MOBILE ── */
-@media(max-width:640px){
-  .sidebar { display:none; }
-  .sidebar.open { display:flex; position:fixed; inset:0; z-index:200; width:100%; }
-  .mob-menu { display:flex !important; }
+/* Hide sidebar by default on screens smaller than 1024px */
+@media (max-width: 1024px) {
+  .sidebar {
+    display: none;
+  }
+  .sidebar.mobile-open {
+    display: flex;
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    width: 100%;
+  }
+  .mobile-menu-btn {
+    display: flex;
+  }
 }
 .mob-menu { display:none; width:36px; height:36px; border-radius:8px; background:var(--s2); border:1px solid var(--border); cursor:pointer; align-items:center; justify-content:center; }
 .mob-menu svg { width:16px; height:16px; fill:var(--text-2); }
