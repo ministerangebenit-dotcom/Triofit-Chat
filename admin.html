@@ -1,11 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>TRIOFIT · Admin</title>
+
+  <!-- PWA Meta Tags -->
   <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>TRIOFIT · Admin</title>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="TRIOFIT Admin">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' style='stop-color:%23e8b84b'/><stop offset='100%25' style='stop-color:%238b6418'/></linearGradient></defs><rect width='512' height='512' rx='128' fill='url(%23g)'/><text x='256' y='340' font-size='300' font-weight='bold' font-family='sans-serif' fill='%23080808' text-anchor='middle'>T</text></svg>">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#080808">
+
 <style>
 :root {
   --bg:       #080808;
@@ -326,7 +333,19 @@ body {
 .lightbox img { max-width:90vw; max-height:90vh; border-radius:10px; }
 
 /* ── MOBILE ── */
-/* Hide sidebar by default on screens smaller than 1024px */
+.mob-menu { 
+  display:none; 
+  width:36px; height:36px; 
+  border-radius:8px; 
+  background:var(--s2); 
+  border:1px solid var(--border); 
+  cursor:pointer; 
+  align-items:center; 
+  justify-content:center; 
+}
+.mob-menu svg { width:16px; height:16px; fill:var(--text-2); }
+
+/* Hide sidebar by default on screens smaller than 1024px, show hamburger */
 @media (max-width: 1024px) {
   .sidebar {
     display: none;
@@ -338,12 +357,10 @@ body {
     z-index: 100;
     width: 100%;
   }
-  .mobile-menu-btn {
+  .mob-menu {
     display: flex;
   }
 }
-.mob-menu { display:none; width:36px; height:36px; border-radius:8px; background:var(--s2); border:1px solid var(--border); cursor:pointer; align-items:center; justify-content:center; }
-.mob-menu svg { width:16px; height:16px; fill:var(--text-2); }
 </style>
 </head>
 <body>
@@ -477,7 +494,6 @@ function clearImg() {
 
 // ── PARSE META ──
 function parseMeta(text) {
-  // e.g. [PROFIL] Nom: Ange | Âge: 25–34 | Style: Classique | ...
   const fields = {};
   if (!text || !text.startsWith('[PROFIL]')) return null;
   const body = text.replace('[PROFIL]', '').trim();
@@ -508,9 +524,7 @@ async function loadSessions() {
     return;
   }
 
-  // Build sessions map — extract meta where available
   const map = new Map();
-  // Process oldest-first so meta (first message) is captured
   const sorted = [...data].reverse();
   sorted.forEach(r => {
     if (!map.has(r.session_id)) {
@@ -534,7 +548,7 @@ async function loadSessions() {
     }
   });
 
-  allSessions = Array.from(map.values()).reverse(); // newest first
+  allSessions = Array.from(map.values()).reverse();
   renderSessions(allSessions);
 }
 
@@ -583,7 +597,6 @@ async function openSession(sessionId) {
   if (s) s.hasUnread = false;
   renderSessions(allSessions);
 
-  // Header
   const name = s ? sessionDisplayName(s.id, s.meta) : sessionId;
   const initials = name.slice(0,2).toUpperCase();
   document.getElementById('headerContent').innerHTML = `
@@ -595,11 +608,9 @@ async function openSession(sessionId) {
       </div>
     </div>`;
 
-  // Profile bar
   if (s && s.meta) renderProfileBar(s.meta);
   else document.getElementById('profileBar').classList.remove('visible');
 
-  // Load messages
   const chatArea = document.getElementById('chatArea');
   chatArea.innerHTML = '<div class="empty-state"><div class="spinner" style="width:18px;height:18px;margin:auto;"></div></div>';
 
@@ -614,7 +625,7 @@ async function openSession(sessionId) {
   else { data.forEach(m => { renderBubble(m); seenIds.add(m.id); }); }
   scrollBottom();
   msgInput.focus();
-  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar').classList.remove('mobile-open');
 }
 
 function renderProfileBar(meta) {
@@ -766,7 +777,6 @@ sb.channel('admin-rt')
       scrollBottom();
       const s = allSessions.find(x => x.id === msg.session_id);
       if (s) { s.hasUnread = false; renderSessions(allSessions); }
-      // Update profile bar if new meta arrived
       if (msg.message_type === 'meta' && s && s.meta) renderProfileBar(s.meta);
     }
   })
@@ -792,7 +802,7 @@ function toast(msg, isErr=false) {
 }
 function openLightbox(src) { document.getElementById('lightboxImg').src=src; document.getElementById('lightbox').classList.add('open'); }
 function closeLightbox()   { document.getElementById('lightbox').classList.remove('open'); }
-function toggleSidebar()   { document.getElementById('sidebar').classList.toggle('open'); }
+function toggleSidebar()   { document.getElementById('sidebar').classList.toggle('mobile-open'); }
 
 loadSessions();
 </script>
