@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>TRIOFIT · Admin</title>
-
   <!-- PWA Meta Tags -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -109,6 +108,7 @@ body {
   cursor:pointer; transition:background .15s;
   display:flex; align-items:center; gap:10px;
   margin-bottom:2px;
+  position: relative;
 }
 .session-item:hover { background:rgba(255,255,255,.03); }
 .session-item.active { background:var(--gold-dim); }
@@ -133,6 +133,32 @@ body {
   width:7px; height:7px; border-radius:50%;
   background:var(--gold);
   box-shadow:0 0 6px rgba(201,153,58,.5);
+}
+
+/* Delete button */
+.delete-session-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(224,82,82,0.15);
+  border: none;
+  color: var(--red);
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.session-item:hover .delete-session-btn {
+  opacity: 1;
+}
+.delete-session-btn:hover {
+  background: rgba(224,82,82,0.3);
 }
 
 .no-sessions { padding:40px 16px; text-align:center; color:var(--text-3); font-size:13px; line-height:1.7; }
@@ -212,7 +238,6 @@ body {
 .brow.admin { align-items:flex-start; }
 .brow.meta  { align-items:stretch; }
 
-/* Meta bar */
 .meta-bar {
   background:var(--s2); border:1px solid var(--border);
   border-radius:10px; padding:10px 14px;
@@ -574,6 +599,7 @@ function renderSessions(list) {
         <span class="s-time">${time}</span>
         ${unread ? '<div class="unread-badge"></div>' : ''}
       </div>
+      <button class="delete-session-btn" title="Delete conversation" onclick="event.stopPropagation(); deleteSession('${s.id}')">🗑</button>
     </div>`;
   }).join('');
 }
@@ -585,6 +611,45 @@ function filterSessions(q) {
     const name = sessionDisplayName(s.id, s.meta).toLowerCase();
     return name.includes(low) || s.id.includes(low);
   }));
+}
+
+// ── DELETE SESSION ──
+async function deleteSession(sessionId) {
+  if (!confirm('Delete this entire conversation? All messages will be permanently removed.')) return;
+
+  const { error } = await sb
+    .from('messages')
+    .delete()
+    .eq('session_id', sessionId);
+
+  if (error) {
+    toast('Delete failed: ' + error.message, true);
+    return;
+  }
+
+  // Remove from local list
+  allSessions = allSessions.filter(s => s.id !== sessionId);
+  
+  // If the deleted session was active, clear the chat area
+  if (activeSession === sessionId) {
+    activeSession = null;
+    document.getElementById('inputWrapper').style.display = 'none';
+    document.getElementById('headerActions').style.display = 'none';
+    document.getElementById('headerContent').innerHTML = '<span class="h-empty">Select a conversation to begin</span>';
+    document.getElementById('profileBar').classList.remove('visible');
+    document.getElementById('chatArea').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+        </div>
+        <div class="empty-text">No conversation selected</div>
+      </div>`;
+  }
+
+  renderSessions(allSessions);
+  toast('Conversation deleted');
 }
 
 // ── OPEN ──
