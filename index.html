@@ -137,3 +137,509 @@ body {
 }
 .chat-avatar {
   width:36px; height:36px; border-radius:50%;
+  background:linear-gradient(145deg,var(--gold-light),#7a5520);
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; box-shadow:0 0 14px rgba(184,137,58,.2);
+}
+.avatar-mark { font-size:12px; font-weight:800; color:#fff; letter-spacing:-.5px; }
+.chat-hname  { font-size:13px; font-weight:700; letter-spacing:.02em; }
+.chat-hstatus{ display:flex; align-items:center; gap:5px; font-size:11px; color:#4ade80; margin-top:2px; }
+.s-dot { width:5px; height:5px; background:#4ade80; border-radius:50%; animation:pulse 2s infinite; }
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+.messages {
+  flex:1; overflow-y:auto; overflow-x:hidden;
+  padding:18px 16px 10px;
+  display:flex; flex-direction:column; gap:10px;
+  -webkit-overflow-scrolling:touch;
+}
+.messages::-webkit-scrollbar{display:none;}
+
+.mrow { display:flex; flex-direction:column; }
+.mrow.user  { align-items:flex-end; }
+.mrow.admin { align-items:flex-start; }
+
+.bubble {
+  max-width:78%; padding:11px 15px;
+  border-radius:16px; font-size:14px; line-height:1.58;
+  word-break:break-word; animation:bIn .28s ease both;
+}
+@keyframes bIn{from{opacity:0;transform:scale(.96) translateY(5px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.bubble.user {
+  background:var(--gold-pale); border:1px solid var(--gold-border);
+  border-bottom-right-radius:3px;
+}
+.bubble.admin {
+  background:var(--surface2); border:1px solid rgba(255,255,255,.04);
+  border-bottom-left-radius:3px;
+}
+.bubble img { max-width:100%; border-radius:8px; display:block; cursor:pointer; }
+.bmeta { font-size:10px; color:var(--text-muted); margin-top:4px; padding:0 2px; letter-spacing:.02em; }
+
+.typing-bub {
+  background:var(--surface2); border:1px solid rgba(255,255,255,.04);
+  border-radius:16px; border-bottom-left-radius:3px;
+  padding:13px 17px; display:inline-flex; gap:5px; align-items:center;
+  animation:bIn .28s ease both;
+}
+.tdot { width:6px; height:6px; background:var(--text-muted); border-radius:50%; animation:td 1.2s ease infinite; }
+.tdot:nth-child(2){animation-delay:.15s}.tdot:nth-child(3){animation-delay:.3s}
+@keyframes td{0%,60%,100%{transform:translateY(0);opacity:.35}30%{transform:translateY(-5px);opacity:1}}
+
+.qr-row { display:flex; flex-wrap:wrap; gap:7px; padding:2px 0 4px; }
+.qr-btn {
+  padding:8px 15px; background:var(--surface2);
+  border:1px solid var(--gold-border); border-radius:20px;
+  font-size:12px; font-weight:500; color:var(--gold);
+  cursor:pointer; font-family:inherit; -webkit-appearance:none;
+  letter-spacing:.02em; transition:all .2s;
+}
+.qr-btn:active { background:var(--gold-pale); transform:scale(.97); }
+
+.chat-input-area {
+  padding:10px 14px;
+  padding-bottom:max(10px, env(safe-area-inset-bottom));
+  background:var(--surface);
+  border-top:1px solid rgba(255,255,255,.04);
+  flex-shrink:0;
+}
+.input-row { display:flex; gap:8px; align-items:flex-end; }
+.chat-ta {
+  flex:1; padding:11px 16px;
+  background:var(--surface2);
+  border:1.5px solid rgba(255,255,255,.06);
+  border-radius:22px; color:var(--text);
+  font-size:14px; font-family:inherit; outline:none;
+  resize:none; max-height:100px; line-height:1.45;
+  transition:border-color .2s; -webkit-appearance:none;
+}
+.chat-ta:focus { border-color:var(--gold-border); }
+.chat-ta::placeholder { color:var(--text-muted); }
+.send-btn {
+  width:40px; height:40px; border-radius:50%;
+  background:linear-gradient(135deg,var(--gold-light),var(--gold));
+  border:none; color:#080808;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; flex-shrink:0; transition:all .2s;
+  box-shadow:0 2px 10px rgba(184,137,58,.28); -webkit-appearance:none;
+}
+.send-btn:active{transform:scale(.9);}
+.send-btn svg{width:16px;height:16px;fill:#080808;}
+
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:9999;align-items:center;justify-content:center;cursor:pointer;}
+.lightbox.open{display:flex;}
+.lightbox img{max-width:92vw;max-height:88vh;border-radius:10px;}
+</style>
+</head>
+<body>
+
+<div class="lang-toggle">
+  <button class="lang-btn on" id="btnFR" onclick="setLang('fr')">FR</button>
+  <button class="lang-btn"    id="btnEN" onclick="setLang('en')">EN</button>
+</div>
+
+<!-- ══ SPLASH ══ -->
+<div class="screen" id="splash">
+  <div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+  <div class="splash-inner">
+    <div class="logo-mark"><span>TF</span></div>
+    <div class="logo-wordmark">TRIOFIT</div>
+    <div class="logo-descriptor" id="s-tag">Styliste Personnel</div>
+    <div class="splash-headline">
+      <h1 id="s-h1">Habillez-vous<br>comme vous <em>méritez</em></h1>
+      <p id="s-p">Un conseil stylistique sur mesure, disponible à tout moment, pour la clientèle de Yaoundé.</p>
+    </div>
+    <button class="btn-primary" id="s-cta" onclick="goTo('namescreen')">Commencer</button>
+    <div class="splash-trust">
+      <span id="s-t1">Conseil personnalisé</span><span class="sep"></span>
+      <span id="s-t2">Réponse rapide</span><span class="sep"></span>
+      <span id="s-t3">Yaoundé</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ NAME SCREEN ══ -->
+<div class="screen hidden" id="namescreen">
+  <div class="orb orb1"></div><div class="orb orb2"></div>
+  <div class="namescreen-inner">
+    <div>
+      <div class="ns-label" id="ns-label">Bienvenue</div>
+      <div class="ns-title" id="ns-title">Comment vous appelez-vous ?</div>
+      <div class="ns-sub"   id="ns-sub">Votre styliste personnel vous attend.</div>
+    </div>
+    <div>
+      <input class="field-input" id="nameInput" type="text"
+        placeholder="Votre prénom" autocomplete="given-name"
+        autocorrect="off" autocapitalize="words">
+    </div>
+    <button class="btn-primary" id="nameBtn" disabled onclick="submitName()">
+      <span id="nameBtn-label">Continuer</span>
+    </button>
+  </div>
+</div>
+
+<!-- ══ CHAT ══ -->
+<div class="screen hidden" id="chat">
+  <div class="chat-header">
+    <div class="chat-avatar"><span class="avatar-mark">TF</span></div>
+    <div>
+      <div class="chat-hname">TRIOFIT Styliste</div>
+      <div class="chat-hstatus"><div class="s-dot"></div><span id="ch-status">En ligne</span></div>
+    </div>
+  </div>
+  <div class="messages" id="messages"></div>
+  <div class="chat-input-area">
+    <div class="input-row">
+      <textarea class="chat-ta" id="chatInput" rows="1" placeholder="Écrivez un message…"></textarea>
+      <button class="send-btn" onclick="sendMsg()">
+        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox" onclick="closeLb()">
+  <img id="lbImg" src="" alt="">
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://ahckbchulymvbhrpynyy.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFoY2tiY2h1bHltdmJocnB5bnl5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4MTI5MTQsImV4cCI6MjA5NjM4ODkxNH0.aBq-qHBBTrzWf_OHpkYmQLLPeS1iywBbX47tLRqRQ1k';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ── STATE ──
+let lang = 'fr';
+let sessionId = null;
+let typingRow = null;
+let profileComplete = false;
+
+const profile = {
+  name:'', gender:'', age:'', style:'', colors:'',
+  height:'', bodyType:'', town:''
+};
+
+// ── PROFILING FLOW ──
+// Each step: key to save, question fn, optional quick replies fn, delay
+const FLOW = {
+  fr: [
+    {
+      key: 'gender',
+      q: (p) => `Merci ${p.name}. Pour affiner mes recommandations, comment vous identifiez-vous ?`,
+      qr: () => ['Masculin','Féminin','Je préfère ne pas le dire'],
+      delay: 1200,
+    },
+    {
+      key: 'age',
+      q: (p) => `Bonjour ${p.name}. Je suis votre styliste TRIOFIT.\n\nPour vous proposer des tenues vraiment adaptées, j'ai besoin de vous connaître un peu mieux.\n\nQuel est votre âge ?`,
+      qr: () => ['18 – 24 ans','25 – 34 ans','35 – 44 ans','45 ans et plus'],
+      delay: 1600,
+    },
+    {
+      key: 'style',
+      q: (p) => `Merci. Quel style vous correspond le mieux au quotidien ?`,
+      qr: () => ['Classique & élégant','Streetwear & urbain','Afro-chic','Décontracté & casual','Mixte selon les occasions'],
+      delay: 1200,
+    },
+    {
+      key: 'colors',
+      q: (p) => `Très bien. Quelles couleurs portez-vous habituellement ou souhaitez-vous explorer ?`,
+      qr: () => ['Tons neutres (noir, blanc, gris)','Tons chauds (beige, marron, camel)','Couleurs vives','Tons foncés','Pas de préférence'],
+      delay: 1200,
+    },
+    {
+      key: 'height',
+      q: (p) => `Quelle est votre taille approximative ? Cela m'aide à orienter les coupes et proportions.`,
+      qr: () => ['Moins de 165 cm','165 – 170 cm','171 – 175 cm','176 – 180 cm','Plus de 180 cm'],
+      delay: 1200,
+    },
+    {
+      key: 'bodyType',
+      q: (p) => `Et votre morphologie ? Ne vous inquiétez pas, c'est strictement pour affiner mes recommandations.`,
+      qr: () => ['Mince / Élancé','Athlétique / Musclé','Corpulent / Fort','Intermédiaire'],
+      delay: 1300,
+    },
+    {
+      key: 'town',
+      q: (p) => `Dans quelle ville ou quel quartier êtes-vous basé ? Cela me permet de vous orienter vers des boutiques accessibles.`,
+      qr: () => ['Yaoundé Centre','Bastos / Omnisports','Ngousso / Mvan','Biyem-Assi / Mimboman','Autre ville'],
+      delay: 1200,
+    },
+    {
+      key: '__done__',
+      q: (p) => `Parfait, ${p.name}. Votre profil est complet.\n\nStyle *${p.style}*, morphologie *${p.bodyType}*, basé à *${p.town}*. Je connais maintenant vos préférences et votre silhouette.\n\nDites-moi : pour quelle occasion cherchez-vous une tenue ?`,
+      qr: () => ['Un entretien professionnel','Une sortie en soirée','Un mariage ou cérémonie','Le quotidien au bureau','Un événement décontracté'],
+      delay: 1500,
+    },
+  ],
+  en: [
+    {
+      key: 'gender',
+      q: (p) => `Thanks ${p.name}. To refine my recommendations, how do you identify?`,
+      qr: () => ['Male','Female','Prefer not to say'],
+      delay: 1200,
+    },
+    {
+      key: 'age',
+      q: (p) => `Good day, ${p.name}. I am your TRIOFIT personal stylist.\n\nTo recommend outfits that truly fit you, I need to learn a bit more about you.\n\nHow old are you?`,
+      qr: () => ['18 – 24','25 – 34','35 – 44','45 and over'],
+      delay: 1600,
+    },
+    {
+      key: 'style',
+      q: (p) => `Thank you. Which style best describes your everyday look?`,
+      qr: () => ['Classic & elegant','Streetwear & urban','Afro-chic','Casual & relaxed','Mixed — depends on the occasion'],
+      delay: 1200,
+    },
+    {
+      key: 'colors',
+      q: (p) => `Noted. Which colours do you usually wear or would like to explore?`,
+      qr: () => ['Neutral tones (black, white, grey)','Warm tones (beige, brown, camel)','Bright colours','Dark tones','No preference'],
+      delay: 1200,
+    },
+    {
+      key: 'height',
+      q: (p) => `What is your approximate height? This helps me recommend the right cuts and proportions.`,
+      qr: () => ['Under 165 cm','165 – 170 cm','171 – 175 cm','176 – 180 cm','Over 180 cm'],
+      delay: 1200,
+    },
+    {
+      key: 'bodyType',
+      q: (p) => `And your body type? This is strictly to refine my recommendations.`,
+      qr: () => ['Slim / Lean','Athletic / Muscular','Large / Full-figured','In between'],
+      delay: 1300,
+    },
+    {
+      key: 'town',
+      q: (p) => `Which city or neighbourhood are you based in? This helps me point you to accessible boutiques.`,
+      qr: () => ['Yaoundé Centre','Bastos / Omnisports','Ngousso / Mvan','Biyem-Assi / Mimboman','Other city'],
+      delay: 1200,
+    },
+    {
+      key: '__done__',
+      q: (p) => `Perfect, ${p.name}. Your profile is complete.\n\n*${p.style}* style, *${p.bodyType}* build, based in *${p.town}*. I now have everything I need.\n\nTell me: what occasion are you dressing for?`,
+      qr: () => ['A professional interview','An evening out','A wedding or ceremony','Everyday office wear','A casual event'],
+      delay: 1500,
+    },
+  ]
+};
+
+let flowStep = 0; // index into FLOW[lang]
+
+// ── COPY ──
+const COPY = {
+  fr: {
+    'splash-tag':'Styliste Personnel',
+    'splash-h1':'Habillez-vous<br>comme vous <em>méritez</em>',
+    'splash-p':'Un conseil stylistique sur mesure, disponible à tout moment, pour la clientèle de Yaoundé.',
+    'splash-cta':'Commencer',
+    't1':'Conseil personnalisé','t2':'Réponse rapide','t3':'Yaoundé',
+    'ns-label':'Bienvenue','ns-title':'Comment vous appelez-vous ?',
+    'ns-sub':'Votre styliste personnel vous attend.',
+    'nameBtn':'Continuer',
+    'status':'En ligne',
+    'ph-chat':'Écrivez votre réponse…',
+    returning: (p) => `Bienvenue de retour, ${p.name}.\n\nPour quelle occasion cherchez-vous une tenue aujourd'hui ?`,
+    ret_qr: () => ['Un entretien professionnel','Une sortie en soirée','Un mariage ou cérémonie','Le quotidien au bureau','Un événement décontracté'],
+  },
+  en: {
+    'splash-tag':'Personal Stylist',
+    'splash-h1':'Dress the way<br>you <em>deserve</em>',
+    'splash-p':'Bespoke style advice, available at any time, for Yaoundé clientele.',
+    'splash-cta':'Get Started',
+    't1':'Personalised advice','t2':'Fast reply','t3':'Yaoundé',
+    'ns-label':'Welcome','ns-title':'What is your name?',
+    'ns-sub':'Your personal stylist is ready for you.',
+    'nameBtn':'Continue',
+    'status':'Online',
+    'ph-chat':'Type your answer…',
+    returning: (p) => `Welcome back, ${p.name}.\n\nWhat occasion are you dressing for today?`,
+    ret_qr: () => ['A professional interview','An evening out','A wedding or ceremony','Everyday office wear','A casual event'],
+  }
+};
+
+function setLang(l) {
+  lang = l;
+  const c = COPY[l];
+  document.getElementById('btnFR').classList.toggle('on', l==='fr');
+  document.getElementById('btnEN').classList.toggle('on', l==='en');
+  const map = {
+    's-tag':c['splash-tag'],'s-h1':c['splash-h1'],'s-p':c['splash-p'],
+    's-cta':c['splash-cta'],'s-t1':c['t1'],'s-t2':c['t2'],'s-t3':c['t3'],
+    'ns-label':c['ns-label'],'ns-title':c['ns-title'],'ns-sub':c['ns-sub'],
+    'nameBtn-label':c['nameBtn'],'ch-status':c['status'],
+  };
+  for (const [id,val] of Object.entries(map)) {
+    const el=document.getElementById(id); if(el) el.innerHTML=val;
+  }
+  const ci=document.getElementById('chatInput');
+  if(ci) ci.placeholder=c['ph-chat'];
+}
+
+// ── SCREENS ──
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(s => {
+    if (s.id===id) { s.classList.remove('hidden','out'); }
+    else { s.classList.add('out'); setTimeout(()=>s.classList.add('hidden'),450); }
+  });
+}
+
+// ── NAME SCREEN ──
+const nameInput = document.getElementById('nameInput');
+nameInput.addEventListener('input', function(){
+  document.getElementById('nameBtn').disabled = this.value.trim().length < 2;
+});
+nameInput.addEventListener('keydown', function(e){
+  if (e.key==='Enter'){ e.preventDefault(); if(!document.getElementById('nameBtn').disabled) submitName(); }
+});
+
+function submitName() {
+  profile.name = nameInput.value.trim();
+  beginSession();
+}
+
+// ── SESSION ──
+function beginSession() {
+  sessionId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2,8);
+  flowStep  = 0;
+  goTo('chat');
+
+  // Send silent meta to admin immediately
+  pushMeta();
+
+  const saved = loadProfile();
+  if (saved && saved.name === profile.name) {
+    // Returning user — profile already complete
+    Object.assign(profile, saved);
+    profileComplete = true;
+    setTimeout(()=>{
+      showTyping();
+      setTimeout(()=>{
+        removeTyping();
+        addAdminBubble(COPY[lang].returning(profile));
+        showQR(COPY[lang].ret_qr());
+      }, 1400);
+    }, 500);
+  } else {
+    // New user — start profiling flow
+    profileComplete = false;
+    askNext();
+  }
+
+  // Realtime: admin replies
+  sb.channel('chat-'+sessionId)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'}, payload=>{
+      const m = payload.new;
+      if (m.session_id===sessionId && m.sender==='admin') {
+        removeTyping();
+        if (m.message_type==='image') addAdminImg(m.message);
+        else addAdminBubble(m.message);
+      }
+    })
+    .subscribe();
+}
+
+// ── FLOW ──
+function askNext() {
+  const steps = FLOW[lang];
+  if (flowStep >= steps.length) return;
+  const step = steps[flowStep];
+  setTimeout(()=>{
+    showTyping();
+    setTimeout(()=>{
+      removeTyping();
+      addAdminBubble(step.q(profile));
+      if (step.qr) showQR(step.qr());
+    }, step.delay);
+  }, flowStep === 0 ? 600 : 300);
+}
+
+function handleFlowAnswer(text) {
+  const steps = FLOW[lang];
+  if (flowStep >= steps.length) return; // profile done, admin handles it
+  const step = steps[flowStep];
+
+  if (step.key !== '__done__') {
+    profile[step.key] = text;
+  }
+
+  flowStep++;
+
+  if (flowStep < steps.length) {
+    askNext();
+  } else {
+    // Shouldn't happen — __done__ is the last step
+  }
+}
+
+// ── SEND ──
+const chatInput = document.getElementById('chatInput');
+chatInput.addEventListener('input', function(){
+  this.style.height='auto';
+  this.style.height=Math.min(this.scrollHeight,100)+'px';
+});
+chatInput.addEventListener('keydown', function(e){
+  if (e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendMsg(); }
+});
+
+async function sendMsg(text) {
+  const t = text || chatInput.value.trim();
+  if (!t || !sessionId) return;
+  chatInput.value=''; chatInput.style.height='auto';
+  removeQR();
+  addUserBubble(t);
+
+  // Save to supabase
+  await sb.from('messages').insert({
+    session_id:sessionId, sender:'user',
+    message:t, message_type:'text'
+  });
+
+  if (!profileComplete) {
+    const steps = FLOW[lang];
+    const currentStep = steps[flowStep - 1] ?? steps[flowStep];
+
+    // If we just answered the last real question (__done__ step fires)
+    if (flowStep < steps.length) {
+      handleFlowAnswer(t);
+      // Check if we've now reached __done__
+      if (FLOW[lang][flowStep] && FLOW[lang][flowStep].key === '__done__') {
+        // Save profile before firing __done__
+        saveProfile();
+        pushMeta();
+        profileComplete = true;
+        // Let askNext fire the done message
+        askNext();
+        flowStep++; // move past __done__
+      }
+    } else if (!profileComplete) {
+      // user typed after __done__ showed — treat as live chat
+      profileComplete = true;
+      setTimeout(()=>showTyping(), 300);
+    }
+  } else {
+    // Profile complete — typing indicator, admin will reply
+    setTimeout(()=>showTyping(), 300);
+  }
+}
+
+// ── BUBBLES ──
+function addUserBubble(text) {
+  const m = document.getElementById('messages');
+  const row = document.createElement('div');
+  row.className='mrow user';
+  row.innerHTML=`<div class="bubble user">${esc(text)}</div><div class="bmeta">${now()}</div>`;
+  m.appendChild(row); scrollM();
+}
+
+function addAdminBubble(text) {
+  const m = document.getElementById('messages');
+  const row = document.createElement('div');
+  row.className='mrow admin';
+  const html = esc(text).replace(/\n/g,'<br>').replace(/\*(.*?)\*/g,'<strong>$1</strong>');
+  row.innerHTML=`<div class="bubble admin">${html}</div><div class="bmeta">Styliste &middot; ${now()}</div>`;
+  m.appendChild(row); scrollM();
+}
+
+function addAdminImg(url) {
+  const m
