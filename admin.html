@@ -4,11 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>TRIOFIT · Admin</title>
-  <!-- PWA Meta Tags -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="TRIOFIT Admin">
-  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' style='stop-color:%23e8b84b'/><stop offset='100%25' style='stop-color:%238b6418'/></linearGradient></defs><rect width='512' height='512' rx='128' fill='url(%23g)'/><text x='256' y='340' font-size='300' font-weight='bold' font-family='sans-serif' fill='%23080808' text-anchor='middle'>T</text></svg>">
+  <link rel="apple-touch-icon" href="logo.jpg">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#080808">
 
@@ -57,12 +56,10 @@ body {
 }
 .brand-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
 .brand { display:flex; align-items:center; gap:10px; }
-.brand-mark {
+.brand-logo {
   width:30px; height:30px; border-radius:7px;
-  background: linear-gradient(135deg, var(--gold-lt), #7a5418);
-  display:flex; align-items:center; justify-content:center;
+  object-fit: cover;
 }
-.brand-mark span { font-size:12px; font-weight:900; color:#fff; letter-spacing:-.5px; }
 .brand-name { font-size:14px; font-weight:700; letter-spacing:.1em; color:var(--text); }
 .brand-role { font-size:10px; color:var(--text-3); letter-spacing:.06em; margin-top:1px; }
 
@@ -75,6 +72,15 @@ body {
 }
 .live-dot { width:5px; height:5px; background:var(--green); border-radius:50%; animation:pulse 2s infinite; }
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* Logo glow animation */
+@keyframes logoGlow {
+  0%, 100% { box-shadow: 0 0 8px rgba(201,153,58,0.3); }
+  50% { box-shadow: 0 0 20px rgba(201,153,58,0.6); }
+}
+.logo-thinking {
+  animation: logoGlow 1.5s ease-in-out infinite;
+}
 
 .search-wrap { position:relative; }
 .search-input {
@@ -118,9 +124,14 @@ body {
   background:var(--s3); border:1px solid rgba(255,255,255,.07);
   display:flex; align-items:center; justify-content:center;
 }
+.s-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
 .s-avatar-initials { font-size:11px; font-weight:700; color:var(--text-2); letter-spacing:.02em; }
-.session-item.active .s-avatar { background:var(--gold-dim); border-color:var(--gold-bd); }
-.session-item.active .s-avatar-initials { color:var(--gold); }
+.session-item.active .s-avatar { border-color:var(--gold-bd); }
 
 .s-info { flex:1; overflow:hidden; }
 .s-name { font-size:13px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -135,38 +146,24 @@ body {
   box-shadow:0 0 6px rgba(201,153,58,.5);
 }
 
-/* Delete button */
 .delete-session-btn {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
+  top: 8px; right: 8px;
+  width: 20px; height: 20px; border-radius: 50%;
   background: rgba(224,82,82,0.15);
-  border: none;
-  color: var(--red);
-  font-size: 12px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.15s;
+  border: none; color: var(--red);
+  font-size: 12px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.15s;
 }
-.session-item:hover .delete-session-btn {
-  opacity: 1;
-}
-.delete-session-btn:hover {
-  background: rgba(224,82,82,0.3);
-}
+.session-item:hover .delete-session-btn { opacity: 1; }
+.delete-session-btn:hover { background: rgba(224,82,82,0.3); }
 
 .no-sessions { padding:40px 16px; text-align:center; color:var(--text-3); font-size:13px; line-height:1.7; }
 
 /* ════════ MAIN ════════ */
 .main { flex:1; display:flex; flex-direction:column; overflow:hidden; background:var(--bg); }
 
-/* ── HEADER ── */
 .chat-header {
   padding:14px 22px;
   background:var(--s1);
@@ -179,6 +176,13 @@ body {
   width:34px; height:34px; border-radius:50%;
   background:var(--s3); border:1px solid rgba(255,255,255,.07);
   display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  overflow: hidden;
+}
+.h-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
 }
 .h-avatar-initials { font-size:11px; font-weight:700; color:var(--text-2); }
 .h-name { font-size:14px; font-weight:600; }
@@ -194,7 +198,6 @@ body {
 }
 .h-action-btn:hover { border-color:var(--gold-bd); color:var(--gold); }
 
-/* PROFILE CARD */
 .profile-bar {
   display:none;
   padding:10px 22px;
@@ -211,7 +214,6 @@ body {
 }
 .profile-tag strong { color:var(--text); font-weight:600; }
 
-/* ── MESSAGES ── */
 .chat-area {
   flex:1; overflow-y:auto;
   padding:22px 22px 12px;
@@ -225,12 +227,13 @@ body {
   align-items:center; justify-content:center; gap:10px;
   color:var(--text-3);
 }
-.empty-mark {
-  width:48px; height:48px; border-radius:12px;
-  background:var(--s2); border:1px solid var(--border);
-  display:flex; align-items:center; justify-content:center;
+.empty-logo {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  object-fit: cover;
+  opacity: 0.5;
 }
-.empty-mark svg { width:20px; height:20px; opacity:.25; }
 .empty-text { font-size:13px; }
 
 .brow { display:flex; flex-direction:column; }
@@ -267,7 +270,6 @@ body {
 .bubble img { max-width:100%; border-radius:8px; display:block; cursor:pointer; margin-top:2px; }
 .bmeta { font-size:10px; color:var(--text-3); margin-top:4px; padding:0 2px; letter-spacing:.02em; }
 
-/* ── INPUT ── */
 .input-wrapper {
   padding:12px 18px;
   padding-bottom:max(12px, env(safe-area-inset-bottom));
@@ -287,74 +289,31 @@ body {
 }
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* Multi-image preview area */
 .multi-preview {
-  display:none;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 8px;
-  max-height: 200px;
-  overflow-y: auto;
+  display:none; flex-direction: column; gap: 8px;
+  margin-bottom: 8px; max-height: 200px; overflow-y: auto;
 }
 .multi-preview.visible { display:flex; }
 .multi-preview-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 8px;
-  background: var(--s2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 8px; background: var(--s2);
+  border: 1px solid var(--border); border-radius: 8px;
 }
 .multi-preview-thumb {
-  width: 48px;
-  height: 48px;
-  border-radius: 6px;
-  object-fit: cover;
-  flex-shrink: 0;
+  width: 48px; height: 48px; border-radius: 6px;
+  object-fit: cover; flex-shrink: 0;
 }
 .multi-preview-caption {
-  flex: 1;
-  background: transparent;
-  border: none;
-  color: var(--text);
-  font-size: 12px;
-  font-family: inherit;
-  outline: none;
-  padding: 4px;
+  flex: 1; background: transparent; border: none;
+  color: var(--text); font-size: 12px;
+  font-family: inherit; outline: none; padding: 4px;
 }
-.multi-preview-caption::placeholder {
-  color: var(--text-3);
-}
+.multi-preview-caption::placeholder { color: var(--text-3); }
 .multi-preview-rm {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: rgba(224,82,82,0.15);
-  border: none;
-  color: var(--red);
-  cursor: pointer;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.img-preview {
-  display:none; align-items:center; gap:10px;
-  padding:8px 12px; border-radius:10px;
-  background:var(--gold-dim); border:1px solid var(--gold-bd);
-  margin-bottom:8px;
-}
-.img-preview.visible { display:flex; }
-.img-preview-thumb { width:44px; height:44px; border-radius:7px; object-fit:cover; }
-.img-preview-name { flex:1; font-size:11px; color:var(--text-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.img-preview-rm {
-  width:22px; height:22px; border-radius:50%;
-  background:rgba(224,82,82,.15); border:none;
-  color:var(--red); cursor:pointer; font-size:13px;
-  display:flex; align-items:center; justify-content:center;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: rgba(224,82,82,0.15); border: none;
+  color: var(--red); cursor: pointer; font-size: 12px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
 
 .input-row { display:flex; gap:8px; align-items:flex-end; }
@@ -368,18 +327,6 @@ body {
 }
 .attach-btn:hover { border-color:var(--gold-bd); color:var(--gold); }
 .attach-btn svg { width:15px; height:15px; }
-
-/* Multi-attach button */
-.multi-attach-btn {
-  width:38px; height:38px; border-radius:9px;
-  background:var(--s2); border:1px solid var(--gold-bd);
-  color:var(--gold); cursor:pointer;
-  display:flex; align-items:center; justify-content:center;
-  flex-shrink:0; transition:all .2s;
-  font-size: 11px;
-  font-weight: 700;
-}
-.multi-attach-btn:hover { background:var(--gold-dim); }
 
 .msg-input {
   flex:1; padding:10px 15px;
@@ -404,7 +351,6 @@ body {
 .send-btn:disabled { opacity:.3; cursor:not-allowed; box-shadow:none; }
 .send-btn svg { width:15px; height:15px; fill:#080808; }
 
-/* ── TOAST ── */
 .toast {
   position:fixed; top:18px; left:50%; transform:translateX(-50%);
   padding:8px 20px; border-radius:20px;
@@ -418,12 +364,10 @@ body {
 @keyframes tIn{from{opacity:0;transform:translateX(-50%) translateY(-8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 @keyframes tOut{from{opacity:1}to{opacity:0;transform:translateX(-50%) translateY(-6px)}}
 
-/* ── LIGHTBOX ── */
 .lightbox { display:none; position:fixed; inset:0; background:rgba(0,0,0,.92); z-index:9999; align-items:center; justify-content:center; cursor:pointer; }
 .lightbox.open { display:flex; }
 .lightbox img { max-width:90vw; max-height:90vh; border-radius:10px; }
 
-/* ── MOBILE ── */
 .mob-menu { 
   display:none; 
   width:36px; height:36px; 
@@ -450,7 +394,7 @@ body {
     <div class="sidebar-top">
       <div class="brand-row">
         <div class="brand">
-          <div class="brand-mark"><span>TF</span></div>
+          <img class="brand-logo" src="logo.jpg" alt="TRIOFIT" id="sidebarLogo">
           <div>
             <div class="brand-name">TRIOFIT</div>
             <div class="brand-role">Admin Panel</div>
@@ -494,11 +438,7 @@ body {
 
     <div class="chat-area" id="chatArea">
       <div class="empty-state">
-        <div class="empty-mark">
-          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-          </svg>
-        </div>
+        <img class="empty-logo" src="logo.jpg" alt="TRIOFIT">
         <div class="empty-text">No conversation selected</div>
       </div>
     </div>
@@ -514,7 +454,7 @@ body {
             <polyline points="21 15 16 10 5 21"/>
           </svg>
         </button>
-        <textarea class="msg-input" id="msgInput" rows="1" placeholder="Type a reply or captions…"></textarea>
+        <textarea class="msg-input" id="msgInput" rows="1" placeholder="Type a reply…"></textarea>
         <button class="send-btn" id="sendBtn" onclick="sendMessage()">
           <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
         </button>
@@ -537,9 +477,8 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let activeSession = null;
 let allSessions   = [];
 let seenIds       = new Set();
-let pendingFiles  = []; // Array of { file, caption }
+let pendingFiles  = [];
 
-// ── INPUT AUTO-RESIZE ──
 const msgInput = document.getElementById('msgInput');
 msgInput.addEventListener('input', () => {
   msgInput.style.height = 'auto';
@@ -549,65 +488,33 @@ msgInput.addEventListener('keydown', e => {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
 });
 
-// ── FILES (MULTI) ──
 function onFilesChange(e) {
   const files = Array.from(e.target.files);
   if (!files.length) return;
-  
-  files.forEach(file => {
-    pendingFiles.push({
-      file: file,
-      caption: ''
-    });
-  });
-  
+  files.forEach(file => { pendingFiles.push({ file: file, caption: '' }); });
   renderMultiPreview();
   e.target.value = '';
 }
 
 function renderMultiPreview() {
   const container = document.getElementById('multiPreview');
-  
-  if (!pendingFiles.length) {
-    container.classList.remove('visible');
-    container.innerHTML = '';
-    return;
-  }
-  
+  if (!pendingFiles.length) { container.classList.remove('visible'); container.innerHTML = ''; return; }
   container.classList.add('visible');
   container.innerHTML = pendingFiles.map((item, index) => {
     const url = URL.createObjectURL(item.file);
     return `
       <div class="multi-preview-item">
         <img class="multi-preview-thumb" src="${url}" alt="${item.file.name}">
-        <input class="multi-preview-caption" 
-               type="text" 
-               placeholder="Caption for ${item.file.name}…" 
-               value="${esc(item.caption)}"
-               oninput="updateCaption(${index}, this.value)">
+        <input class="multi-preview-caption" type="text" placeholder="Caption…" value="${esc(item.caption)}" oninput="updateCaption(${index}, this.value)">
         <button class="multi-preview-rm" onclick="removeFile(${index})">&#x2715;</button>
-      </div>
-    `;
+      </div>`;
   }).join('');
 }
 
-function updateCaption(index, value) {
-  if (pendingFiles[index]) {
-    pendingFiles[index].caption = value;
-  }
-}
+function updateCaption(index, value) { if (pendingFiles[index]) pendingFiles[index].caption = value; }
+function removeFile(index) { pendingFiles.splice(index, 1); renderMultiPreview(); }
+function clearAllFiles() { pendingFiles = []; renderMultiPreview(); }
 
-function removeFile(index) {
-  pendingFiles.splice(index, 1);
-  renderMultiPreview();
-}
-
-function clearAllFiles() {
-  pendingFiles = [];
-  renderMultiPreview();
-}
-
-// ── PARSE META ──
 function parseMeta(text) {
   const fields = {};
   if (!text || !text.startsWith('[PROFIL]')) return null;
@@ -619,50 +526,34 @@ function parseMeta(text) {
   return fields;
 }
 
-// ── SESSION NAME ──
 function sessionDisplayName(sessionId, metaMap) {
   if (metaMap && metaMap['Nom']) return metaMap['Nom'];
   return sessionId.replace('user_','').substring(0,10) + '…';
 }
 
-// ── LOAD ──
 async function loadSessions() {
-  const { data, error } = await sb
-    .from('messages')
+  const { data, error } = await sb.from('messages')
     .select('id, session_id, message, sender, created_at, message_type')
-    .order('created_at', { ascending: false })
-    .limit(600);
-
+    .order('created_at', { ascending: false }).limit(600);
   if (error) { toast('Error: ' + error.message, true); return; }
   if (!data || !data.length) {
     document.getElementById('sessionList').innerHTML = '<div class="no-sessions">No conversations yet</div>';
     return;
   }
-
   const map = new Map();
   const sorted = [...data].reverse();
   sorted.forEach(r => {
     if (!map.has(r.session_id)) {
-      map.set(r.session_id, {
-        id: r.session_id,
-        meta: null,
-        lastMessage: '',
-        lastSender: r.sender,
-        lastTime: r.created_at,
-        hasUnread: false,
-      });
+      map.set(r.session_id, { id: r.session_id, meta: null, lastMessage: '', lastSender: r.sender, lastTime: r.created_at, hasUnread: false });
     }
     const s = map.get(r.session_id);
-    if (r.message_type === 'meta') {
-      s.meta = parseMeta(r.message);
-    } else {
+    if (r.message_type === 'meta') { s.meta = parseMeta(r.message); }
+    else {
       s.lastMessage = r.message_type === 'image' ? 'Image' : (r.message || '').substring(0, 50);
-      s.lastSender  = r.sender;
-      s.lastTime    = r.created_at;
+      s.lastSender  = r.sender; s.lastTime = r.created_at;
       if (r.sender === 'user' && !seenIds.has(r.id)) s.hasUnread = true;
     }
   });
-
   allSessions = Array.from(map.values()).reverse();
   renderSessions(allSessions);
 }
@@ -671,7 +562,6 @@ function renderSessions(list) {
   const el = document.getElementById('sessionList');
   document.getElementById('sessionsCount').textContent = list.length || '—';
   if (!list.length) { el.innerHTML = '<div class="no-sessions">No conversations yet</div>'; return; }
-
   el.innerHTML = list.map(s => {
     const name = sessionDisplayName(s.id, s.meta);
     const initials = name.slice(0,2).toUpperCase();
@@ -681,15 +571,9 @@ function renderSessions(list) {
     const preview = (s.lastSender === 'admin' ? '&#x21A9; ' : '') + esc(s.lastMessage || '…');
     return `<div class="session-item${active}" onclick="openSession('${s.id}')">
       <div class="s-avatar"><span class="s-avatar-initials">${initials}</span></div>
-      <div class="s-info">
-        <div class="s-name">${esc(name)}</div>
-        <div class="s-preview">${preview}</div>
-      </div>
-      <div class="s-meta">
-        <span class="s-time">${time}</span>
-        ${unread ? '<div class="unread-badge"></div>' : ''}
-      </div>
-      <button class="delete-session-btn" title="Delete conversation" onclick="event.stopPropagation(); deleteSession('${s.id}')">🗑</button>
+      <div class="s-info"><div class="s-name">${esc(name)}</div><div class="s-preview">${preview}</div></div>
+      <div class="s-meta"><span class="s-time">${time}</span>${unread ? '<div class="unread-badge"></div>' : ''}</div>
+      <button class="delete-session-btn" title="Delete" onclick="event.stopPropagation(); deleteSession('${s.id}')">🗑</button>
     </div>`;
   }).join('');
 }
@@ -704,21 +588,41 @@ function filterSessions(q) {
 }
 
 async function deleteSession(sessionId) {
-  if (!confirm('Delete this entire conversation? All messages will be permanently removed.')) return;
+  if (!confirm('Delete this entire conversation permanently?')) return;
   const { error } = await sb.from('messages').delete().eq('session_id', sessionId);
-  if (error) { toast('Delete failed: ' + error.message, true); return; }
+  if (error) { toast('Delete failed', true); return; }
   allSessions = allSessions.filter(s => s.id !== sessionId);
   if (activeSession === sessionId) {
     activeSession = null;
     document.getElementById('inputWrapper').style.display = 'none';
     document.getElementById('headerActions').style.display = 'none';
-    document.getElementById('headerContent').innerHTML = '<span class="h-empty">Select a conversation to begin</span>';
+    document.getElementById('headerContent').innerHTML = '<span class="h-empty">Select a conversation</span>';
     document.getElementById('profileBar').classList.remove('visible');
-    document.getElementById('chatArea').innerHTML = `
-      <div class="empty-state">
-        <div class="empty-mark">
-          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-          </svg>
-        </div>
-        <div class="empty-text">No conversation selected
+    document.getElementById('chatArea').innerHTML = '<div class="empty-state"><img class="empty-logo" src="logo.jpg" alt="TRIOFIT"><div class="empty-text">No conversation selected</div></div>';
+  }
+  renderSessions(allSessions);
+  toast('Conversation deleted');
+}
+
+async function openSession(sessionId) {
+  activeSession = sessionId;
+  document.getElementById('inputWrapper').style.display = 'block';
+  document.getElementById('headerActions').style.display = 'flex';
+  const s = allSessions.find(x => x.id === sessionId);
+  if (s) s.hasUnread = false;
+  renderSessions(allSessions);
+  const name = s ? sessionDisplayName(s.id, s.meta) : sessionId;
+  const initials = name.slice(0,2).toUpperCase();
+  document.getElementById('headerContent').innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="h-avatar"><span class="h-avatar-initials">${initials}</span></div>
+      <div><div class="h-name">${esc(name)}</div><div class="h-sub">Active session</div></div>
+    </div>`;
+  if (s && s.meta) renderProfileBar(s.meta);
+  else document.getElementById('profileBar').classList.remove('visible');
+  const chatArea = document.getElementById('chatArea');
+  chatArea.innerHTML = '<div class="empty-state"><div class="spinner" style="width:18px;height:18px;margin:auto;"></div></div>';
+  const { data, error } = await sb.from('messages').select('*').eq('session_id', sessionId).order('created_at', { ascending: true });
+  chatArea.innerHTML = '';
+  if (error || !data) { chatArea.innerHTML = '<div class="empty-state"><div class="empty-text">Failed to load</div></div>'; return; }
+  if (!data.length) { chat
