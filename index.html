@@ -1,645 +1,759 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>TRIOFIT · Styliste Personnel</title>
-
-  <!-- PWA Meta Tags -->
+  <title>TRIOFIT · Admin</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="TRIOFIT">
-  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' style='stop-color:%23e8b84b'/><stop offset='100%25' style='stop-color:%238b6418'/></linearGradient></defs><rect width='512' height='512' rx='128' fill='url(%23g)'/><text x='256' y='340' font-size='300' font-weight='bold' font-family='sans-serif' fill='%23080808' text-anchor='middle'>T</text></svg>">
+  <meta name="apple-mobile-web-app-title" content="TRIOFIT Admin">
+  <link rel="apple-touch-icon" href="logo.jpg">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#080808">
 
 <style>
 :root {
-  --bg: #070707;
-  --surface: #101010;
-  --surface2: #181818;
-  --surface3: #202020;
-  --gold: #b8893a;
-  --gold-light: #d4a84b;
-  --gold-pale: rgba(184,137,58,0.1);
-  --gold-border: rgba(184,137,58,0.22);
-  --text: #efefef;
-  --text-muted: #555;
-  --text-dim: #888;
+  --bg:       #080808;
+  --s1:       #0f0f0f;
+  --s2:       #161616;
+  --s3:       #1e1e1e;
+  --s4:       #272727;
+  --gold:     #c9993a;
+  --gold-lt:  #ddb04e;
+  --gold-dim: rgba(201,153,58,0.12);
+  --gold-bd:  rgba(201,153,58,0.22);
+  --text:     #ececec;
+  --text-2:   #999;
+  --text-3:   #555;
+  --border:   rgba(255,255,255,0.055);
+  --green:    #3ecf6e;
+  --red:      #e05252;
 }
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-html, body { height:100%; }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; overflow:hidden; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
   background: var(--bg); color: var(--text);
   -webkit-font-smoothing: antialiased;
+}
+
+/* ════════ LAYOUT ════════ */
+.app { display:flex; height:100vh; }
+
+/* ════════ SIDEBAR ════════ */
+.sidebar {
+  width: 300px; min-width: 300px;
+  background: var(--s1);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
   overflow: hidden;
 }
 
-/* ── SCREENS ── */
-.screen {
-  position:fixed; inset:0; display:flex; flex-direction:column;
-  transition: opacity .42s cubic-bezier(.4,0,.2,1), transform .42s cubic-bezier(.4,0,.2,1);
+.sidebar-top {
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
 }
-.screen.hidden { opacity:0; pointer-events:none; transform:translateY(14px); }
-.screen.out    { opacity:0; pointer-events:none; transform:translateY(-14px); }
+.brand-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.brand { display:flex; align-items:center; gap:10px; }
+.brand-logo {
+  width:30px; height:30px; border-radius:7px;
+  object-fit: cover;
+}
+.brand-name { font-size:14px; font-weight:700; letter-spacing:.1em; color:var(--text); }
+.brand-role { font-size:10px; color:var(--text-3); letter-spacing:.06em; margin-top:1px; }
 
-/* ── LANG ── */
-.lang-toggle {
-  position:fixed; top:16px; right:16px; z-index:1000;
-  display:flex; background:rgba(14,14,14,.95);
-  border:1px solid rgba(255,255,255,.07);
-  border-radius:20px; padding:3px; gap:2px;
-  backdrop-filter:blur(12px);
+.status-pill {
+  display:inline-flex; align-items:center; gap:5px;
+  padding:4px 10px; border-radius:12px;
+  background: rgba(62,207,110,0.07);
+  border:1px solid rgba(62,207,110,0.18);
+  font-size:10px; font-weight:600; letter-spacing:.04em; color:var(--green);
 }
-.lang-btn {
-  padding:5px 13px; border-radius:14px;
-  font-size:11px; font-weight:600; letter-spacing:.04em;
-  border:none; background:none; color:var(--text-muted); cursor:pointer; transition:all .2s;
-}
-.lang-btn.on { background:var(--gold); color:#0a0a0a; }
-
-/* ── SPLASH ── */
-#splash {
-  align-items:center; justify-content:center;
-  padding:40px 28px; overflow:hidden; background:var(--bg);
-}
-.orb { position:absolute; border-radius:50%; filter:blur(90px); opacity:.1; animation:drift 10s ease-in-out infinite alternate; }
-.orb1{width:420px;height:420px;background:var(--gold);top:-100px;right:-100px;}
-.orb2{width:300px;height:300px;background:#6b4a18;bottom:-60px;left:-80px;animation-delay:-4s;}
-.orb3{width:200px;height:200px;background:var(--gold-light);top:50%;left:20%;animation-delay:-7s;}
-@keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(16px,22px) scale(1.08)}}
-
-.splash-inner {
-  position:relative; z-index:1;
-  width:100%; max-width:340px; margin:auto;
-  text-align:center; display:flex; flex-direction:column; align-items:center;
-}
-.logo-mark {
-  width:64px; height:64px; border-radius:16px;
-  background:linear-gradient(145deg,var(--gold-light),#7a5418);
-  display:flex; align-items:center; justify-content:center;
-  margin:0 auto 16px;
-  box-shadow:0 0 48px rgba(184,137,58,.25),0 8px 28px rgba(0,0,0,.6);
-}
-.logo-mark span { font-size:22px; font-weight:900; color:#fff; letter-spacing:-1px; }
-.logo-wordmark  { font-size:22px; font-weight:800; letter-spacing:.18em; }
-.logo-descriptor{ font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); margin-top:6px; font-weight:500; }
-.splash-headline { margin:30px 0 28px; }
-.splash-headline h1 { font-size:clamp(22px,6.5vw,34px); font-weight:700; line-height:1.2; }
-.splash-headline h1 em { font-style:normal; background:linear-gradient(90deg,var(--gold-light),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-.splash-headline p { margin-top:14px; font-size:14px; color:var(--text-dim); line-height:1.65; max-width:280px; margin-left:auto; margin-right:auto; }
-.btn-primary {
-  width:100%; padding:15px 24px;
-  background:linear-gradient(135deg,var(--gold-light),var(--gold));
-  border:none; border-radius:50px; color:#080808;
-  font-size:14px; font-weight:700; letter-spacing:.04em;
-  cursor:pointer; box-shadow:0 4px 28px rgba(184,137,58,.3); transition:all .2s;
-}
-.btn-primary:active { transform:scale(.97); opacity:.9; }
-.splash-trust { display:flex; align-items:center; gap:10px; margin-top:22px; font-size:11px; color:var(--text-muted); }
-.sep { width:1px; height:11px; background:var(--surface3); }
-
-/* ── NAME SCREEN ── */
-#namescreen {
-  align-items:center; justify-content:center;
-  padding:40px 28px; background:var(--bg); overflow:hidden;
-}
-.namescreen-inner {
-  position:relative; z-index:1;
-  width:100%; max-width:340px;
-  display:flex; flex-direction:column; gap:28px;
-}
-.ns-label { font-size:10px; font-weight:700; letter-spacing:.16em; color:var(--gold); text-transform:uppercase; }
-.ns-title { font-size:24px; font-weight:700; line-height:1.2; margin-top:6px; }
-.ns-sub   { font-size:14px; color:var(--text-dim); line-height:1.6; margin-top:8px; }
-.field-input {
-  width:100%; padding:14px 18px;
-  background:var(--surface2);
-  border:1.5px solid rgba(255,255,255,.06);
-  border-radius:12px; color:var(--text);
-  font-size:16px; font-family:inherit; outline:none;
-  transition:border-color .2s; -webkit-appearance:none;
-}
-.field-input:focus { border-color:var(--gold-border); }
-.field-input::placeholder { color:var(--text-muted); }
-
-/* ── CHAT ── */
-#chat { background:var(--bg); }
-
-.chat-header {
-  display:flex; align-items:center; gap:12px;
-  padding:13px 18px;
-  padding-top:max(13px, env(safe-area-inset-top));
-  background:var(--surface);
-  border-bottom:1px solid rgba(255,255,255,.04);
-  flex-shrink:0;
-}
-.chat-avatar {
-  width:36px; height:36px; border-radius:50%;
-  background:linear-gradient(145deg,var(--gold-light),#7a5520);
-  display:flex; align-items:center; justify-content:center;
-  flex-shrink:0; box-shadow:0 0 14px rgba(184,137,58,.2);
-}
-.avatar-mark { font-size:12px; font-weight:800; color:#fff; letter-spacing:-.5px; }
-.chat-hname  { font-size:13px; font-weight:700; letter-spacing:.02em; }
-.chat-hstatus{ display:flex; align-items:center; gap:5px; font-size:11px; color:#4ade80; margin-top:2px; }
-.s-dot { width:5px; height:5px; background:#4ade80; border-radius:50%; animation:pulse 2s infinite; }
+.live-dot { width:5px; height:5px; background:var(--green); border-radius:50%; animation:pulse 2s infinite; }
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-.messages {
-  flex:1; overflow-y:auto; overflow-x:hidden;
-  padding:18px 16px 10px;
-  display:flex; flex-direction:column; gap:10px;
-  -webkit-overflow-scrolling:touch;
+/* Logo glow animation */
+@keyframes logoGlow {
+  0%, 100% { box-shadow: 0 0 8px rgba(201,153,58,0.3); }
+  50% { box-shadow: 0 0 20px rgba(201,153,58,0.6); }
 }
-.messages::-webkit-scrollbar{display:none;}
+.logo-thinking {
+  animation: logoGlow 1.5s ease-in-out infinite;
+}
 
-.mrow { display:flex; flex-direction:column; }
-.mrow.user  { align-items:flex-end; }
-.mrow.admin { align-items:flex-start; }
+.search-wrap { position:relative; }
+.search-input {
+  width:100%; padding:9px 14px 9px 34px;
+  background:var(--s2); border:1px solid var(--border);
+  border-radius:10px; color:var(--text);
+  font-size:13px; font-family:inherit; outline:none;
+  transition:border-color .2s;
+}
+.search-input:focus { border-color:var(--gold-bd); }
+.search-input::placeholder { color:var(--text-3); }
+.search-icon {
+  position:absolute; left:11px; top:50%; transform:translateY(-50%);
+  width:14px; height:14px; opacity:.35;
+}
 
-.bubble {
-  max-width:78%; padding:11px 15px;
-  border-radius:16px; font-size:14px; line-height:1.58;
-  word-break:break-word; animation:bIn .28s ease both;
-}
-@keyframes bIn{from{opacity:0;transform:scale(.96) translateY(5px)}to{opacity:1;transform:scale(1) translateY(0)}}
-.bubble.user {
-  background:var(--gold-pale); border:1px solid var(--gold-border);
-  border-bottom-right-radius:3px;
-}
-.bubble.admin {
-  background:var(--surface2); border:1px solid rgba(255,255,255,.04);
-  border-bottom-left-radius:3px;
-}
-.bubble img { max-width:100%; border-radius:8px; display:block; cursor:pointer; }
-.bmeta { font-size:10px; color:var(--text-muted); margin-top:4px; padding:0 2px; letter-spacing:.02em; }
-
-.typing-bub {
-  background:var(--surface2); border:1px solid rgba(255,255,255,.04);
-  border-radius:16px; border-bottom-left-radius:3px;
-  padding:13px 17px; display:inline-flex; gap:5px; align-items:center;
-  animation:bIn .28s ease both;
-}
-.tdot { width:6px; height:6px; background:var(--text-muted); border-radius:50%; animation:td 1.2s ease infinite; }
-.tdot:nth-child(2){animation-delay:.15s}.tdot:nth-child(3){animation-delay:.3s}
-@keyframes td{0%,60%,100%{transform:translateY(0);opacity:.35}30%{transform:translateY(-5px);opacity:1}}
-
-.qr-row { display:flex; flex-wrap:wrap; gap:7px; padding:2px 0 4px; }
-.qr-btn {
-  padding:8px 15px; background:var(--surface2);
-  border:1px solid var(--gold-border); border-radius:20px;
-  font-size:12px; font-weight:500; color:var(--gold);
-  cursor:pointer; font-family:inherit; -webkit-appearance:none;
-  letter-spacing:.02em; transition:all .2s;
-}
-.qr-btn:active { background:var(--gold-pale); transform:scale(.97); }
-
-.chat-input-area {
-  padding:10px 14px;
-  padding-bottom:max(10px, env(safe-area-inset-bottom));
-  background:var(--surface);
-  border-top:1px solid rgba(255,255,255,.04);
+.sessions-header {
+  padding:14px 18px 6px;
+  display:flex; align-items:center; justify-content:space-between;
   flex-shrink:0;
 }
-.input-row { display:flex; gap:8px; align-items:flex-end; }
-.chat-ta {
-  flex:1; padding:11px 16px;
-  background:var(--surface2);
-  border:1.5px solid rgba(255,255,255,.06);
-  border-radius:22px; color:var(--text);
-  font-size:14px; font-family:inherit; outline:none;
-  resize:none; max-height:100px; line-height:1.45;
-  transition:border-color .2s; -webkit-appearance:none;
-}
-.chat-ta:focus { border-color:var(--gold-border); }
-.chat-ta::placeholder { color:var(--text-muted); }
-.send-btn {
-  width:40px; height:40px; border-radius:50%;
-  background:linear-gradient(135deg,var(--gold-light),var(--gold));
-  border:none; color:#080808;
-  display:flex; align-items:center; justify-content:center;
-  cursor:pointer; flex-shrink:0; transition:all .2s;
-  box-shadow:0 2px 10px rgba(184,137,58,.28); -webkit-appearance:none;
-}
-.send-btn:active{transform:scale(.9);}
-.send-btn svg{width:16px;height:16px;fill:#080808;}
+.sessions-label { font-size:10px; font-weight:700; letter-spacing:.12em; color:var(--text-3); text-transform:uppercase; }
+.sessions-count { font-size:10px; color:var(--text-3); font-weight:600; }
 
-.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:9999;align-items:center;justify-content:center;cursor:pointer;}
-.lightbox.open{display:flex;}
-.lightbox img{max-width:92vw;max-height:88vh;border-radius:10px;}
+.sessions-list { flex:1; overflow-y:auto; padding:4px 8px 8px; }
+.sessions-list::-webkit-scrollbar { width:3px; }
+.sessions-list::-webkit-scrollbar-thumb { background:rgba(255,255,255,.07); border-radius:2px; }
+
+.session-item {
+  padding:11px 12px; border-radius:10px;
+  cursor:pointer; transition:background .15s;
+  display:flex; align-items:center; gap:10px;
+  margin-bottom:2px;
+  position: relative;
+}
+.session-item:hover { background:rgba(255,255,255,.03); }
+.session-item.active { background:var(--gold-dim); }
+
+.s-avatar {
+  width:34px; height:34px; border-radius:50%; flex-shrink:0;
+  background:var(--s3); border:1px solid rgba(255,255,255,.07);
+  display:flex; align-items:center; justify-content:center;
+}
+.s-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.s-avatar-initials { font-size:11px; font-weight:700; color:var(--text-2); letter-spacing:.02em; }
+.session-item.active .s-avatar { border-color:var(--gold-bd); }
+
+.s-info { flex:1; overflow:hidden; }
+.s-name { font-size:13px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.s-preview { font-size:11px; color:var(--text-3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px; }
+.session-item.active .s-preview { color:var(--text-2); }
+
+.s-meta { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
+.s-time { font-size:10px; color:var(--text-3); }
+.unread-badge {
+  width:7px; height:7px; border-radius:50%;
+  background:var(--gold);
+  box-shadow:0 0 6px rgba(201,153,58,.5);
+}
+
+.delete-session-btn {
+  position: absolute;
+  top: 8px; right: 8px;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: rgba(224,82,82,0.15);
+  border: none; color: var(--red);
+  font-size: 12px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.15s;
+}
+.session-item:hover .delete-session-btn { opacity: 1; }
+.delete-session-btn:hover { background: rgba(224,82,82,0.3); }
+
+.no-sessions { padding:40px 16px; text-align:center; color:var(--text-3); font-size:13px; line-height:1.7; }
+
+/* ════════ MAIN ════════ */
+.main { flex:1; display:flex; flex-direction:column; overflow:hidden; background:var(--bg); }
+
+.chat-header {
+  padding:14px 22px;
+  background:var(--s1);
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+  min-height:62px; flex-shrink:0;
+}
+.header-left { display:flex; align-items:center; gap:12px; }
+.h-avatar {
+  width:34px; height:34px; border-radius:50%;
+  background:var(--s3); border:1px solid rgba(255,255,255,.07);
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  overflow: hidden;
+}
+.h-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.h-avatar-initials { font-size:11px; font-weight:700; color:var(--text-2); }
+.h-name { font-size:14px; font-weight:600; }
+.h-sub  { font-size:11px; color:var(--text-3); margin-top:2px; }
+.h-empty { font-size:13px; color:var(--text-3); }
+
+.header-right { display:flex; align-items:center; gap:8px; }
+.h-action-btn {
+  padding:7px 14px; border-radius:8px;
+  background:var(--s3); border:1px solid var(--border);
+  color:var(--text-2); font-size:12px; font-weight:500;
+  cursor:pointer; font-family:inherit; transition:all .2s;
+}
+.h-action-btn:hover { border-color:var(--gold-bd); color:var(--gold); }
+
+.profile-bar {
+  display:none;
+  padding:10px 22px;
+  background:var(--s1);
+  border-bottom:1px solid var(--border);
+  gap:6px; flex-wrap:wrap; align-items:center;
+}
+.profile-bar.visible { display:flex; }
+.profile-bar-label { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--text-3); margin-right:4px; }
+.profile-tag {
+  padding:3px 10px; border-radius:6px;
+  background:var(--s3); border:1px solid var(--border);
+  font-size:11px; color:var(--text-2);
+}
+.profile-tag strong { color:var(--text); font-weight:600; }
+
+.chat-area {
+  flex:1; overflow-y:auto;
+  padding:22px 22px 12px;
+  display:flex; flex-direction:column; gap:10px;
+}
+.chat-area::-webkit-scrollbar { width:3px; }
+.chat-area::-webkit-scrollbar-thumb { background:rgba(255,255,255,.06); border-radius:2px; }
+
+.empty-state {
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:10px;
+  color:var(--text-3);
+}
+.empty-logo {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  object-fit: cover;
+  opacity: 0.5;
+}
+.empty-text { font-size:13px; }
+
+.brow { display:flex; flex-direction:column; }
+.brow.user  { align-items:flex-end; }
+.brow.admin { align-items:flex-start; }
+.brow.meta  { align-items:stretch; }
+
+.meta-bar {
+  background:var(--s2); border:1px solid var(--border);
+  border-radius:10px; padding:10px 14px;
+  display:flex; flex-wrap:wrap; gap:6px; align-items:center;
+}
+.meta-bar-label { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--gold); margin-right:4px; }
+.meta-pill {
+  padding:2px 9px; border-radius:5px;
+  background:var(--s3); font-size:11px; color:var(--text-2);
+}
+.meta-pill strong { color:var(--text); }
+
+.bubble {
+  max-width:70%; padding:10px 14px;
+  border-radius:14px; font-size:14px; line-height:1.56;
+  word-break:break-word;
+}
+.bubble.user {
+  background:var(--s2); border:1px solid rgba(255,255,255,.05);
+  border-bottom-right-radius:3px; color:var(--text);
+}
+.bubble.admin {
+  background:linear-gradient(140deg,#1a1408,#261c09);
+  border:1px solid var(--gold-bd);
+  border-bottom-left-radius:3px; color:#f0e0c0;
+}
+.bubble img { max-width:100%; border-radius:8px; display:block; cursor:pointer; margin-top:2px; }
+.bmeta { font-size:10px; color:var(--text-3); margin-top:4px; padding:0 2px; letter-spacing:.02em; }
+
+.input-wrapper {
+  padding:12px 18px;
+  padding-bottom:max(12px, env(safe-area-inset-bottom));
+  background:var(--s1); border-top:1px solid var(--border);
+  flex-shrink:0;
+}
+.upload-state {
+  display:none; align-items:center; gap:8px;
+  padding:6px 0 8px; font-size:11px; color:var(--gold);
+}
+.upload-state.visible { display:flex; }
+.spinner {
+  width:12px; height:12px;
+  border:1.5px solid rgba(201,153,58,.2);
+  border-top-color:var(--gold); border-radius:50%;
+  animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.multi-preview {
+  display:none; flex-direction: column; gap: 8px;
+  margin-bottom: 8px; max-height: 200px; overflow-y: auto;
+}
+.multi-preview.visible { display:flex; }
+.multi-preview-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 8px; background: var(--s2);
+  border: 1px solid var(--border); border-radius: 8px;
+}
+.multi-preview-thumb {
+  width: 48px; height: 48px; border-radius: 6px;
+  object-fit: cover; flex-shrink: 0;
+}
+.multi-preview-caption {
+  flex: 1; background: transparent; border: none;
+  color: var(--text); font-size: 12px;
+  font-family: inherit; outline: none; padding: 4px;
+}
+.multi-preview-caption::placeholder { color: var(--text-3); }
+.multi-preview-rm {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: rgba(224,82,82,0.15); border: none;
+  color: var(--red); cursor: pointer; font-size: 12px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+
+.input-row { display:flex; gap:8px; align-items:flex-end; }
+
+.attach-btn {
+  width:38px; height:38px; border-radius:9px;
+  background:var(--s2); border:1px solid var(--border);
+  color:var(--text-3); cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; transition:all .2s;
+}
+.attach-btn:hover { border-color:var(--gold-bd); color:var(--gold); }
+.attach-btn svg { width:15px; height:15px; }
+
+.msg-input {
+  flex:1; padding:10px 15px;
+  background:var(--s2); border:1px solid var(--border);
+  border-radius:12px; color:var(--text);
+  font-size:14px; font-family:inherit; outline:none;
+  resize:none; max-height:120px; line-height:1.45;
+  transition:border-color .2s;
+}
+.msg-input:focus { border-color:var(--gold-bd); }
+.msg-input::placeholder { color:var(--text-3); }
+
+.send-btn {
+  width:38px; height:38px; border-radius:9px;
+  background:var(--gold); border:none;
+  color:#080808; cursor:pointer; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  transition:all .2s; box-shadow:0 2px 10px rgba(201,153,58,.25);
+}
+.send-btn:hover { background:var(--gold-lt); }
+.send-btn:active { transform:scale(.93); }
+.send-btn:disabled { opacity:.3; cursor:not-allowed; box-shadow:none; }
+.send-btn svg { width:15px; height:15px; fill:#080808; }
+
+.toast {
+  position:fixed; top:18px; left:50%; transform:translateX(-50%);
+  padding:8px 20px; border-radius:20px;
+  background:var(--s3); color:var(--text);
+  font-size:12px; font-weight:500; letter-spacing:.02em;
+  border:1px solid rgba(255,255,255,.09); z-index:9999;
+  animation:tIn .25s ease, tOut .3s ease 1.8s forwards;
+  pointer-events:none; white-space:nowrap;
+}
+.toast.err { color:#fca5a5; border-color:rgba(224,82,82,.3); }
+@keyframes tIn{from{opacity:0;transform:translateX(-50%) translateY(-8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+@keyframes tOut{from{opacity:1}to{opacity:0;transform:translateX(-50%) translateY(-6px)}}
+
+.lightbox { display:none; position:fixed; inset:0; background:rgba(0,0,0,.92); z-index:9999; align-items:center; justify-content:center; cursor:pointer; }
+.lightbox.open { display:flex; }
+.lightbox img { max-width:90vw; max-height:90vh; border-radius:10px; }
+
+.mob-menu { 
+  display:none; 
+  width:36px; height:36px; 
+  border-radius:8px; 
+  background:var(--s2); 
+  border:1px solid var(--border); 
+  cursor:pointer; 
+  align-items:center; 
+  justify-content:center; 
+}
+.mob-menu svg { width:16px; height:16px; fill:var(--text-2); }
+
+@media (max-width: 1024px) {
+  .sidebar { display: none; }
+  .sidebar.mobile-open { display: flex; position: fixed; inset: 0; z-index: 100; width: 100%; }
+  .mob-menu { display: flex; }
+}
 </style>
 </head>
 <body>
+<div class="app">
 
-<div class="lang-toggle">
-  <button class="lang-btn on" id="btnFR" onclick="setLang('fr')">FR</button>
-  <button class="lang-btn"    id="btnEN" onclick="setLang('en')">EN</button>
-</div>
-
-<!-- ══ SPLASH ══ -->
-<div class="screen" id="splash">
-  <div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
-  <div class="splash-inner">
-    <div class="logo-mark"><span>TF</span></div>
-    <div class="logo-wordmark">TRIOFIT</div>
-    <div class="logo-descriptor" id="s-tag">Styliste Personnel</div>
-    <div class="splash-headline">
-      <h1 id="s-h1">Habillez-vous<br>comme vous <em>méritez</em></h1>
-      <p id="s-p">Un conseil stylistique sur mesure, disponible à tout moment, pour la clientèle de Yaoundé.</p>
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-top">
+      <div class="brand-row">
+        <div class="brand">
+          <img class="brand-logo" src="logo.jpg" alt="TRIOFIT" id="sidebarLogo">
+          <div>
+            <div class="brand-name">TRIOFIT</div>
+            <div class="brand-role">Admin Panel</div>
+          </div>
+        </div>
+        <div class="status-pill"><div class="live-dot"></div>Live</div>
+      </div>
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input class="search-input" id="searchInput" type="text" placeholder="Search conversations…" oninput="filterSessions(this.value)">
+      </div>
     </div>
-    <button class="btn-primary" id="s-cta" onclick="goTo('namescreen')">Commencer</button>
-    <div class="splash-trust">
-      <span id="s-t1">Conseil personnalisé</span><span class="sep"></span>
-      <span id="s-t2">Réponse rapide</span><span class="sep"></span>
-      <span id="s-t3">Yaoundé</span>
+
+    <div class="sessions-header">
+      <span class="sessions-label">Conversations</span>
+      <span class="sessions-count" id="sessionsCount">—</span>
+    </div>
+    <div class="sessions-list" id="sessionList">
+      <div class="no-sessions">Waiting for messages…</div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="chat-header">
+      <div class="header-left">
+        <button class="mob-menu" onclick="toggleSidebar()">
+          <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+        </button>
+        <div id="headerContent">
+          <span class="h-empty">Select a conversation to begin</span>
+        </div>
+      </div>
+      <div class="header-right" id="headerActions" style="display:none;">
+        <button class="h-action-btn" onclick="location.reload()">Refresh</button>
+      </div>
+    </div>
+
+    <div class="profile-bar" id="profileBar"></div>
+
+    <div class="chat-area" id="chatArea">
+      <div class="empty-state">
+        <img class="empty-logo" src="logo.jpg" alt="TRIOFIT">
+        <div class="empty-text">No conversation selected</div>
+      </div>
+    </div>
+
+    <div class="input-wrapper" id="inputWrapper" style="display:none;">
+      <div class="upload-state" id="uploadState"><div class="spinner"></div>Uploading…</div>
+      <div class="multi-preview" id="multiPreview"></div>
+      <div class="input-row">
+        <input type="file" id="fileInput" accept="image/*" multiple style="display:none" onchange="onFilesChange(event)">
+        <button class="attach-btn" onclick="document.getElementById('fileInput').click()" title="Attach images">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+            <polyline points="21 15 16 10 5 21"/>
+          </svg>
+        </button>
+        <textarea class="msg-input" id="msgInput" rows="1" placeholder="Type a reply…"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+          <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </button>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ══ NAME SCREEN ══ -->
-<div class="screen hidden" id="namescreen">
-  <div class="orb orb1"></div><div class="orb orb2"></div>
-  <div class="namescreen-inner">
-    <div>
-      <div class="ns-label" id="ns-label">Bienvenue</div>
-      <div class="ns-title" id="ns-title">Comment vous appelez-vous ?</div>
-      <div class="ns-sub"   id="ns-sub">Votre styliste personnel vous attend.</div>
-    </div>
-    <div>
-      <input class="field-input" id="nameInput" type="text"
-        placeholder="Votre prénom" autocomplete="given-name"
-        autocorrect="off" autocapitalize="words">
-    </div>
-    <button class="btn-primary" id="nameBtn" disabled onclick="submitName()">
-      <span id="nameBtn-label">Continuer</span>
-    </button>
-  </div>
-</div>
-
-<!-- ══ CHAT ══ -->
-<div class="screen hidden" id="chat">
-  <div class="chat-header">
-    <div class="chat-avatar"><span class="avatar-mark">TF</span></div>
-    <div>
-      <div class="chat-hname">TRIOFIT Styliste</div>
-      <div class="chat-hstatus"><div class="s-dot"></div><span id="ch-status">En ligne</span></div>
-    </div>
-  </div>
-  <div class="messages" id="messages"></div>
-  <div class="chat-input-area">
-    <div class="input-row">
-      <textarea class="chat-ta" id="chatInput" rows="1" placeholder="Écrivez un message…"></textarea>
-      <button class="send-btn" onclick="sendMsg()">
-        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-      </button>
-    </div>
-  </div>
-</div>
-
-<div class="lightbox" id="lightbox" onclick="closeLb()">
-  <img id="lbImg" src="" alt="">
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <img id="lightboxImg" src="" alt="">
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const SUPABASE_URL = 'https://ahckbchulymvbhrpynyy.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFoY2tiY2h1bHltdmJocnB5bnl5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4MTI5MTQsImV4cCI6MjA5NjM4ODkxNH0.aBq-qHBBTrzWf_OHpkYmQLLPeS1iywBbX47tLRqRQ1k';
+const SUPABASE_URL    = 'https://ahckbchulymvbhrpynyy.supabase.co';
+const SUPABASE_KEY    = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFoY2tiY2h1bHltdmJocnB5bnl5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4MTI5MTQsImV4cCI6MjA5NjM4ODkxNH0.aBq-qHBBTrzWf_OHpkYmQLLPeS1iywBbX47tLRqRQ1k';
+const STORAGE_BUCKET  = 'chat-images';
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ── STATE ──
-let lang = 'fr';
-let sessionId = null;
-let typingRow = null;
-let profileComplete = false;
+let activeSession = null;
+let allSessions   = [];
+let seenIds       = new Set();
+let pendingFiles  = [];
 
-const profile = {
-  name:'', gender:'', age:'', style:'', colors:'',
-  height:'', bodyType:'', town:''
-};
+const msgInput = document.getElementById('msgInput');
+msgInput.addEventListener('input', () => {
+  msgInput.style.height = 'auto';
+  msgInput.style.height = Math.min(msgInput.scrollHeight, 120) + 'px';
+});
+msgInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+});
 
-// ── PROFILING FLOW ──
-// Each step: key to save, question fn, optional quick replies fn, delay
-const FLOW = {
-  fr: [
-    {
-      key: 'gender',
-      q: (p) => `Merci ${p.name}. Pour affiner mes recommandations, comment vous identifiez-vous ?`,
-      qr: () => ['Masculin','Féminin','Je préfère ne pas le dire'],
-      delay: 1200,
-    },
-    {
-      key: 'age',
-      q: (p) => `Bonjour ${p.name}. Je suis votre styliste TRIOFIT.\n\nPour vous proposer des tenues vraiment adaptées, j'ai besoin de vous connaître un peu mieux.\n\nQuel est votre âge ?`,
-      qr: () => ['18 – 24 ans','25 – 34 ans','35 – 44 ans','45 ans et plus'],
-      delay: 1600,
-    },
-    {
-      key: 'style',
-      q: (p) => `Merci. Quel style vous correspond le mieux au quotidien ?`,
-      qr: () => ['Classique & élégant','Streetwear & urbain','Afro-chic','Décontracté & casual','Mixte selon les occasions'],
-      delay: 1200,
-    },
-    {
-      key: 'colors',
-      q: (p) => `Très bien. Quelles couleurs portez-vous habituellement ou souhaitez-vous explorer ?`,
-      qr: () => ['Tons neutres (noir, blanc, gris)','Tons chauds (beige, marron, camel)','Couleurs vives','Tons foncés','Pas de préférence'],
-      delay: 1200,
-    },
-    {
-      key: 'height',
-      q: (p) => `Quelle est votre taille approximative ? Cela m'aide à orienter les coupes et proportions.`,
-      qr: () => ['Moins de 165 cm','165 – 170 cm','171 – 175 cm','176 – 180 cm','Plus de 180 cm'],
-      delay: 1200,
-    },
-    {
-      key: 'bodyType',
-      q: (p) => `Et votre morphologie ? Ne vous inquiétez pas, c'est strictement pour affiner mes recommandations.`,
-      qr: () => ['Mince / Élancé','Athlétique / Musclé','Corpulent / Fort','Intermédiaire'],
-      delay: 1300,
-    },
-    {
-      key: 'town',
-      q: (p) => `Dans quelle ville ou quel quartier êtes-vous basé ? Cela me permet de vous orienter vers des boutiques accessibles.`,
-      qr: () => ['Yaoundé Centre','Bastos / Omnisports','Ngousso / Mvan','Biyem-Assi / Mimboman','Autre ville'],
-      delay: 1200,
-    },
-    {
-      key: '__done__',
-      q: (p) => `Parfait, ${p.name}. Votre profil est complet.\n\nStyle *${p.style}*, morphologie *${p.bodyType}*, basé à *${p.town}*. Je connais maintenant vos préférences et votre silhouette.\n\nDites-moi : pour quelle occasion cherchez-vous une tenue ?`,
-      qr: () => ['Un entretien professionnel','Une sortie en soirée','Un mariage ou cérémonie','Le quotidien au bureau','Un événement décontracté'],
-      delay: 1500,
-    },
-  ],
-  en: [
-    {
-      key: 'gender',
-      q: (p) => `Thanks ${p.name}. To refine my recommendations, how do you identify?`,
-      qr: () => ['Male','Female','Prefer not to say'],
-      delay: 1200,
-    },
-    {
-      key: 'age',
-      q: (p) => `Good day, ${p.name}. I am your TRIOFIT personal stylist.\n\nTo recommend outfits that truly fit you, I need to learn a bit more about you.\n\nHow old are you?`,
-      qr: () => ['18 – 24','25 – 34','35 – 44','45 and over'],
-      delay: 1600,
-    },
-    {
-      key: 'style',
-      q: (p) => `Thank you. Which style best describes your everyday look?`,
-      qr: () => ['Classic & elegant','Streetwear & urban','Afro-chic','Casual & relaxed','Mixed — depends on the occasion'],
-      delay: 1200,
-    },
-    {
-      key: 'colors',
-      q: (p) => `Noted. Which colours do you usually wear or would like to explore?`,
-      qr: () => ['Neutral tones (black, white, grey)','Warm tones (beige, brown, camel)','Bright colours','Dark tones','No preference'],
-      delay: 1200,
-    },
-    {
-      key: 'height',
-      q: (p) => `What is your approximate height? This helps me recommend the right cuts and proportions.`,
-      qr: () => ['Under 165 cm','165 – 170 cm','171 – 175 cm','176 – 180 cm','Over 180 cm'],
-      delay: 1200,
-    },
-    {
-      key: 'bodyType',
-      q: (p) => `And your body type? This is strictly to refine my recommendations.`,
-      qr: () => ['Slim / Lean','Athletic / Muscular','Large / Full-figured','In between'],
-      delay: 1300,
-    },
-    {
-      key: 'town',
-      q: (p) => `Which city or neighbourhood are you based in? This helps me point you to accessible boutiques.`,
-      qr: () => ['Yaoundé Centre','Bastos / Omnisports','Ngousso / Mvan','Biyem-Assi / Mimboman','Other city'],
-      delay: 1200,
-    },
-    {
-      key: '__done__',
-      q: (p) => `Perfect, ${p.name}. Your profile is complete.\n\n*${p.style}* style, *${p.bodyType}* build, based in *${p.town}*. I now have everything I need.\n\nTell me: what occasion are you dressing for?`,
-      qr: () => ['A professional interview','An evening out','A wedding or ceremony','Everyday office wear','A casual event'],
-      delay: 1500,
-    },
-  ]
-};
-
-let flowStep = 0; // index into FLOW[lang]
-
-// ── COPY ──
-const COPY = {
-  fr: {
-    'splash-tag':'Styliste Personnel',
-    'splash-h1':'Habillez-vous<br>comme vous <em>méritez</em>',
-    'splash-p':'Un conseil stylistique sur mesure, disponible à tout moment, pour la clientèle de Yaoundé.',
-    'splash-cta':'Commencer',
-    't1':'Conseil personnalisé','t2':'Réponse rapide','t3':'Yaoundé',
-    'ns-label':'Bienvenue','ns-title':'Comment vous appelez-vous ?',
-    'ns-sub':'Votre styliste personnel vous attend.',
-    'nameBtn':'Continuer',
-    'status':'En ligne',
-    'ph-chat':'Écrivez votre réponse…',
-    returning: (p) => `Bienvenue de retour, ${p.name}.\n\nPour quelle occasion cherchez-vous une tenue aujourd'hui ?`,
-    ret_qr: () => ['Un entretien professionnel','Une sortie en soirée','Un mariage ou cérémonie','Le quotidien au bureau','Un événement décontracté'],
-  },
-  en: {
-    'splash-tag':'Personal Stylist',
-    'splash-h1':'Dress the way<br>you <em>deserve</em>',
-    'splash-p':'Bespoke style advice, available at any time, for Yaoundé clientele.',
-    'splash-cta':'Get Started',
-    't1':'Personalised advice','t2':'Fast reply','t3':'Yaoundé',
-    'ns-label':'Welcome','ns-title':'What is your name?',
-    'ns-sub':'Your personal stylist is ready for you.',
-    'nameBtn':'Continue',
-    'status':'Online',
-    'ph-chat':'Type your answer…',
-    returning: (p) => `Welcome back, ${p.name}.\n\nWhat occasion are you dressing for today?`,
-    ret_qr: () => ['A professional interview','An evening out','A wedding or ceremony','Everyday office wear','A casual event'],
-  }
-};
-
-function setLang(l) {
-  lang = l;
-  const c = COPY[l];
-  document.getElementById('btnFR').classList.toggle('on', l==='fr');
-  document.getElementById('btnEN').classList.toggle('on', l==='en');
-  const map = {
-    's-tag':c['splash-tag'],'s-h1':c['splash-h1'],'s-p':c['splash-p'],
-    's-cta':c['splash-cta'],'s-t1':c['t1'],'s-t2':c['t2'],'s-t3':c['t3'],
-    'ns-label':c['ns-label'],'ns-title':c['ns-title'],'ns-sub':c['ns-sub'],
-    'nameBtn-label':c['nameBtn'],'ch-status':c['status'],
-  };
-  for (const [id,val] of Object.entries(map)) {
-    const el=document.getElementById(id); if(el) el.innerHTML=val;
-  }
-  const ci=document.getElementById('chatInput');
-  if(ci) ci.placeholder=c['ph-chat'];
+function onFilesChange(e) {
+  const files = Array.from(e.target.files);
+  if (!files.length) return;
+  files.forEach(file => { pendingFiles.push({ file: file, caption: '' }); });
+  renderMultiPreview();
+  e.target.value = '';
 }
 
-// ── SCREENS ──
-function goTo(id) {
-  document.querySelectorAll('.screen').forEach(s => {
-    if (s.id===id) { s.classList.remove('hidden','out'); }
-    else { s.classList.add('out'); setTimeout(()=>s.classList.add('hidden'),450); }
+function renderMultiPreview() {
+  const container = document.getElementById('multiPreview');
+  if (!pendingFiles.length) { container.classList.remove('visible'); container.innerHTML = ''; return; }
+  container.classList.add('visible');
+  container.innerHTML = pendingFiles.map((item, index) => {
+    const url = URL.createObjectURL(item.file);
+    return `
+      <div class="multi-preview-item">
+        <img class="multi-preview-thumb" src="${url}" alt="${item.file.name}">
+        <input class="multi-preview-caption" type="text" placeholder="Caption…" value="${esc(item.caption)}" oninput="updateCaption(${index}, this.value)">
+        <button class="multi-preview-rm" onclick="removeFile(${index})">&#x2715;</button>
+      </div>`;
+  }).join('');
+}
+
+function updateCaption(index, value) { if (pendingFiles[index]) pendingFiles[index].caption = value; }
+function removeFile(index) { pendingFiles.splice(index, 1); renderMultiPreview(); }
+function clearAllFiles() { pendingFiles = []; renderMultiPreview(); }
+
+function parseMeta(text) {
+  const fields = {};
+  if (!text || !text.startsWith('[PROFIL]')) return null;
+  const body = text.replace('[PROFIL]', '').trim();
+  body.split('|').forEach(chunk => {
+    const [k, ...rest] = chunk.split(':');
+    if (k && rest.length) fields[k.trim()] = rest.join(':').trim();
   });
+  return fields;
 }
 
-// ── NAME SCREEN ──
-const nameInput = document.getElementById('nameInput');
-nameInput.addEventListener('input', function(){
-  document.getElementById('nameBtn').disabled = this.value.trim().length < 2;
-});
-nameInput.addEventListener('keydown', function(e){
-  if (e.key==='Enter'){ e.preventDefault(); if(!document.getElementById('nameBtn').disabled) submitName(); }
-});
-
-function submitName() {
-  profile.name = nameInput.value.trim();
-  beginSession();
+function sessionDisplayName(sessionId, metaMap) {
+  if (metaMap && metaMap['Nom']) return metaMap['Nom'];
+  return sessionId.replace('user_','').substring(0,10) + '…';
 }
 
-// ── SESSION ──
-function beginSession() {
-  sessionId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2,8);
-  flowStep  = 0;
-  goTo('chat');
-
-  // Send silent meta to admin immediately
-  pushMeta();
-
-  const saved = loadProfile();
-  if (saved && saved.name === profile.name) {
-    // Returning user — profile already complete
-    Object.assign(profile, saved);
-    profileComplete = true;
-    setTimeout(()=>{
-      showTyping();
-      setTimeout(()=>{
-        removeTyping();
-        addAdminBubble(COPY[lang].returning(profile));
-        showQR(COPY[lang].ret_qr());
-      }, 1400);
-    }, 500);
-  } else {
-    // New user — start profiling flow
-    profileComplete = false;
-    askNext();
+async function loadSessions() {
+  const { data, error } = await sb.from('messages')
+    .select('id, session_id, message, sender, created_at, message_type')
+    .order('created_at', { ascending: false }).limit(600);
+  if (error) { toast('Error: ' + error.message, true); return; }
+  if (!data || !data.length) {
+    document.getElementById('sessionList').innerHTML = '<div class="no-sessions">No conversations yet</div>';
+    return;
   }
-
-  // Realtime: admin replies
-  sb.channel('chat-'+sessionId)
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'}, payload=>{
-      const m = payload.new;
-      if (m.session_id===sessionId && m.sender==='admin') {
-        removeTyping();
-        if (m.message_type==='image') addAdminImg(m.message);
-        else addAdminBubble(m.message);
-      }
-    })
-    .subscribe();
-}
-
-// ── FLOW ──
-function askNext() {
-  const steps = FLOW[lang];
-  if (flowStep >= steps.length) return;
-  const step = steps[flowStep];
-  setTimeout(()=>{
-    showTyping();
-    setTimeout(()=>{
-      removeTyping();
-      addAdminBubble(step.q(profile));
-      if (step.qr) showQR(step.qr());
-    }, step.delay);
-  }, flowStep === 0 ? 600 : 300);
-}
-
-function handleFlowAnswer(text) {
-  const steps = FLOW[lang];
-  if (flowStep >= steps.length) return; // profile done, admin handles it
-  const step = steps[flowStep];
-
-  if (step.key !== '__done__') {
-    profile[step.key] = text;
-  }
-
-  flowStep++;
-
-  if (flowStep < steps.length) {
-    askNext();
-  } else {
-    // Shouldn't happen — __done__ is the last step
-  }
-}
-
-// ── SEND ──
-const chatInput = document.getElementById('chatInput');
-chatInput.addEventListener('input', function(){
-  this.style.height='auto';
-  this.style.height=Math.min(this.scrollHeight,100)+'px';
-});
-chatInput.addEventListener('keydown', function(e){
-  if (e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendMsg(); }
-});
-
-async function sendMsg(text) {
-  const t = text || chatInput.value.trim();
-  if (!t || !sessionId) return;
-  chatInput.value=''; chatInput.style.height='auto';
-  removeQR();
-  addUserBubble(t);
-
-  // Save to supabase
-  await sb.from('messages').insert({
-    session_id:sessionId, sender:'user',
-    message:t, message_type:'text'
-  });
-
-  if (!profileComplete) {
-    const steps = FLOW[lang];
-    const currentStep = steps[flowStep - 1] ?? steps[flowStep];
-
-    // If we just answered the last real question (__done__ step fires)
-    if (flowStep < steps.length) {
-      handleFlowAnswer(t);
-      // Check if we've now reached __done__
-      if (FLOW[lang][flowStep] && FLOW[lang][flowStep].key === '__done__') {
-        // Save profile before firing __done__
-        saveProfile();
-        pushMeta();
-        profileComplete = true;
-        // Let askNext fire the done message
-        askNext();
-        flowStep++; // move past __done__
-      }
-    } else if (!profileComplete) {
-      // user typed after __done__ showed — treat as live chat
-      profileComplete = true;
-      setTimeout(()=>showTyping(), 300);
+  const map = new Map();
+  const sorted = [...data].reverse();
+  sorted.forEach(r => {
+    if (!map.has(r.session_id)) {
+      map.set(r.session_id, { id: r.session_id, meta: null, lastMessage: '', lastSender: r.sender, lastTime: r.created_at, hasUnread: false });
     }
-  } else {
-    // Profile complete — typing indicator, admin will reply
-    setTimeout(()=>showTyping(), 300);
+    const s = map.get(r.session_id);
+    if (r.message_type === 'meta') { s.meta = parseMeta(r.message); }
+    else {
+      s.lastMessage = r.message_type === 'image' ? 'Image' : (r.message || '').substring(0, 50);
+      s.lastSender  = r.sender; s.lastTime = r.created_at;
+      if (r.sender === 'user' && !seenIds.has(r.id)) s.hasUnread = true;
+    }
+  });
+  allSessions = Array.from(map.values()).reverse();
+  renderSessions(allSessions);
+}
+
+function renderSessions(list) {
+  const el = document.getElementById('sessionList');
+  document.getElementById('sessionsCount').textContent = list.length || '—';
+  if (!list.length) { el.innerHTML = '<div class="no-sessions">No conversations yet</div>'; return; }
+  el.innerHTML = list.map(s => {
+    const name = sessionDisplayName(s.id, s.meta);
+    const initials = name.slice(0,2).toUpperCase();
+    const active = s.id === activeSession ? ' active' : '';
+    const unread = s.hasUnread && s.id !== activeSession;
+    const time   = s.lastTime ? relTime(s.lastTime) : '';
+    const preview = (s.lastSender === 'admin' ? '&#x21A9; ' : '') + esc(s.lastMessage || '…');
+    return `<div class="session-item${active}" onclick="openSession('${s.id}')">
+      <div class="s-avatar"><span class="s-avatar-initials">${initials}</span></div>
+      <div class="s-info"><div class="s-name">${esc(name)}</div><div class="s-preview">${preview}</div></div>
+      <div class="s-meta"><span class="s-time">${time}</span>${unread ? '<div class="unread-badge"></div>' : ''}</div>
+      <button class="delete-session-btn" title="Delete" onclick="event.stopPropagation(); deleteSession('${s.id}')">🗑</button>
+    </div>`;
+  }).join('');
+}
+
+function filterSessions(q) {
+  if (!q.trim()) { renderSessions(allSessions); return; }
+  const low = q.toLowerCase();
+  renderSessions(allSessions.filter(s => {
+    const name = sessionDisplayName(s.id, s.meta).toLowerCase();
+    return name.includes(low) || s.id.includes(low);
+  }));
+}
+
+async function deleteSession(sessionId) {
+  if (!confirm('Delete this entire conversation permanently?')) return;
+  const { error } = await sb.from('messages').delete().eq('session_id', sessionId);
+  if (error) { toast('Delete failed', true); return; }
+  allSessions = allSessions.filter(s => s.id !== sessionId);
+  if (activeSession === sessionId) {
+    activeSession = null;
+    document.getElementById('inputWrapper').style.display = 'none';
+    document.getElementById('headerActions').style.display = 'none';
+    document.getElementById('headerContent').innerHTML = '<span class="h-empty">Select a conversation</span>';
+    document.getElementById('profileBar').classList.remove('visible');
+    document.getElementById('chatArea').innerHTML = '<div class="empty-state"><img class="empty-logo" src="logo.jpg" alt="TRIOFIT"><div class="empty-text">No conversation selected</div></div>';
   }
+  renderSessions(allSessions);
+  toast('Conversation deleted');
 }
 
-// ── BUBBLES ──
-function addUserBubble(text) {
-  const m = document.getElementById('messages');
-  const row = document.createElement('div');
-  row.className='mrow user';
-  row.innerHTML=`<div class="bubble user">${esc(text)}</div><div class="bmeta">${now()}</div>`;
-  m.appendChild(row); scrollM();
+async function openSession(sessionId) {
+  activeSession = sessionId;
+  document.getElementById('inputWrapper').style.display = 'block';
+  document.getElementById('headerActions').style.display = 'flex';
+  const s = allSessions.find(x => x.id === sessionId);
+  if (s) s.hasUnread = false;
+  renderSessions(allSessions);
+  const name = s ? sessionDisplayName(s.id, s.meta) : sessionId;
+  const initials = name.slice(0,2).toUpperCase();
+  document.getElementById('headerContent').innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="h-avatar"><span class="h-avatar-initials">${initials}</span></div>
+      <div><div class="h-name">${esc(name)}</div><div class="h-sub">Active session</div></div>
+    </div>`;
+  if (s && s.meta) renderProfileBar(s.meta);
+  else document.getElementById('profileBar').classList.remove('visible');
+  const chatArea = document.getElementById('chatArea');
+  chatArea.innerHTML = '<div class="empty-state"><div class="spinner" style="width:18px;height:18px;margin:auto;"></div></div>';
+  const { data, error } = await sb.from('messages').select('*').eq('session_id', sessionId).order('created_at', { ascending: true });
+  chatArea.innerHTML = '';
+  if (error || !data) { chatArea.innerHTML = '<div class="empty-state"><div class="empty-text">Failed to load</div></div>'; return; }
+  if (!data.length) { chatArea.innerHTML = '<div class="empty-state"><div class="empty-text">No messages yet</div></div>'; }
+  else { data.forEach(m => { renderBubble(m); seenIds.add(m.id); }); }
+  scrollBottom(); msgInput.focus();
+  document.getElementById('sidebar').classList.remove('mobile-open');
 }
 
-function addAdminBubble(text) {
-  const m = document.getElementById('messages');
-  const row = document.createElement('div');
-  row.className='mrow admin';
-  const html = esc(text).replace(/\n/g,'<br>').replace(/\*(.*?)\*/g,'<strong>$1</strong>');
-  row.innerHTML=`<div class="bubble admin">${html}</div><div class="bmeta">Styliste &middot; ${now()}</div>`;
-  m.appendChild(row); scrollM();
+function renderProfileBar(meta) {
+  const bar = document.getElementById('profileBar');
+  const fields = ['Nom','Genre','Âge','Style','Couleurs','Taille','Morpho','Ville'];
+  const labels = { 'Nom':'Name','Genre':'Gender','Âge':'Age','Style':'Style','Couleurs':'Colours','Taille':'Height','Morpho':'Build','Ville':'City' };
+  let html = `<span class="profile-bar-label">Profile</span>`;
+  fields.forEach(f => {
+    const v = meta[f] || meta[f.replace('é','e')] || '—';
+    if (v && v !== '—') { html += `<span class="profile-tag"><strong>${labels[f]||f}:</strong> ${esc(v)}</span>`; }
+  });
+  bar.innerHTML = html;
+  bar.classList.add('visible');
 }
 
-function addAdminImg(url) {
-  const m
+function renderBubble(msg) {
+  const area = document.getElementById('chatArea');
+  const empty = area.querySelector('.empty-state');
+  if (empty) empty.remove();
+  if (msg.message_type === 'meta') {
+    const meta = parseMeta(msg.message);
+    if (!meta) return;
+    const row = document.createElement('div'); row.className = 'brow meta';
+    const bar = document.createElement('div'); bar.className = 'meta-bar';
+    let html = `<span class="meta-bar-label">Profile</span>`;
+    for (const [k,v] of Object.entries(meta)) { html += `<span class="meta-pill"><strong>${esc(k)}:</strong> ${esc(v)}</span>`; }
+    bar.innerHTML = html; row.appendChild(bar); area.appendChild(row);
+    return;
+  }
+  const row = document.createElement('div'); row.className = 'brow ' + msg.sender;
+  const bub = document.createElement('div'); bub.className = 'bubble ' + msg.sender;
+  if (msg.message_type === 'image' && msg.message) {
+    const img = document.createElement('img'); img.src = msg.message; img.alt = 'Image';
+    img.onclick = () => openLightbox(msg.message); bub.appendChild(img);
+  } else { bub.textContent = msg.message || ''; }
+  const meta = document.createElement('div'); meta.className = 'bmeta';
+  const label = msg.sender === 'user' ? 'Client' : 'You';
+  const t = msg.created_at ? new Date(msg.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '';
+  meta.textContent = label + ' · ' + t;
+  row.appendChild(bub); row.appendChild(meta); area.appendChild(row);
+}
+
+async function sendMessage() {
+  if (!activeSession) { toast('Select a conversation first', true); return; }
+  const text = msgInput.value.trim();
+  if (!text && !pendingFiles.length) return;
+  const btn = document.getElementById('sendBtn'); btn.disabled = true;
+  try {
+    if (pendingFiles.length) {
+      document.getElementById('uploadState').classList.add('visible');
+      for (const item of pendingFiles) {
+        const ext = item.file.name.split('.').pop();
+        const path = `${activeSession}/${Date.now()}_${Math.random().toString(36).substr(2,4)}.${ext}`;
+        const { error: upErr } = await sb.storage.from(STORAGE_BUCKET).upload(path, item.file, { cacheControl:'3600', upsert:false });
+        if (upErr) { toast('Upload failed: ' + upErr.message, true); continue; }
+        const { data: urlData } = sb.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+        const messageContent = item.caption ? `${item.caption}\n${urlData.publicUrl}` : urlData.publicUrl;
+        const { error: insErr } = await sb.from('messages').insert({
+          session_id: activeSession, sender:'admin',
+          message: messageContent, message_type: 'image'
+        });
+        if (insErr) { toast('Send failed', true); continue; }
+        renderBubble({ sender:'admin', message: messageContent, message_type:'image', created_at: new Date().toISOString() });
+      }
+      document.getElementById('uploadState').classList.remove('visible');
+      clearAllFiles();
+      toast('Images sent');
+    }
+    if (text) {
+      msgInput.value = ''; msgInput.style.height = 'auto';
+      const { error } = await sb.from('messages').insert({
+        session_id:activeSession, sender:'admin', message:text, message_type:'text'
+      });
+      if (error) { toast('Send failed', true); return; }
+      renderBubble({ sender:'admin', message:text, message_type:'text', created_at:new Date().toISOString() });
+      toast('Sent');
+    }
+    scrollBottom();
+  } finally { btn.disabled = false; msgInput.focus(); }
+}
+
+sb.channel('admin-rt')
+  .on('postgres_changes', { event:'INSERT', schema:'public', table:'messages' }, payload => {
+    const msg = payload.new;
+    const exists = allSessions.find(s => s.id === msg.session_id);
+    const preview = msg.message_type === 'image' ? 'Image' : (msg.message || '').substring(0, 50);
+    if (!exists) {
+      const newS = { id: msg.session_id, meta: null, lastMessage: preview, lastSender: msg.sender, lastTime: msg.created_at, hasUnread: msg.sender === 'user' };
+      if (msg.message_type === 'meta') newS.meta = parseMeta(msg.message);
+      allSessions.unshift(newS);
+    } else {
+      if (msg.message_type === 'meta') { exists.meta = parseMeta(msg.message); }
+      else { exists.lastMessage = preview; exists.lastSender = msg.sender; exists.lastTime = msg.created_at; }
+      if (msg.sender === 'user' && msg.session_id !== activeSession) exists.hasUnread = true;
+    }
+    renderSessions(allSessions);
+    if (msg.session_id === activeSession && msg.sender !== 'admin') {
+      renderBubble(msg); seenIds.add(msg.id); scrollBottom();
+      const s = allSessions.find(x => x.id === msg.session_id);
+      if (s) { s.hasUnread = false; renderSessions(allSessions); }
+      if (msg.message_type === 'meta' && s && s.meta) renderProfileBar(s.meta);
+    }
+  })
+  .subscribe();
+
+function scrollBottom() { const c=document.getElementById('chatArea'); c.scrollTop=c.scrollHeight; }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function relTime(iso) {
+  const diff = Date.now() - new Date(iso).getTime();
+  if (diff < 60000) return 'now';
+  if (diff < 3600000) return Math.floor(diff/60000) + 'm';
+  if (diff < 86400000) return Math.floor(diff/3600000) + 'h';
+  return Math.floor(diff/86400000) + 'd';
+}
+function toast(msg, isErr=false) {
+  const old = document.querySelector('.toast'); if (old) old.remove();
+  const t = document.createElement('div'); t.className = 'toast' + (isErr ? ' err' : '');
+  t.textContent = msg; document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2300);
+}
+function openLightbox(src) { document.getElementById('lightboxImg').src=src; document.getElementById('lightbox').classList.add('open'); }
+function closeLightbox()   { document.getElementById('lightbox').classList.remove('open'); }
+function toggleSidebar()   { document.getElementById('sidebar').classList.toggle('mobile-open'); }
+
+loadSessions();
+</script>
+</body>
+</html>
