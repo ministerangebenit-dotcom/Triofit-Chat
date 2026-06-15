@@ -29,7 +29,7 @@
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 html, body { height:100%; }
 body {
-  font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', \'Helvetica Neue\', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
   background: var(--bg); color: var(--text);
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
@@ -99,7 +99,19 @@ body {
 }
 .messages::-webkit-scrollbar{display:none;}
 
-''' + pattern_css + '''
+/* Gender-based Background Patterns */
+.bg-female {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cpath d='M30 100 Q45 60 60 100 T90 100' fill='none' stroke='%23f4aac8' stroke-width='1.5' opacity='0.5'/%3E%3Ccircle cx='20' cy='20' r='5' fill='%23f4aac8' opacity='0.4'/%3E%3Cpath d='M100 20 Q110 35 100 50' fill='none' stroke='%23f4aac8' stroke-width='2' opacity='0.4'/%3E%3C/svg%3E");
+  background-color: #f8e8ee;
+}
+.bg-male {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cpolygon points='60,15 72,45 110,45 78,70 90,108 60,80 30,108 42,70 10,45 48,45' fill='%23a0c4f0' opacity='0.35'/%3E%3Crect x='20' y='20' width='12' height='24' fill='%23a0c4f0' opacity='0.25'/%3E%3C/svg%3E");
+  background-color: #e8f0f8;
+}
+.bg-neutral {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Ccircle cx='60' cy='60' r='18' fill='none' stroke='%23d4a853' stroke-width='1.5' opacity='0.45'/%3E%3Ccircle cx='25' cy='25' r='4' fill='%23d4a853' opacity='0.45'/%3E%3Ccircle cx='95' cy='95' r='5' fill='%23d4a853' opacity='0.35'/%3E%3C/svg%3E");
+  background-color: var(--bg);
+}
 
 .mrow { display:flex; flex-direction:column; }
 .mrow.user  { align-items:flex-end; }
@@ -137,8 +149,8 @@ body {
 <body>
 
 <div class="lang-toggle">
-  <button class="lang-btn on" id="btnFR" onclick="setLang(\'fr\')">FR</button>
-  <button class="lang-btn"    id="btnEN" onclick="setLang(\'en\')">EN</button>
+  <button class="lang-btn on" id="btnFR" onclick="setLang('fr')">FR</button>
+  <button class="lang-btn"    id="btnEN" onclick="setLang('en')">EN</button>
 </div>
 
 <!-- ══ SPLASH ══ -->
@@ -152,7 +164,7 @@ body {
       <h1 id="s-h1">Habillez-vous<br>comme vous <em>méritez</em></h1>
       <p id="s-p">Un conseil stylistique sur mesure, disponible à tout moment, pour la clientèle de Yaoundé.</p>
     </div>
-    <button class="btn-primary" id="s-cta" onclick="goTo(\'namescreen\')">Commencer</button>
+    <button class="btn-primary" id="s-cta" onclick="goTo('namescreen')">Commencer</button>
     <div class="splash-trust">
       <span id="s-t1">Conseil personnalisé</span><span class="sep"></span>
       <span id="s-t2">Réponse rapide</span><span class="sep"></span>
@@ -205,118 +217,118 @@ body {
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const SUPABASE_URL = \'https://ahckbchulymvbhrpynyy.supabase.co\';
-const SUPABASE_KEY = \'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFoY2tiY2h1bHltdmJocnB5bnl5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4MTI5MTQsImV4cCI6MjA5NjM4ODkxNH0.aBq-qHBBTrzWf_OHpkYmQLLPeS1iywBbX47tLRqRQ1k\';
+const SUPABASE_URL = 'https://ahckbchulymvbhrpynyy.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFoY2tiY2h1bHltdmJocnB5bnl5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4MTI5MTQsImV4cCI6MjA5NjM4ODkxNH0.aBq-qHBBTrzWf_OHpkYmQLLPeS1iywBbX47tLRqRQ1k';
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let lang = \'fr\';
+let lang = 'fr';
 let sessionId = null;
 let typingRow = null;
 let profileComplete = false;
 
 const profile = {
-  name:\'\', gender:\'\', age:\'\', style:\'\', colors:\'\',
-  height:\'\', bodyType:\'\', town:\'\'
+  name:'', gender:'', age:'', style:'', colors:'',
+  height:'', bodyType:'', town:''
 };
 
 const FLOW = {
   fr: [
     {
-      key: \'gender\',
+      key: 'gender',
       q: (p) => `Merci ${p.name}. Pour affiner mes recommandations, comment vous identifiez-vous ?`,
-      qr: () => [\'Masculin\',\'Féminin\',\'Je préfère ne pas le dire\'],
+      qr: () => ['Masculin','Féminin','Je préfère ne pas le dire'],
       delay: 1200,
     },
     {
-      key: \'age\',
-      q: (p) => `Bonjour ${p.name}. Je suis votre styliste TRIOFIT.\\n\\nPour vous proposer des tenues vraiment adaptées, j\'ai besoin de vous connaître un peu mieux.\\n\\nQuel est votre âge ?`,
-      qr: () => [\'18 – 24 ans\',\'25 – 34 ans\',\'35 – 44 ans\',\'45 ans et plus\'],
+      key: 'age',
+      q: (p) => `Bonjour ${p.name}. Je suis votre styliste TRIOFIT.\n\nPour vous proposer des tenues vraiment adaptées, j'ai besoin de vous connaître un peu mieux.\n\nQuel est votre âge ?`,
+      qr: () => ['18 – 24 ans','25 – 34 ans','35 – 44 ans','45 ans et plus'],
       delay: 1600,
     },
     {
-      key: \'style\',
+      key: 'style',
       q: (p) => `Merci. Quel style vous correspond le mieux au quotidien ?`,
-      qr: () => [\'Classique & élégant\',\'Streetwear & urbain\',\'Afro-chic\',\'Décontracté & casual\',\'Mixte selon les occasions\'],
+      qr: () => ['Classique & élégant','Streetwear & urbain','Afro-chic','Décontracté & casual','Mixte selon les occasions'],
       delay: 1200,
     },
     {
-      key: \'colors\',
+      key: 'colors',
       q: (p) => `Très bien. Quelles couleurs portez-vous habituellement ou souhaitez-vous explorer ?`,
-      qr: () => [\'Tons neutres (noir, blanc, gris)\',\'Tons chauds (beige, marron, camel)\',\'Couleurs vives\',\'Tons foncés\',\'Pas de préférence\'],
+      qr: () => ['Tons neutres (noir, blanc, gris)','Tons chauds (beige, marron, camel)','Couleurs vives','Tons foncés','Pas de préférence'],
       delay: 1200,
     },
     {
-      key: \'height\',
-      q: (p) => `Quelle est votre taille approximative ? Cela m\'aide à orienter les coupes et proportions.`,
-      qr: () => [\'Moins de 165 cm\',\'165 – 170 cm\',\'171 – 175 cm\',\'176 – 180 cm\',\'Plus de 180 cm\'],
+      key: 'height',
+      q: (p) => `Quelle est votre taille approximative ? Cela m'aide à orienter les coupes et proportions.`,
+      qr: () => ['Moins de 165 cm','165 – 170 cm','171 – 175 cm','176 – 180 cm','Plus de 180 cm'],
       delay: 1200,
     },
     {
-      key: \'bodyType\',
-      q: (p) => `Et votre morphologie ? Ne vous inquiétez pas, c\'est strictement pour affiner mes recommandations.`,
-      qr: () => [\'Mince / Élancé\',\'Athlétique / Musclé\',\'Corpulent / Fort\',\'Intermédiaire\'],
+      key: 'bodyType',
+      q: (p) => `Et votre morphologie ? Ne vous inquiétez pas, c'est strictement pour affiner mes recommandations.`,
+      qr: () => ['Mince / Élancé','Athlétique / Musclé','Corpulent / Fort','Intermédiaire'],
       delay: 1300,
     },
     {
-      key: \'town\',
+      key: 'town',
       q: (p) => `Dans quelle ville ou quel quartier êtes-vous basé ? Cela me permet de vous orienter vers des boutiques accessibles.`,
-      qr: () => [\'Yaoundé Centre\',\'Bastos / Omnisports\',\'Ngousso / Mvan\',\'Biyem-Assi / Mimboman\',\'Autre ville\'],
+      qr: () => ['Yaoundé Centre','Bastos / Omnisports','Ngousso / Mvan','Biyem-Assi / Mimboman','Autre ville'],
       delay: 1200,
     },
     {
-      key: \'__done__\',
-      q: (p) => `Parfait, ${p.name}. Votre profil est complet.\\n\\nStyle *${p.style}*, morphologie *${p.bodyType}*, basé à *${p.town}*. Je connais maintenant vos préférences et votre silhouette.\\n\\nDites-moi : pour quelle occasion cherchez-vous une tenue ?`,
-      qr: () => [\'Un entretien professionnel\',\'Une sortie en soirée\',\'Un mariage ou cérémonie\',\'Le quotidien au bureau\',\'Un événement décontracté\'],
+      key: '__done__',
+      q: (p) => `Parfait, ${p.name}. Votre profil est complet.\n\nStyle *${p.style}*, morphologie *${p.bodyType}*, basé à *${p.town}*. Je connais maintenant vos préférences et votre silhouette.\n\nDites-moi : pour quelle occasion cherchez-vous une tenue ?`,
+      qr: () => ['Un entretien professionnel','Une sortie en soirée','Un mariage ou cérémonie','Le quotidien au bureau','Un événement décontracté'],
       delay: 1500,
     },
   ],
   en: [
     {
-      key: \'gender\',
+      key: 'gender',
       q: (p) => `Thanks ${p.name}. To refine my recommendations, how do you identify?`,
-      qr: () => [\'Male\',\'Female\',\'Prefer not to say\'],
+      qr: () => ['Male','Female','Prefer not to say'],
       delay: 1200,
     },
     {
-      key: \'age\',
-      q: (p) => `Good day, ${p.name}. I am your TRIOFIT personal stylist.\\n\\nTo recommend outfits that truly fit you, I need to learn a bit more about you.\\n\\nHow old are you?`,
-      qr: () => [\'18 – 24\',\'25 – 34\',\'35 – 44\',\'45 and over\'],
+      key: 'age',
+      q: (p) => `Good day, ${p.name}. I am your TRIOFIT personal stylist.\n\nTo recommend outfits that truly fit you, I need to learn a bit more about you.\n\nHow old are you?`,
+      qr: () => ['18 – 24','25 – 34','35 – 44','45 and over'],
       delay: 1600,
     },
     {
-      key: \'style\',
+      key: 'style',
       q: (p) => `Thank you. Which style best describes your everyday look?`,
-      qr: () => [\'Classic & elegant\',\'Streetwear & urban\',\'Afro-chic\',\'Casual & relaxed\',\'Mixed — depends on the occasion\'],
+      qr: () => ['Classic & elegant','Streetwear & urban','Afro-chic','Casual & relaxed','Mixed — depends on the occasion'],
       delay: 1200,
     },
     {
-      key: \'colors\',
+      key: 'colors',
       q: (p) => `Noted. Which colours do you usually wear or would like to explore?`,
-      qr: () => [\'Neutral tones (black, white, grey)\',\'Warm tones (beige, brown, camel)\',\'Bright colours\',\'Dark tones\',\'No preference\'],
+      qr: () => ['Neutral tones (black, white, grey)','Warm tones (beige, brown, camel)','Bright colours','Dark tones','No preference'],
       delay: 1200,
     },
     {
-      key: \'height\',
+      key: 'height',
       q: (p) => `What is your approximate height? This helps me recommend the right cuts and proportions.`,
-      qr: () => [\'Under 165 cm\',\'165 – 170 cm\',\'171 – 175 cm\',\'176 – 180 cm\',\'Over 180 cm\'],
+      qr: () => ['Under 165 cm','165 – 170 cm','171 – 175 cm','176 – 180 cm','Over 180 cm'],
       delay: 1200,
     },
     {
-      key: \'bodyType\',
+      key: 'bodyType',
       q: (p) => `And your body type? This is strictly to refine my recommendations.`,
-      qr: () => [\'Slim / Lean\',\'Athletic / Muscular\',\'Large / Full-figured\',\'In between\'],
+      qr: () => ['Slim / Lean','Athletic / Muscular','Large / Full-figured','In between'],
       delay: 1300,
     },
     {
-      key: \'town\',
+      key: 'town',
       q: (p) => `Which city or neighbourhood are you based in? This helps me point you to accessible boutiques.`,
-      qr: () => [\'Yaoundé Centre\',\'Bastos / Omnisports\',\'Ngousso / Mvan\',\'Biyem-Assi / Mimboman\',\'Other city\'],
+      qr: () => ['Yaoundé Centre','Bastos / Omnisports','Ngousso / Mvan','Biyem-Assi / Mimboman','Other city'],
       delay: 1200,
     },
     {
-      key: \'__done__\',
-      q: (p) => `Perfect, ${p.name}. Your profile is complete.\\n\\n*${p.style}* style, *${p.bodyType}* build, based in *${p.town}*. I now have everything I need.\\n\\nTell me: what occasion are you dressing for?`,
-      qr: () => [\'A professional interview\',\'An evening out\',\'A wedding or ceremony\',\'Everyday office wear\',\'A casual event\'],
+      key: '__done__',
+      q: (p) => `Perfect, ${p.name}. Your profile is complete.\n\n*${p.style}* style, *${p.bodyType}* build, based in *${p.town}*. I now have everything I need.\n\nTell me: what occasion are you dressing for?`,
+      qr: () => ['A professional interview','An evening out','A wedding or ceremony','Everyday office wear','A casual event'],
       delay: 1500,
     },
   ]
@@ -326,70 +338,70 @@ let flowStep = 0;
 
 const COPY = {
   fr: {
-    \'splash-tag\':\'Styliste Personnel\',\'splash-h1\':\'Habillez-vous<br>comme vous <em>méritez</em>\',
-    \'splash-p\':\'Un conseil stylistique sur mesure, disponible à tout moment, pour la clientèle de Yaoundé.\',
-    \'splash-cta\':\'Commencer\',\'t1\':\'Conseil personnalisé\',\'t2\':\'Réponse rapide\',\'t3\':\'Yaoundé\',
-    \'ns-label\':\'Bienvenue\',\'ns-title\':\'Comment vous appelez-vous ?\',\'ns-sub\':\'Votre styliste personnel vous attend.\',
-    \'nameBtn\':\'Continuer\',\'status\':\'En ligne\',\'ph-chat\':\'Écrivez votre réponse…\',
-    returning: (p) => `Bienvenue de retour, ${p.name}.\\n\\nPour quelle occasion cherchez-vous une tenue aujourd\'hui ?`,
-    ret_qr: () => [\'Un entretien professionnel\',\'Une sortie en soirée\',\'Un mariage ou cérémonie\',\'Le quotidien au bureau\',\'Un événement décontracté\'],
+    'splash-tag':'Styliste Personnel','splash-h1':'Habillez-vous<br>comme vous <em>méritez</em>',
+    'splash-p':'Un conseil stylistique sur mesure, disponible à tout moment, pour la clientèle de Yaoundé.',
+    'splash-cta':'Commencer','t1':'Conseil personnalisé','t2':'Réponse rapide','t3':'Yaoundé',
+    'ns-label':'Bienvenue','ns-title':'Comment vous appelez-vous ?','ns-sub':'Votre styliste personnel vous attend.',
+    'nameBtn':'Continuer','status':'En ligne','ph-chat':'Écrivez votre réponse…',
+    returning: (p) => `Bienvenue de retour, ${p.name}.\n\nPour quelle occasion cherchez-vous une tenue aujourd'hui ?`,
+    ret_qr: () => ['Un entretien professionnel','Une sortie en soirée','Un mariage ou cérémonie','Le quotidien au bureau','Un événement décontracté'],
   },
   en: {
-    \'splash-tag\':\'Personal Stylist\',\'splash-h1\':\'Dress the way<br>you <em>deserve</em>\',
-    \'splash-p\':\'Bespoke style advice, available at any time, for Yaoundé clientele.\',
-    \'splash-cta\':\'Get Started\',\'t1\':\'Personalised advice\',\'t2\':\'Fast reply\',\'t3\':\'Yaoundé\',
-    \'ns-label\':\'Welcome\',\'ns-title\':\'What is your name?\',\'ns-sub\':\'Your personal stylist is ready for you.\',
-    \'nameBtn\':\'Continue\',\'status\':\'Online\',\'ph-chat\':\'Type your answer…\',
-    returning: (p) => `Welcome back, ${p.name}.\\n\\nWhat occasion are you dressing for today?`,
-    ret_qr: () => [\'A professional interview\',\'An evening out\',\'A wedding or ceremony\',\'Everyday office wear\',\'A casual event\'],
+    'splash-tag':'Personal Stylist','splash-h1':'Dress the way<br>you <em>deserve</em>',
+    'splash-p':'Bespoke style advice, available at any time, for Yaoundé clientele.',
+    'splash-cta':'Get Started','t1':'Personalised advice','t2':'Fast reply','t3':'Yaoundé',
+    'ns-label':'Welcome','ns-title':'What is your name?','ns-sub':'Your personal stylist is ready for you.',
+    'nameBtn':'Continue','status':'Online','ph-chat':'Type your answer…',
+    returning: (p) => `Welcome back, ${p.name}.\n\nWhat occasion are you dressing for today?`,
+    ret_qr: () => ['A professional interview','An evening out','A wedding or ceremony','Everyday office wear','A casual event'],
   }
 };
 
 function setLang(l) {
   lang = l;
   const c = COPY[l];
-  document.getElementById(\'btnFR\').classList.toggle(\'on\', l===\'fr\');
-  document.getElementById(\'btnEN\').classList.toggle(\'on\', l===\'en\');
+  document.getElementById('btnFR').classList.toggle('on', l==='fr');
+  document.getElementById('btnEN').classList.toggle('on', l==='en');
   const map = {
-    \'s-tag\':c[\'splash-tag\'],\'s-h1\':c[\'splash-h1\'],\'s-p\':c[\'splash-p\'],
-    \'s-cta\':c[\'splash-cta\'],\'s-t1\':c[\'t1\'],\'s-t2\':c[\'t2\'],\'s-t3\':c[\'t3\'],
-    \'ns-label\':c[\'ns-label\'],\'ns-title\':c[\'ns-title\'],\'ns-sub\':c[\'ns-sub\'],
-    \'nameBtn-label\':c[\'nameBtn\'],\'ch-status\':c[\'status\'],
+    's-tag':c['splash-tag'],'s-h1':c['splash-h1'],'s-p':c['splash-p'],
+    's-cta':c['splash-cta'],'s-t1':c['t1'],'s-t2':c['t2'],'s-t3':c['t3'],
+    'ns-label':c['ns-label'],'ns-title':c['ns-title'],'ns-sub':c['ns-sub'],
+    'nameBtn-label':c['nameBtn'],'ch-status':c['status'],
   };
   for (const [id,val] of Object.entries(map)) { const el=document.getElementById(id); if(el) el.innerHTML=val; }
-  const ci=document.getElementById(\'chatInput\'); if(ci) ci.placeholder=c[\'ph-chat\'];
+  const ci=document.getElementById('chatInput'); if(ci) ci.placeholder=c['ph-chat'];
 }
 
 function goTo(id) {
-  document.querySelectorAll(\'.screen\').forEach(s => {
-    if (s.id===id) { s.classList.remove(\'hidden\',\'out\'); }
-    else { s.classList.add(\'out\'); setTimeout(()=>s.classList.add(\'hidden\'),450); }
+  document.querySelectorAll('.screen').forEach(s => {
+    if (s.id===id) { s.classList.remove('hidden','out'); }
+    else { s.classList.add('out'); setTimeout(()=>s.classList.add('hidden'),450); }
   });
 }
 
-const nameInput = document.getElementById(\'nameInput\');
-nameInput.addEventListener(\'input\', function(){ document.getElementById(\'nameBtn\').disabled = this.value.trim().length < 2; });
-nameInput.addEventListener(\'keydown\', function(e){ if (e.key===\'Enter\'){ e.preventDefault(); if(!document.getElementById(\'nameBtn\').disabled) submitName(); } });
+const nameInput = document.getElementById('nameInput');
+nameInput.addEventListener('input', function(){ document.getElementById('nameBtn').disabled = this.value.trim().length < 2; });
+nameInput.addEventListener('keydown', function(e){ if (e.key==='Enter'){ e.preventDefault(); if(!document.getElementById('nameBtn').disabled) submitName(); } });
 
 function updateChatBackground(gender) {
-  const messagesDiv = document.getElementById(\'messages\');
+  const messagesDiv = document.getElementById('messages');
   if (!messagesDiv) return;
-  messagesDiv.classList.remove(\'bg-female\', \'bg-male\', \'bg-neutral\');
-  if (gender === \'Féminin\' || gender === \'Female\') {
-    messagesDiv.classList.add(\'bg-female\');
-  } else if (gender === \'Masculin\' || gender === \'Male\') {
-    messagesDiv.classList.add(\'bg-male\');
+  messagesDiv.classList.remove('bg-female', 'bg-male', 'bg-neutral');
+  if (gender === 'Féminin' || gender === 'Female') {
+    messagesDiv.classList.add('bg-female');
+  } else if (gender === 'Masculin' || gender === 'Male') {
+    messagesDiv.classList.add('bg-male');
   } else {
-    messagesDiv.classList.add(\'bg-neutral\');
+    messagesDiv.classList.add('bg-neutral');
   }
 }
 
 function submitName() { profile.name = nameInput.value.trim(); beginSession(); }
 
 function beginSession() {
-  sessionId = \'user_\' + Date.now() + \'_\' + Math.random().toString(36).substr(2,8);
+  sessionId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2,8);
   flowStep  = 0;
-  goTo(\'chat\');
+  goTo('chat');
   pushMeta();
   const saved = loadProfile();
   if (saved && saved.name === profile.name) {
@@ -401,10 +413,10 @@ function beginSession() {
     profileComplete = false;
     askNext();
   }
-  sb.channel(\'chat-\'+sessionId)
-    .on(\'postgres_changes\',{event:\'INSERT\',schema:\'public\',table:\'messages\'}, payload=>{
+  sb.channel('chat-'+sessionId)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'}, payload=>{
       const m = payload.new;
-      if (m.session_id===sessionId && m.sender===\'admin\') { removeTyping(); if (m.message_type===\'image\') addAdminImg(m.message); else addAdminBubble(m.message); }
+      if (m.session_id===sessionId && m.sender==='admin') { removeTyping(); if (m.message_type==='image') addAdminImg(m.message); else addAdminBubble(m.message); }
     })
     .subscribe();
 }
@@ -418,69 +430,69 @@ function askNext() {
 function handleFlowAnswer(text) {
   const steps = FLOW[lang]; if (flowStep >= steps.length) return;
   const step = steps[flowStep];
-  if (step.key !== \'__done__\') { 
+  if (step.key !== '__done__') { 
     profile[step.key] = text; 
-    if (step.key === \'gender\') updateChatBackground(text);
+    if (step.key === 'gender') updateChatBackground(text);
   }
   flowStep++;
   if (flowStep < steps.length) { askNext(); }
 }
 
-const chatInput = document.getElementById(\'chatInput\');
-chatInput.addEventListener(\'input\', function(){ this.style.height=\'auto\'; this.style.height=Math.min(this.scrollHeight,100)+\'px\'; });
-chatInput.addEventListener(\'keydown\', function(e){ if (e.key===\'Enter\'&&!e.shiftKey){ e.preventDefault(); sendMsg(); } });
+const chatInput = document.getElementById('chatInput');
+chatInput.addEventListener('input', function(){ this.style.height='auto'; this.style.height=Math.min(this.scrollHeight,100)+'px'; });
+chatInput.addEventListener('keydown', function(e){ if (e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendMsg(); } });
 
 async function sendMsg(text) {
   const t = text || chatInput.value.trim();
   if (!t || !sessionId) return;
-  chatInput.value=\'\'; chatInput.style.height=\'auto\';
+  chatInput.value=''; chatInput.style.height='auto';
   removeQR(); addUserBubble(t);
-  await sb.from(\'messages\').insert({ session_id:sessionId, sender:\'user\', message:t, message_type:\'text\' });
+  await sb.from('messages').insert({ session_id:sessionId, sender:'user', message:t, message_type:'text' });
   if (!profileComplete) {
     const steps = FLOW[lang];
-    if (flowStep < steps.length) { handleFlowAnswer(t); if (FLOW[lang][flowStep] && FLOW[lang][flowStep].key===\'__done__\') { saveProfile(); pushMeta(); profileComplete=true; askNext(); flowStep++; } }
+    if (flowStep < steps.length) { handleFlowAnswer(t); if (FLOW[lang][flowStep] && FLOW[lang][flowStep].key==='__done__') { saveProfile(); pushMeta(); profileComplete=true; askNext(); flowStep++; } }
     else if (!profileComplete) { profileComplete = true; setTimeout(()=>showTyping(), 300); }
   } else { setTimeout(()=>showTyping(), 300); }
 }
 
-function addUserBubble(text) { const m=document.getElementById(\'messages\'); const row=document.createElement(\'div\'); row.className=\'mrow user\'; row.innerHTML=`<div class="bubble user">${esc(text)}</div><div class="bmeta">${now()}</div>`; m.appendChild(row); scrollM(); }
-function addAdminBubble(text) { const m=document.getElementById(\'messages\'); const row=document.createElement(\'div\'); row.className=\'mrow admin\'; const html=esc(text).replace(/\\n/g,\'<br>\').replace(/\\*(.*?)\\*/g,\'<strong>$1</strong>\'); row.innerHTML=`<div class="bubble admin">${html}</div><div class="bmeta">Styliste &middot; ${now()}</div>`; m.appendChild(row); scrollM(); }
-function addAdminImg(url) { const m=document.getElementById(\'messages\'); const row=document.createElement(\'div\'); row.className=\'mrow admin\'; row.innerHTML=`<div class="bubble admin"><img src="${url}" alt="Suggestion" onclick="openLb(\'${url}\')"></div><div class="bmeta">Styliste &middot; ${now()}</div>`; m.appendChild(row); scrollM(); }
+function addUserBubble(text) { const m=document.getElementById('messages'); const row=document.createElement('div'); row.className='mrow user'; row.innerHTML=`<div class="bubble user">${esc(text)}</div><div class="bmeta">${now()}</div>`; m.appendChild(row); scrollM(); }
+function addAdminBubble(text) { const m=document.getElementById('messages'); const row=document.createElement('div'); row.className='mrow admin'; const html=esc(text).replace(/\n/g,'<br>').replace(/\*(.*?)\*/g,'<strong>$1</strong>'); row.innerHTML=`<div class="bubble admin">${html}</div><div class="bmeta">Styliste &middot; ${now()}</div>`; m.appendChild(row); scrollM(); }
+function addAdminImg(url) { const m=document.getElementById('messages'); const row=document.createElement('div'); row.className='mrow admin'; row.innerHTML=`<div class="bubble admin"><img src="${url}" alt="Suggestion" onclick="openLb('${url}')"></div><div class="bmeta">Styliste &middot; ${now()}</div>`; m.appendChild(row); scrollM(); }
 
 function showTyping() {
   if (typingRow) return;
-  const m = document.getElementById(\'messages\');
-  const row = document.createElement(\'div\'); row.className=\'mrow admin\'; row.id=\'typingRow\';
-  row.innerHTML=\'<div class="typing-bub"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>\';
+  const m = document.getElementById('messages');
+  const row = document.createElement('div'); row.className='mrow admin'; row.id='typingRow';
+  row.innerHTML='<div class="typing-bub"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>';
   m.appendChild(row); typingRow=row; scrollM();
-  document.getElementById(\'chatAvatar\').classList.add(\'thinking\');
+  document.getElementById('chatAvatar').classList.add('thinking');
 }
-function removeTyping() { if(typingRow){typingRow.remove();typingRow=null;} document.getElementById(\'chatAvatar\').classList.remove(\'thinking\'); }
+function removeTyping() { if(typingRow){typingRow.remove();typingRow=null;} document.getElementById('chatAvatar').classList.remove('thinking'); }
 
-function showQR(list) { const m=document.getElementById(\'messages\'); const d=document.createElement(\'div\'); d.className=\'qr-row\'; d.id=\'qrRow\'; list.forEach(r=>{ const b=document.createElement(\'button\'); b.className=\'qr-btn\'; b.textContent=r; b.onclick=()=>sendMsg(r); d.appendChild(b); }); m.appendChild(d); scrollM(); }
-function removeQR() { const e=document.getElementById(\'qrRow\'); if(e) e.remove(); }
+function showQR(list) { const m=document.getElementById('messages'); const d=document.createElement('div'); d.className='qr-row'; d.id='qrRow'; list.forEach(r=>{ const b=document.createElement('button'); b.className='qr-btn'; b.textContent=r; b.onclick=()=>sendMsg(r); d.appendChild(b); }); m.appendChild(d); scrollM(); }
+function removeQR() { const e=document.getElementById('qrRow'); if(e) e.remove(); }
 
 async function pushMeta() { 
-  const meta = `[PROFIL] Nom: ${profile.name} | Genre: ${profile.gender||\'—\'} | Âge: ${profile.age||\'—\'} | Style: ${profile.style||\'—\'} | Couleurs: ${profile.colors||\'—\'} | Taille: ${profile.height||\'—\'} | Morpho: ${profile.bodyType||\'—\'} | Ville: ${profile.town||\'—\'}`; 
-  await sb.from(\'messages\').insert({ session_id:sessionId, sender:\'user\', message:meta, message_type:\'meta\' });
-  await sb.from(\'profiles\').upsert({
+  const meta = `[PROFIL] Nom: ${profile.name} | Genre: ${profile.gender||'—'} | Âge: ${profile.age||'—'} | Style: ${profile.style||'—'} | Couleurs: ${profile.colors||'—'} | Taille: ${profile.height||'—'} | Morpho: ${profile.bodyType||'—'} | Ville: ${profile.town||'—'}`; 
+  await sb.from('messages').insert({ session_id:sessionId, sender:'user', message:meta, message_type:'meta' });
+  await sb.from('profiles').upsert({
     session_id: sessionId, name: profile.name, gender: profile.gender || null,
     age: profile.age || null, style: profile.style || null, colors: profile.colors || null,
     height: profile.height || null, body_type: profile.bodyType || null, town: profile.town || null
-  }, { onConflict: \'session_id\' });
+  }, { onConflict: 'session_id' });
 }
-function saveProfile() { localStorage.setItem(\'tf_profile\', JSON.stringify(profile)); }
-function loadProfile() { try { return JSON.parse(localStorage.getItem(\'tf_profile\')); } catch { return null; } }
-function scrollM() { const m=document.getElementById(\'messages\'); m.scrollTop=m.scrollHeight; }
-function now() { return new Date().toLocaleTimeString([],{hour:\'2-digit\',minute:\'2-digit\'}); }
-function esc(s) { return s.replace(/&/g,\'&amp;\').replace(/</g,\'&lt;\').replace(/>/g,\'&gt;\'); }
-function openLb(src){ document.getElementById(\'lbImg\').src=src; document.getElementById(\'lightbox\').classList.add(\'open\'); }
-function closeLb(){ document.getElementById(\'lightbox\').classList.remove(\'open\'); }
-document.getElementById(\'lightbox\').addEventListener(\'click\', closeLb);
+function saveProfile() { localStorage.setItem('tf_profile', JSON.stringify(profile)); }
+function loadProfile() { try { return JSON.parse(localStorage.getItem('tf_profile')); } catch { return null; } }
+function scrollM() { const m=document.getElementById('messages'); m.scrollTop=m.scrollHeight; }
+function now() { return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function openLb(src){ document.getElementById('lbImg').src=src; document.getElementById('lightbox').classList.add('open'); }
+function closeLb(){ document.getElementById('lightbox').classList.remove('open'); }
+document.getElementById('lightbox').addEventListener('click', closeLb);
 
 (function init() {
   const saved = loadProfile();
-  if (saved && saved.name) { Object.assign(profile, saved); goTo(\'namescreen\'); document.getElementById(\'nameInput\').value = saved.name; document.getElementById(\'nameBtn\').disabled = false; }
+  if (saved && saved.name) { Object.assign(profile, saved); goTo('namescreen'); document.getElementById('nameInput').value = saved.name; document.getElementById('nameBtn').disabled = false; }
 })();
 </script>
 </body>
