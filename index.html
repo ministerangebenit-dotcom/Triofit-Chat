@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>TRIOFIT · Styliste Personnel</title>
+
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="TRIOFIT">
@@ -86,15 +87,36 @@ body {
 .s-dot { width:5px; height:5px; background:#4ade80; border-radius:50%; animation:pulse 2s infinite; }
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-.messages { flex:1; overflow-y:auto; overflow-x:hidden; padding:18px 16px 10px; display:flex; flex-direction:column; gap:10px; -webkit-overflow-scrolling:touch; }
+.messages {
+  flex:1; overflow-y:auto; overflow-x:hidden;
+  padding:18px 16px 10px;
+  display:flex; flex-direction:column; gap:10px;
+  -webkit-overflow-scrolling:touch;
+  background-color: var(--bg);
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  transition: background-image 0.6s ease;
+}
 .messages::-webkit-scrollbar{display:none;}
+
+/* Gender-based Background Patterns */
+.bg-female {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Cpath d='M50 180 Q75 100 100 180 T150 180' fill='none' stroke='%23f4aac8' stroke-width='2' opacity='0.4'/%3E%3Ccircle cx='40' cy='40' r='8' fill='%23f4aac8' opacity='0.3'/%3E%3Cpath d='M160 40 Q180 60 160 80' fill='none' stroke='%23f4aac8' stroke-width='3' opacity='0.3'/%3E%3Cpath d='M100 20 L100 40' stroke='%23f4aac8' stroke-width='2' opacity='0.3'/%3E%3C/svg%3E");
+}
+.bg-male {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Cpolygon points='100,30 120,70 180,70 130,110 150,170 100,130 50,170 70,110 20,70 80,70' fill='%23a0c4f0' opacity='0.3'/%3E%3Crect x='40' y='40' width='20' height='40' fill='%23a0c4f0' opacity='0.2'/%3E%3Cline x1='160' y1='40' x2='160' y2='80' stroke='%23a0c4f0' stroke-width='2' opacity='0.4'/%3E%3C/svg%3E");
+}
+.bg-neutral {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Ccircle cx='100' cy='100' r='30' fill='none' stroke='%23d4a853' stroke-width='2' opacity='0.4'/%3E%3Ccircle cx='40' cy='40' r='5' fill='%23d4a853' opacity='0.4'/%3E%3Ccircle cx='160' cy='160' r='8' fill='%23d4a853' opacity='0.3'/%3E%3Cpath d='M100 20 L105 35 L120 35 L108 45 L113 60 L100 50 L87 60 L92 45 L80 35 L95 35 Z' fill='%23d4a853' opacity='0.4'/%3E%3C/svg%3E");
+}
+
 .mrow { display:flex; flex-direction:column; }
 .mrow.user  { align-items:flex-end; }
 .mrow.admin { align-items:flex-start; }
 .bubble { max-width:78%; padding:11px 15px; border-radius:16px; font-size:14px; line-height:1.58; word-break:break-word; animation:bIn .28s ease both; }
 @keyframes bIn{from{opacity:0;transform:scale(.96) translateY(5px)}to{opacity:1;transform:scale(1) translateY(0)}}
-.bubble.user { background:var(--gold-pale); border:1px solid var(--gold-border); border-bottom-right-radius:3px; }
-.bubble.admin { background:var(--surface2); border:1px solid rgba(255,255,255,.04); border-bottom-left-radius:3px; }
+.bubble.user { background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); border:1px solid var(--gold-border); border-bottom-right-radius:3px; }
+.bubble.admin { background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,.08); border-bottom-left-radius:3px; }
 .bubble img { max-width:100%; border-radius:8px; display:block; cursor:pointer; }
 .bmeta { font-size:10px; color:var(--text-muted); margin-top:4px; padding:0 2px; letter-spacing:.02em; }
 
@@ -175,7 +197,7 @@ body {
       <div class="chat-hstatus"><div class="s-dot"></div><span id="ch-status">En ligne</span></div>
     </div>
   </div>
-  <div class="messages" id="messages"></div>
+  <div class="messages bg-neutral" id="messages"></div>
   <div class="chat-input-area">
     <div class="input-row">
       <textarea class="chat-ta" id="chatInput" rows="1" placeholder="Écrivez un message…"></textarea>
@@ -358,6 +380,19 @@ const nameInput = document.getElementById('nameInput');
 nameInput.addEventListener('input', function(){ document.getElementById('nameBtn').disabled = this.value.trim().length < 2; });
 nameInput.addEventListener('keydown', function(e){ if (e.key==='Enter'){ e.preventDefault(); if(!document.getElementById('nameBtn').disabled) submitName(); } });
 
+function updateChatBackground(gender) {
+  const messagesDiv = document.getElementById('messages');
+  if (!messagesDiv) return;
+  messagesDiv.classList.remove('bg-female', 'bg-male', 'bg-neutral');
+  if (gender === 'Féminin' || gender === 'Female') {
+    messagesDiv.classList.add('bg-female');
+  } else if (gender === 'Masculin' || gender === 'Male') {
+    messagesDiv.classList.add('bg-male');
+  } else {
+    messagesDiv.classList.add('bg-neutral');
+  }
+}
+
 function submitName() { profile.name = nameInput.value.trim(); beginSession(); }
 
 function beginSession() {
@@ -369,6 +404,7 @@ function beginSession() {
   if (saved && saved.name === profile.name) {
     Object.assign(profile, saved);
     profileComplete = true;
+    if (saved.gender) updateChatBackground(saved.gender);
     setTimeout(()=>{ showTyping(); setTimeout(()=>{ removeTyping(); addAdminBubble(COPY[lang].returning(profile)); showQR(COPY[lang].ret_qr()); }, 1400); }, 500);
   } else {
     profileComplete = false;
@@ -382,65 +418,6 @@ function beginSession() {
     .subscribe();
 }
 
--- ============================================
--- TRIOFIT COMPLETE DATABASE SETUP
--- Run once. Does everything.
--- ============================================
-
--- 1. MESSAGES TABLE (recreate with all columns)
-DROP TABLE IF EXISTS messages;
-CREATE TABLE messages (
-  id bigint generated by default as identity primary key,
-  session_id text not null,
-  sender text not null check (sender in ('user', 'admin')),
-  message text not null,
-  message_type text default 'text',
-  created_at timestamp with time zone default now()
-);
-
--- 2. PROFILES TABLE
-CREATE TABLE IF NOT EXISTS profiles (
-  id bigint generated by default as identity primary key,
-  session_id text unique not null,
-  name text not null,
-  gender text,
-  age text,
-  style text,
-  colors text,
-  height text,
-  body_type text,
-  town text,
-  created_at timestamp with time zone default now()
-);
-
--- 3. ROW LEVEL SECURITY — MESSAGES
-ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "messages_insert" ON messages FOR INSERT WITH CHECK (true);
-CREATE POLICY "messages_select" ON messages FOR SELECT USING (true);
-CREATE POLICY "messages_delete" ON messages FOR DELETE USING (true);
-
--- 4. ROW LEVEL SECURITY — PROFILES
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "profiles_insert" ON profiles FOR INSERT WITH CHECK (true);
-CREATE POLICY "profiles_select" ON profiles FOR SELECT USING (true);
-CREATE POLICY "profiles_update" ON profiles FOR UPDATE USING (true);
-
--- 5. STORAGE BUCKET
-INSERT INTO storage.buckets (id, name, public)
-VALUES ('chat-images', 'chat-images', true)
-ON CONFLICT (id) DO NOTHING;
-
--- 6. STORAGE POLICIES (drop old ones first)
-DROP POLICY IF EXISTS "Allow all uploads" ON storage.objects;
-DROP POLICY IF EXISTS "Allow all reads" ON storage.objects;
-DROP POLICY IF EXISTS "Anyone can upload images" ON storage.objects;
-DROP POLICY IF EXISTS "Anyone can read images" ON storage.objects;
-CREATE POLICY "storage_insert" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'chat-images');
-CREATE POLICY "storage_select" ON storage.objects FOR SELECT USING (bucket_id = 'chat-images');
-
--- 7. REALTIME
-ALTER PUBLICATION supabase_realtime ADD TABLE messages;
-ALTER PUBLICATION supabase_realtime ADD TABLE profiles;
 function askNext() {
   const steps = FLOW[lang]; if (flowStep >= steps.length) return;
   const step = steps[flowStep];
@@ -450,7 +427,10 @@ function askNext() {
 function handleFlowAnswer(text) {
   const steps = FLOW[lang]; if (flowStep >= steps.length) return;
   const step = steps[flowStep];
-  if (step.key !== '__done__') { profile[step.key] = text; }
+  if (step.key !== '__done__') { 
+    profile[step.key] = text; 
+    if (step.key === 'gender') updateChatBackground(text);
+  }
   flowStep++;
   if (flowStep < steps.length) { askNext(); }
 }
@@ -489,7 +469,15 @@ function removeTyping() { if(typingRow){typingRow.remove();typingRow=null;} docu
 function showQR(list) { const m=document.getElementById('messages'); const d=document.createElement('div'); d.className='qr-row'; d.id='qrRow'; list.forEach(r=>{ const b=document.createElement('button'); b.className='qr-btn'; b.textContent=r; b.onclick=()=>sendMsg(r); d.appendChild(b); }); m.appendChild(d); scrollM(); }
 function removeQR() { const e=document.getElementById('qrRow'); if(e) e.remove(); }
 
-async function pushMeta() { const meta = `[PROFIL] Nom: ${profile.name} | Genre: ${profile.gender||'—'} | Âge: ${profile.age||'—'} | Style: ${profile.style||'—'} | Couleurs: ${profile.colors||'—'} | Taille: ${profile.height||'—'} | Morpho: ${profile.bodyType||'—'} | Ville: ${profile.town||'—'}`; await sb.from('messages').insert({ session_id:sessionId, sender:'user', message:meta, message_type:'meta' }); }
+async function pushMeta() { 
+  const meta = `[PROFIL] Nom: ${profile.name} | Genre: ${profile.gender||'—'} | Âge: ${profile.age||'—'} | Style: ${profile.style||'—'} | Couleurs: ${profile.colors||'—'} | Taille: ${profile.height||'—'} | Morpho: ${profile.bodyType||'—'} | Ville: ${profile.town||'—'}`; 
+  await sb.from('messages').insert({ session_id:sessionId, sender:'user', message:meta, message_type:'meta' });
+  await sb.from('profiles').upsert({
+    session_id: sessionId, name: profile.name, gender: profile.gender || null,
+    age: profile.age || null, style: profile.style || null, colors: profile.colors || null,
+    height: profile.height || null, body_type: profile.bodyType || null, town: profile.town || null
+  }, { onConflict: 'session_id' });
+}
 function saveProfile() { localStorage.setItem('tf_profile', JSON.stringify(profile)); }
 function loadProfile() { try { return JSON.parse(localStorage.getItem('tf_profile')); } catch { return null; } }
 function scrollM() { const m=document.getElementById('messages'); m.scrollTop=m.scrollHeight; }
