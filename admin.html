@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>TRIOFIT · Admin</title>
+
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="TRIOFIT Admin">
@@ -56,10 +57,7 @@ body {
 }
 .brand-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
 .brand { display:flex; align-items:center; gap:10px; }
-.brand-logo {
-  width:30px; height:30px; border-radius:7px;
-  object-fit: cover;
-}
+.brand-logo { width:30px; height:30px; border-radius:7px; object-fit:cover; }
 .brand-name { font-size:14px; font-weight:700; letter-spacing:.1em; color:var(--text); }
 .brand-role { font-size:10px; color:var(--text-3); letter-spacing:.06em; margin-top:1px; }
 
@@ -72,15 +70,6 @@ body {
 }
 .live-dot { width:5px; height:5px; background:var(--green); border-radius:50%; animation:pulse 2s infinite; }
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-
-/* Logo glow animation */
-@keyframes logoGlow {
-  0%, 100% { box-shadow: 0 0 8px rgba(201,153,58,0.3); }
-  50% { box-shadow: 0 0 20px rgba(201,153,58,0.6); }
-}
-.logo-thinking {
-  animation: logoGlow 1.5s ease-in-out infinite;
-}
 
 .search-wrap { position:relative; }
 .search-input {
@@ -124,12 +113,7 @@ body {
   background:var(--s3); border:1px solid rgba(255,255,255,.07);
   display:flex; align-items:center; justify-content:center;
 }
-.s-avatar img {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-}
+.s-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
 .s-avatar-initials { font-size:11px; font-weight:700; color:var(--text-2); letter-spacing:.02em; }
 .session-item.active .s-avatar { border-color:var(--gold-bd); }
 
@@ -178,12 +162,7 @@ body {
   display:flex; align-items:center; justify-content:center; flex-shrink:0;
   overflow: hidden;
 }
-.h-avatar img {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-}
+.h-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
 .h-avatar-initials { font-size:11px; font-weight:700; color:var(--text-2); }
 .h-name { font-size:14px; font-weight:600; }
 .h-sub  { font-size:11px; color:var(--text-3); margin-top:2px; }
@@ -227,13 +206,7 @@ body {
   align-items:center; justify-content:center; gap:10px;
   color:var(--text-3);
 }
-.empty-logo {
-  width: 64px;
-  height: 64px;
-  border-radius: 16px;
-  object-fit: cover;
-  opacity: 0.5;
-}
+.empty-logo { width: 48px; height: 48px; border-radius: 12px; object-fit: cover; opacity: 0.5; }
 .empty-text { font-size:13px; }
 
 .brow { display:flex; flex-direction:column; }
@@ -394,7 +367,7 @@ body {
     <div class="sidebar-top">
       <div class="brand-row">
         <div class="brand">
-          <img class="brand-logo" src="logo.jpg" alt="TRIOFIT" id="sidebarLogo">
+          <img class="brand-logo" src="logo.jpg" alt="TRIOFIT">
           <div>
             <div class="brand-name">TRIOFIT</div>
             <div class="brand-role">Admin Panel</div>
