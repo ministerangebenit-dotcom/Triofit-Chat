@@ -1,18 +1,15 @@
-const CACHE_NAME = 'triofit-v3';
-const ASSETS_TO_CACHE = [
-  './',
-  './index.html',
-  './admin.html',
-  './manifest.json',
-  './logo.jpg'
-];
+const CACHE_NAME = 'triofit-v5';
 
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(ASSETS_TO_CACHE).catch(err => {
-        console.warn('Cache addAll failed:', err);
-      });
+      return cache.addAll([
+        './',
+        './index.html',
+        './admin.html',
+        './manifest.json',
+        './logo.jpg'
+      ]).catch(err => console.warn('Cache addAll:', err));
     })
   );
   self.skipWaiting();
@@ -34,15 +31,11 @@ self.addEventListener('fetch', event => {
     fetch(event.request)
       .then(response => {
         if (response && response.status === 200) {
-          const responseClone = response.clone();
-          caches.open(CACHE_NAME).then(cache => {
-            cache.put(event.request, responseClone);
-          });
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
         }
         return response;
       })
-      .catch(() => {
-        return caches.match(event.request);
-      })
+      .catch(() => caches.match(event.request))
   );
 });
