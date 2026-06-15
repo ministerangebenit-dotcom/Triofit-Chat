@@ -83,8 +83,10 @@ body {
 @keyframes logoGlow { 0%,100%{box-shadow:0 0 8px rgba(184,137,58,.3)} 50%{box-shadow:0 0 20px rgba(184,137,58,.6)} }
 .chat-avatar.thinking { animation:logoGlow 1.5s ease-in-out infinite; }
 .chat-hname  { font-size:13px; font-weight:700; letter-spacing:.02em; }
-.chat-hstatus{ display:flex; align-items:center; gap:5px; font-size:11px; color:#4ade80; margin-top:2px; }
-.s-dot { width:5px; height:5px; background:#4ade80; border-radius:50%; animation:pulse 2s infinite; }
+.chat-hstatus{ display:flex; align-items:center; gap:5px; font-size:11px; color:var(--text-dim); margin-top:2px; }
+.chat-hstatus .s-dot { width:5px; height:5px; background:var(--gold); border-radius:50%; }
+.chat-hstatus.thinking-status { color:var(--gold); }
+.chat-hstatus.thinking-status .s-dot { animation:pulse 1.2s infinite; }
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
 .messages {
@@ -93,33 +95,16 @@ body {
   display:flex; flex-direction:column; gap:10px;
   -webkit-overflow-scrolling:touch;
   background-color: var(--bg);
-  background-repeat: repeat;
-  background-size: 120px 120px;
-  transition: background-image 0.5s ease, background-color 0.5s ease;
 }
 .messages::-webkit-scrollbar{display:none;}
-
-/* Gender-based Background Patterns */
-.bg-female {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cpath d='M30 100 Q45 60 60 100 T90 100' fill='none' stroke='%23f4aac8' stroke-width='1.5' opacity='0.5'/%3E%3Ccircle cx='20' cy='20' r='5' fill='%23f4aac8' opacity='0.4'/%3E%3Cpath d='M100 20 Q110 35 100 50' fill='none' stroke='%23f4aac8' stroke-width='2' opacity='0.4'/%3E%3C/svg%3E");
-  background-color: #f8e8ee;
-}
-.bg-male {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cpolygon points='60,15 72,45 110,45 78,70 90,108 60,80 30,108 42,70 10,45 48,45' fill='%23a0c4f0' opacity='0.35'/%3E%3Crect x='20' y='20' width='12' height='24' fill='%23a0c4f0' opacity='0.25'/%3E%3C/svg%3E");
-  background-color: #e8f0f8;
-}
-.bg-neutral {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Ccircle cx='60' cy='60' r='18' fill='none' stroke='%23d4a853' stroke-width='1.5' opacity='0.45'/%3E%3Ccircle cx='25' cy='25' r='4' fill='%23d4a853' opacity='0.45'/%3E%3Ccircle cx='95' cy='95' r='5' fill='%23d4a853' opacity='0.35'/%3E%3C/svg%3E");
-  background-color: var(--bg);
-}
 
 .mrow { display:flex; flex-direction:column; }
 .mrow.user  { align-items:flex-end; }
 .mrow.admin { align-items:flex-start; }
 .bubble { max-width:78%; padding:11px 15px; border-radius:16px; font-size:14px; line-height:1.58; word-break:break-word; animation:bIn .28s ease both; }
 @keyframes bIn{from{opacity:0;transform:scale(.96) translateY(5px)}to{opacity:1;transform:scale(1) translateY(0)}}
-.bubble.user { background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); border:1px solid var(--gold-border); border-bottom-right-radius:3px; }
-.bubble.admin { background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,.08); border-bottom-left-radius:3px; }
+.bubble.user { background:var(--gold-pale); border:1px solid var(--gold-border); border-bottom-right-radius:3px; }
+.bubble.admin { background:var(--surface2); border:1px solid rgba(255,255,255,.04); border-bottom-left-radius:3px; }
 .bubble img { max-width:100%; border-radius:8px; display:block; cursor:pointer; }
 .bmeta { font-size:10px; color:var(--text-muted); margin-top:4px; padding:0 2px; letter-spacing:.02em; }
 
@@ -197,10 +182,10 @@ body {
     <div class="chat-avatar" id="chatAvatar"><img src="logo.jpg" alt="TRIOFIT"></div>
     <div>
       <div class="chat-hname">TRIOFIT Styliste</div>
-      <div class="chat-hstatus"><div class="s-dot"></div><span id="ch-status">En ligne</span></div>
+      <div class="chat-hstatus" id="chatStatus"><div class="s-dot"></div><span id="ch-status">MODE GRATUIT</span></div>
     </div>
   </div>
-  <div class="messages bg-neutral" id="messages"></div>
+  <div class="messages" id="messages"></div>
   <div class="chat-input-area">
     <div class="input-row">
       <textarea class="chat-ta" id="chatInput" rows="1" placeholder="Écrivez un message…"></textarea>
@@ -230,6 +215,24 @@ const profile = {
   name:'', gender:'', age:'', style:'', colors:'',
   height:'', bodyType:'', town:''
 };
+
+const STATUS_TEXT = {
+  fr: { free: 'MODE GRATUIT', thinking: 'Réflexion…' },
+  en: { free: 'FREE MODE', thinking: 'Thinking…' }
+};
+
+function setStatus(mode) {
+  const el = document.getElementById('ch-status');
+  const container = document.getElementById('chatStatus');
+  if (!el || !container) return;
+  if (mode === 'thinking') {
+    el.textContent = STATUS_TEXT[lang].thinking;
+    container.classList.add('thinking-status');
+  } else {
+    el.textContent = STATUS_TEXT[lang].free;
+    container.classList.remove('thinking-status');
+  }
+}
 
 const FLOW = {
   fr: [
@@ -342,7 +345,7 @@ const COPY = {
     'splash-p':'Un conseil stylistique sur mesure, disponible à tout moment, pour la clientèle de Yaoundé.',
     'splash-cta':'Commencer','t1':'Conseil personnalisé','t2':'Réponse rapide','t3':'Yaoundé',
     'ns-label':'Bienvenue','ns-title':'Comment vous appelez-vous ?','ns-sub':'Votre styliste personnel vous attend.',
-    'nameBtn':'Continuer','status':'En ligne','ph-chat':'Écrivez votre réponse…',
+    'nameBtn':'Continuer','ph-chat':'Écrivez votre réponse…',
     returning: (p) => `Bienvenue de retour, ${p.name}.\n\nPour quelle occasion cherchez-vous une tenue aujourd'hui ?`,
     ret_qr: () => ['Un entretien professionnel','Une sortie en soirée','Un mariage ou cérémonie','Le quotidien au bureau','Un événement décontracté'],
   },
@@ -351,7 +354,7 @@ const COPY = {
     'splash-p':'Bespoke style advice, available at any time, for Yaoundé clientele.',
     'splash-cta':'Get Started','t1':'Personalised advice','t2':'Fast reply','t3':'Yaoundé',
     'ns-label':'Welcome','ns-title':'What is your name?','ns-sub':'Your personal stylist is ready for you.',
-    'nameBtn':'Continue','status':'Online','ph-chat':'Type your answer…',
+    'nameBtn':'Continue','ph-chat':'Type your answer…',
     returning: (p) => `Welcome back, ${p.name}.\n\nWhat occasion are you dressing for today?`,
     ret_qr: () => ['A professional interview','An evening out','A wedding or ceremony','Everyday office wear','A casual event'],
   }
@@ -366,10 +369,11 @@ function setLang(l) {
     's-tag':c['splash-tag'],'s-h1':c['splash-h1'],'s-p':c['splash-p'],
     's-cta':c['splash-cta'],'s-t1':c['t1'],'s-t2':c['t2'],'s-t3':c['t3'],
     'ns-label':c['ns-label'],'ns-title':c['ns-title'],'ns-sub':c['ns-sub'],
-    'nameBtn-label':c['nameBtn'],'ch-status':c['status'],
+    'nameBtn-label':c['nameBtn'],
   };
   for (const [id,val] of Object.entries(map)) { const el=document.getElementById(id); if(el) el.innerHTML=val; }
   const ci=document.getElementById('chatInput'); if(ci) ci.placeholder=c['ph-chat'];
+  setStatus('free');
 }
 
 function goTo(id) {
@@ -383,19 +387,6 @@ const nameInput = document.getElementById('nameInput');
 nameInput.addEventListener('input', function(){ document.getElementById('nameBtn').disabled = this.value.trim().length < 2; });
 nameInput.addEventListener('keydown', function(e){ if (e.key==='Enter'){ e.preventDefault(); if(!document.getElementById('nameBtn').disabled) submitName(); } });
 
-function updateChatBackground(gender) {
-  const messagesDiv = document.getElementById('messages');
-  if (!messagesDiv) return;
-  messagesDiv.classList.remove('bg-female', 'bg-male', 'bg-neutral');
-  if (gender === 'Féminin' || gender === 'Female') {
-    messagesDiv.classList.add('bg-female');
-  } else if (gender === 'Masculin' || gender === 'Male') {
-    messagesDiv.classList.add('bg-male');
-  } else {
-    messagesDiv.classList.add('bg-neutral');
-  }
-}
-
 function submitName() { profile.name = nameInput.value.trim(); beginSession(); }
 
 function beginSession() {
@@ -407,7 +398,6 @@ function beginSession() {
   if (saved && saved.name === profile.name) {
     Object.assign(profile, saved);
     profileComplete = true;
-    if (saved.gender) updateChatBackground(saved.gender);
     setTimeout(()=>{ showTyping(); setTimeout(()=>{ removeTyping(); addAdminBubble(COPY[lang].returning(profile)); showQR(COPY[lang].ret_qr()); }, 1400); }, 500);
   } else {
     profileComplete = false;
@@ -432,7 +422,6 @@ function handleFlowAnswer(text) {
   const step = steps[flowStep];
   if (step.key !== '__done__') { 
     profile[step.key] = text; 
-    if (step.key === 'gender') updateChatBackground(text);
   }
   flowStep++;
   if (flowStep < steps.length) { askNext(); }
@@ -466,8 +455,9 @@ function showTyping() {
   row.innerHTML='<div class="typing-bub"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>';
   m.appendChild(row); typingRow=row; scrollM();
   document.getElementById('chatAvatar').classList.add('thinking');
+  setStatus('thinking');
 }
-function removeTyping() { if(typingRow){typingRow.remove();typingRow=null;} document.getElementById('chatAvatar').classList.remove('thinking'); }
+function removeTyping() { if(typingRow){typingRow.remove();typingRow=null;} document.getElementById('chatAvatar').classList.remove('thinking'); setStatus('free'); }
 
 function showQR(list) { const m=document.getElementById('messages'); const d=document.createElement('div'); d.className='qr-row'; d.id='qrRow'; list.forEach(r=>{ const b=document.createElement('button'); b.className='qr-btn'; b.textContent=r; b.onclick=()=>sendMsg(r); d.appendChild(b); }); m.appendChild(d); scrollM(); }
 function removeQR() { const e=document.getElementById('qrRow'); if(e) e.remove(); }
@@ -489,6 +479,8 @@ function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>
 function openLb(src){ document.getElementById('lbImg').src=src; document.getElementById('lightbox').classList.add('open'); }
 function closeLb(){ document.getElementById('lightbox').classList.remove('open'); }
 document.getElementById('lightbox').addEventListener('click', closeLb);
+
+setStatus('free');
 
 (function init() {
   const saved = loadProfile();
