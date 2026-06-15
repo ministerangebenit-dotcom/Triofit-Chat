@@ -83,7 +83,7 @@ body {
 @keyframes logoGlow { 0%,100%{box-shadow:0 0 8px rgba(184,137,58,.3)} 50%{box-shadow:0 0 20px rgba(184,137,58,.6)} }
 .chat-avatar.thinking { animation:logoGlow 1.5s ease-in-out infinite; }
 .chat-hname  { font-size:13px; font-weight:700; letter-spacing:.02em; }
-.chat-hstatus{ display:flex; align-items:center; gap:5px; font-size:11px; color:var(--text-dim); margin-top:2px; }
+.chat-hstatus { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--text-dim); margin-top:2px; }
 .chat-hstatus .s-dot { width:5px; height:5px; background:var(--gold); border-radius:50%; }
 .chat-hstatus.thinking-status { color:var(--gold); }
 .chat-hstatus.thinking-status .s-dot { animation:pulse 1.2s infinite; }
@@ -225,115 +225,34 @@ function setStatus(mode) {
   const el = document.getElementById('ch-status');
   const container = document.getElementById('chatStatus');
   if (!el || !container) return;
+  el.textContent = STATUS_TEXT[lang][mode];
   if (mode === 'thinking') {
-    el.textContent = STATUS_TEXT[lang].thinking;
     container.classList.add('thinking-status');
   } else {
-    el.textContent = STATUS_TEXT[lang].free;
     container.classList.remove('thinking-status');
   }
 }
 
 const FLOW = {
   fr: [
-    {
-      key: 'gender',
-      q: (p) => `Merci ${p.name}. Pour affiner mes recommandations, comment vous identifiez-vous ?`,
-      qr: () => ['Masculin','Féminin','Je préfère ne pas le dire'],
-      delay: 1200,
-    },
-    {
-      key: 'age',
-      q: (p) => `Bonjour ${p.name}. Je suis votre styliste TRIOFIT.\n\nPour vous proposer des tenues vraiment adaptées, j'ai besoin de vous connaître un peu mieux.\n\nQuel est votre âge ?`,
-      qr: () => ['18 – 24 ans','25 – 34 ans','35 – 44 ans','45 ans et plus'],
-      delay: 1600,
-    },
-    {
-      key: 'style',
-      q: (p) => `Merci. Quel style vous correspond le mieux au quotidien ?`,
-      qr: () => ['Classique & élégant','Streetwear & urbain','Afro-chic','Décontracté & casual','Mixte selon les occasions'],
-      delay: 1200,
-    },
-    {
-      key: 'colors',
-      q: (p) => `Très bien. Quelles couleurs portez-vous habituellement ou souhaitez-vous explorer ?`,
-      qr: () => ['Tons neutres (noir, blanc, gris)','Tons chauds (beige, marron, camel)','Couleurs vives','Tons foncés','Pas de préférence'],
-      delay: 1200,
-    },
-    {
-      key: 'height',
-      q: (p) => `Quelle est votre taille approximative ? Cela m'aide à orienter les coupes et proportions.`,
-      qr: () => ['Moins de 165 cm','165 – 170 cm','171 – 175 cm','176 – 180 cm','Plus de 180 cm'],
-      delay: 1200,
-    },
-    {
-      key: 'bodyType',
-      q: (p) => `Et votre morphologie ? Ne vous inquiétez pas, c'est strictement pour affiner mes recommandations.`,
-      qr: () => ['Mince / Élancé','Athlétique / Musclé','Corpulent / Fort','Intermédiaire'],
-      delay: 1300,
-    },
-    {
-      key: 'town',
-      q: (p) => `Dans quelle ville ou quel quartier êtes-vous basé ? Cela me permet de vous orienter vers des boutiques accessibles.`,
-      qr: () => ['Yaoundé Centre','Bastos / Omnisports','Ngousso / Mvan','Biyem-Assi / Mimboman','Autre ville'],
-      delay: 1200,
-    },
-    {
-      key: '__done__',
-      q: (p) => `Parfait, ${p.name}. Votre profil est complet.\n\nStyle *${p.style}*, morphologie *${p.bodyType}*, basé à *${p.town}*. Je connais maintenant vos préférences et votre silhouette.\n\nDites-moi : pour quelle occasion cherchez-vous une tenue ?`,
-      qr: () => ['Un entretien professionnel','Une sortie en soirée','Un mariage ou cérémonie','Le quotidien au bureau','Un événement décontracté'],
-      delay: 1500,
-    },
+    { key:'gender', q:(p)=>`Merci ${p.name}. Pour affiner mes recommandations, comment vous identifiez-vous ?`, qr:()=>['Masculin','Féminin','Je préfère ne pas le dire'], delay:1200 },
+    { key:'age', q:(p)=>`Bonjour ${p.name}. Je suis votre styliste TRIOFIT.\n\nPour vous proposer des tenues vraiment adaptées, j'ai besoin de vous connaître un peu mieux.\n\nQuel est votre âge ?`, qr:()=>['18 – 24 ans','25 – 34 ans','35 – 44 ans','45 ans et plus'], delay:1600 },
+    { key:'style', q:(p)=>`Merci. Quel style vous correspond le mieux au quotidien ?`, qr:()=>['Classique & élégant','Streetwear & urbain','Afro-chic','Décontracté & casual','Mixte selon les occasions'], delay:1200 },
+    { key:'colors', q:(p)=>`Très bien. Quelles couleurs portez-vous habituellement ou souhaitez-vous explorer ?`, qr:()=>['Tons neutres (noir, blanc, gris)','Tons chauds (beige, marron, camel)','Couleurs vives','Tons foncés','Pas de préférence'], delay:1200 },
+    { key:'height', q:(p)=>`Quelle est votre taille approximative ? Cela m'aide à orienter les coupes et proportions.`, qr:()=>['Moins de 165 cm','165 – 170 cm','171 – 175 cm','176 – 180 cm','Plus de 180 cm'], delay:1200 },
+    { key:'bodyType', q:(p)=>`Et votre morphologie ? Ne vous inquiétez pas, c'est strictement pour affiner mes recommandations.`, qr:()=>['Mince / Élancé','Athlétique / Musclé','Corpulent / Fort','Intermédiaire'], delay:1300 },
+    { key:'town', q:(p)=>`Dans quelle ville ou quel quartier êtes-vous basé ? Cela me permet de vous orienter vers des boutiques accessibles.`, qr:()=>['Yaoundé Centre','Bastos / Omnisports','Ngousso / Mvan','Biyem-Assi / Mimboman','Autre ville'], delay:1200 },
+    { key:'__done__', q:(p)=>`Parfait, ${p.name}. Votre profil est complet.\n\nStyle *${p.style}*, morphologie *${p.bodyType}*, basé à *${p.town}*. Je connais maintenant vos préférences et votre silhouette.\n\nDites-moi : pour quelle occasion cherchez-vous une tenue ?`, qr:()=>['Un entretien professionnel','Une sortie en soirée','Un mariage ou cérémonie','Le quotidien au bureau','Un événement décontracté'], delay:1500 },
   ],
   en: [
-    {
-      key: 'gender',
-      q: (p) => `Thanks ${p.name}. To refine my recommendations, how do you identify?`,
-      qr: () => ['Male','Female','Prefer not to say'],
-      delay: 1200,
-    },
-    {
-      key: 'age',
-      q: (p) => `Good day, ${p.name}. I am your TRIOFIT personal stylist.\n\nTo recommend outfits that truly fit you, I need to learn a bit more about you.\n\nHow old are you?`,
-      qr: () => ['18 – 24','25 – 34','35 – 44','45 and over'],
-      delay: 1600,
-    },
-    {
-      key: 'style',
-      q: (p) => `Thank you. Which style best describes your everyday look?`,
-      qr: () => ['Classic & elegant','Streetwear & urban','Afro-chic','Casual & relaxed','Mixed — depends on the occasion'],
-      delay: 1200,
-    },
-    {
-      key: 'colors',
-      q: (p) => `Noted. Which colours do you usually wear or would like to explore?`,
-      qr: () => ['Neutral tones (black, white, grey)','Warm tones (beige, brown, camel)','Bright colours','Dark tones','No preference'],
-      delay: 1200,
-    },
-    {
-      key: 'height',
-      q: (p) => `What is your approximate height? This helps me recommend the right cuts and proportions.`,
-      qr: () => ['Under 165 cm','165 – 170 cm','171 – 175 cm','176 – 180 cm','Over 180 cm'],
-      delay: 1200,
-    },
-    {
-      key: 'bodyType',
-      q: (p) => `And your body type? This is strictly to refine my recommendations.`,
-      qr: () => ['Slim / Lean','Athletic / Muscular','Large / Full-figured','In between'],
-      delay: 1300,
-    },
-    {
-      key: 'town',
-      q: (p) => `Which city or neighbourhood are you based in? This helps me point you to accessible boutiques.`,
-      qr: () => ['Yaoundé Centre','Bastos / Omnisports','Ngousso / Mvan','Biyem-Assi / Mimboman','Other city'],
-      delay: 1200,
-    },
-    {
-      key: '__done__',
-      q: (p) => `Perfect, ${p.name}. Your profile is complete.\n\n*${p.style}* style, *${p.bodyType}* build, based in *${p.town}*. I now have everything I need.\n\nTell me: what occasion are you dressing for?`,
-      qr: () => ['A professional interview','An evening out','A wedding or ceremony','Everyday office wear','A casual event'],
-      delay: 1500,
-    },
+    { key:'gender', q:(p)=>`Thanks ${p.name}. To refine my recommendations, how do you identify?`, qr:()=>['Male','Female','Prefer not to say'], delay:1200 },
+    { key:'age', q:(p)=>`Good day, ${p.name}. I am your TRIOFIT personal stylist.\n\nTo recommend outfits that truly fit you, I need to learn a bit more about you.\n\nHow old are you?`, qr:()=>['18 – 24','25 – 34','35 – 44','45 and over'], delay:1600 },
+    { key:'style', q:(p)=>`Thank you. Which style best describes your everyday look?`, qr:()=>['Classic & elegant','Streetwear & urban','Afro-chic','Casual & relaxed','Mixed — depends on the occasion'], delay:1200 },
+    { key:'colors', q:(p)=>`Noted. Which colours do you usually wear or would like to explore?`, qr:()=>['Neutral tones (black, white, grey)','Warm tones (beige, brown, camel)','Bright colours','Dark tones','No preference'], delay:1200 },
+    { key:'height', q:(p)=>`What is your approximate height? This helps me recommend the right cuts and proportions.`, qr:()=>['Under 165 cm','165 – 170 cm','171 – 175 cm','176 – 180 cm','Over 180 cm'], delay:1200 },
+    { key:'bodyType', q:(p)=>`And your body type? This is strictly to refine my recommendations.`, qr:()=>['Slim / Lean','Athletic / Muscular','Large / Full-figured','In between'], delay:1300 },
+    { key:'town', q:(p)=>`Which city or neighbourhood are you based in? This helps me point you to accessible boutiques.`, qr:()=>['Yaoundé Centre','Bastos / Omnisports','Ngousso / Mvan','Biyem-Assi / Mimboman','Other city'], delay:1200 },
+    { key:'__done__', q:(p)=>`Perfect, ${p.name}. Your profile is complete.\n\n*${p.style}* style, *${p.bodyType}* build, based in *${p.town}*. I now have everything I need.\n\nTell me: what occasion are you dressing for?`, qr:()=>['A professional interview','An evening out','A wedding or ceremony','Everyday office wear','A casual event'], delay:1500 },
   ]
 };
 
@@ -346,8 +265,8 @@ const COPY = {
     'splash-cta':'Commencer','t1':'Conseil personnalisé','t2':'Réponse rapide','t3':'Yaoundé',
     'ns-label':'Bienvenue','ns-title':'Comment vous appelez-vous ?','ns-sub':'Votre styliste personnel vous attend.',
     'nameBtn':'Continuer','ph-chat':'Écrivez votre réponse…',
-    returning: (p) => `Bienvenue de retour, ${p.name}.\n\nPour quelle occasion cherchez-vous une tenue aujourd'hui ?`,
-    ret_qr: () => ['Un entretien professionnel','Une sortie en soirée','Un mariage ou cérémonie','Le quotidien au bureau','Un événement décontracté'],
+    returning:(p)=>`Bienvenue de retour, ${p.name}.\n\nPour quelle occasion cherchez-vous une tenue aujourd'hui ?`,
+    ret_qr:()=>['Un entretien professionnel','Une sortie en soirée','Un mariage ou cérémonie','Le quotidien au bureau','Un événement décontracté'],
   },
   en: {
     'splash-tag':'Personal Stylist','splash-h1':'Dress the way<br>you <em>deserve</em>',
@@ -355,8 +274,8 @@ const COPY = {
     'splash-cta':'Get Started','t1':'Personalised advice','t2':'Fast reply','t3':'Yaoundé',
     'ns-label':'Welcome','ns-title':'What is your name?','ns-sub':'Your personal stylist is ready for you.',
     'nameBtn':'Continue','ph-chat':'Type your answer…',
-    returning: (p) => `Welcome back, ${p.name}.\n\nWhat occasion are you dressing for today?`,
-    ret_qr: () => ['A professional interview','An evening out','A wedding or ceremony','Everyday office wear','A casual event'],
+    returning:(p)=>`Welcome back, ${p.name}.\n\nWhat occasion are you dressing for today?`,
+    ret_qr:()=>['A professional interview','An evening out','A wedding or ceremony','Everyday office wear','A casual event'],
   }
 };
 
@@ -420,9 +339,7 @@ function askNext() {
 function handleFlowAnswer(text) {
   const steps = FLOW[lang]; if (flowStep >= steps.length) return;
   const step = steps[flowStep];
-  if (step.key !== '__done__') { 
-    profile[step.key] = text; 
-  }
+  if (step.key !== '__done__') { profile[step.key] = text; }
   flowStep++;
   if (flowStep < steps.length) { askNext(); }
 }
@@ -465,11 +382,7 @@ function removeQR() { const e=document.getElementById('qrRow'); if(e) e.remove()
 async function pushMeta() { 
   const meta = `[PROFIL] Nom: ${profile.name} | Genre: ${profile.gender||'—'} | Âge: ${profile.age||'—'} | Style: ${profile.style||'—'} | Couleurs: ${profile.colors||'—'} | Taille: ${profile.height||'—'} | Morpho: ${profile.bodyType||'—'} | Ville: ${profile.town||'—'}`; 
   await sb.from('messages').insert({ session_id:sessionId, sender:'user', message:meta, message_type:'meta' });
-  await sb.from('profiles').upsert({
-    session_id: sessionId, name: profile.name, gender: profile.gender || null,
-    age: profile.age || null, style: profile.style || null, colors: profile.colors || null,
-    height: profile.height || null, body_type: profile.bodyType || null, town: profile.town || null
-  }, { onConflict: 'session_id' });
+  await sb.from('profiles').upsert({ session_id:sessionId, name:profile.name, gender:profile.gender||null, age:profile.age||null, style:profile.style||null, colors:profile.colors||null, height:profile.height||null, body_type:profile.bodyType||null, town:profile.town||null }, { onConflict:'session_id' });
 }
 function saveProfile() { localStorage.setItem('tf_profile', JSON.stringify(profile)); }
 function loadProfile() { try { return JSON.parse(localStorage.getItem('tf_profile')); } catch { return null; } }
