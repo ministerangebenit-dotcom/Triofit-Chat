@@ -243,6 +243,44 @@ body {
 .bubble img { max-width:100%; border-radius:8px; display:block; cursor:pointer; margin-top:2px; }
 .bmeta { font-size:10px; color:var(--text-3); margin-top:4px; padding:0 2px; letter-spacing:.02em; }
 
+/* ── QUICK RESPONSE TEMPLATES ── */
+.quick-responses {
+  display:flex; flex-wrap:wrap; gap:6px;
+  padding:8px 16px;
+  background:var(--s2);
+  border-top:1px solid var(--border);
+  overflow-x:auto;
+}
+.quick-responses::-webkit-scrollbar { height:3px; }
+.quick-responses::-webkit-scrollbar-thumb { background:rgba(255,255,255,.1); border-radius:3px; }
+.qr-btn {
+  padding:7px 14px;
+  background:var(--s3);
+  border:1px solid var(--gold-bd);
+  border-radius:20px;
+  font-size:12px; font-weight:500;
+  color:var(--gold);
+  cursor:pointer;
+  white-space:nowrap;
+  transition:all 0.15s;
+  font-family:inherit;
+}
+.qr-btn:hover {
+  background:var(--gold);
+  color:#080808;
+  border-color:var(--gold);
+}
+.qr-btn.occasion-btn {
+  background:var(--gold-dim);
+  border-color:var(--gold);
+  color:var(--gold-lt);
+  font-weight:600;
+}
+.qr-btn.occasion-btn:hover {
+  background:var(--gold);
+  color:#080808;
+}
+
 .input-wrapper {
   padding:12px 18px;
   padding-bottom:max(12px, env(safe-area-inset-bottom));
@@ -416,6 +454,8 @@ body {
       </div>
     </div>
 
+    <div class="quick-responses" id="quickResponses" style="display:none;"></div>
+
     <div class="input-wrapper" id="inputWrapper" style="display:none;">
       <div class="upload-state" id="uploadState"><div class="spinner"></div>Uploading…</div>
       <div class="multi-preview" id="multiPreview"></div>
@@ -451,6 +491,14 @@ let activeSession = null;
 let allSessions   = [];
 let seenIds       = new Set();
 let pendingFiles  = [];
+let outfitTemplates = [];
+
+// ── LOAD OUTFIT TEMPLATES ──
+async function loadTemplates() {
+  const { data, error } = await sb.from('outfit_templates').select('*').order('usage_count', { ascending: false });
+  if (error) { console.error('Template load error:', error); return; }
+  outfitTemplates = data || [];
+}
 
 const msgInput = document.getElementById('msgInput');
 msgInput.addEventListener('input', () => {
@@ -502,6 +550,111 @@ function parseMeta(text) {
 function sessionDisplayName(sessionId, metaMap) {
   if (metaMap && metaMap['Nom']) return metaMap['Nom'];
   return sessionId.replace('user_','').substring(0,10) + '…';
+}
+
+// ── DETECT OCCASION ──
+function detectOccasion() {
+  const chatArea = document.getElementById('chatArea');
+  const bubbles = chatArea.querySelectorAll('.bubble.user');
+  if (!bubbles.length) return null;
+  const lastMsg = bubbles[bubbles.length - 1].textContent.toLowerCase();
+  if (lastMsg.includes('décontracté') || lastMsg.includes('casual')) return 'casual';
+  if (lastMsg.includes('soirée') || lastMsg.includes('party') || lastMsg.includes('sortie') || lastMsg.includes('night')) return 'party';
+  if (lastMsg.includes('bureau') || lastMsg.includes('travail') || lastMsg.includes('work') || lastMsg.includes('office')) return 'bureau';
+  if (lastMsg.includes('entretien') || lastMsg.includes('interview')) return 'entretien';
+  if (lastMsg.includes('mariage') || lastMsg.includes('cérémonie') || lastMsg.includes('wedding') || lastMsg.includes('ceremony')) return 'mariage';
+  if (lastMsg.includes('date') || lastMsg.includes('rendez-vous') || lastMsg.includes('rencard')) return 'date';
+  if (lastMsg.includes('sport') || lastMsg.includes('fitness') || lastMsg.includes('training')) return 'sport';
+  if (lastMsg.includes('église') || lastMsg.includes('religieux') || lastMsg.includes('church') || lastMsg.includes('dimanche')) return 'religieux';
+  return null;
+}
+
+// ── RENDER QUICK RESPONSES ──
+function renderQuickResponses(meta) {
+  const container = document.getElementById('quickResponses');
+  if (!outfitTemplates.length) { container.style.display = 'none'; return; }
+  
+  const occasion = detectOccasion();
+  const gender = meta?.['Genre'] || '';
+  
+  let templates = outfitTemplates.filter(t => {
+    if (gender && t.gender && t.gender !== gender) return false;
+    if (occasion && t.occasion !== occasion) return false;
+    return true;
+  });
+  
+  if (!templates.length && occasion) {
+    templates = outfitTemplates.filter(t => {
+      if (gender && t.gender && t.gender !== gender) return false;
+      return true;
+    });
+  }
+  
+  if (!templates.length) { container.style.display = 'none'; return; }
+  
+  container.style.display = 'flex';
+  container.innerHTML = '';
+  
+  const occasions = [...new Set(outfitTemplates.map(t => t.occasion))];
+  occasions.forEach(occ => {
+    const btn = document.createElement('button');
+    btn.className = 'qr-btn occasion-btn';
+    btn.textContent = occ.charAt(0).toUpperCase() + occ.slice(1);
+    btn.onclick = () => {
+      const filtered = outfitTemplates.filter(t => t.occasion === occ && (!gender || !t.gender || t.gender === gender));
+      if (filtered.length) sendTemplate(filtered[0]);
+    };
+    container.appendChild(btn);
+  });
+  
+  if (templates.length && occasions.length) {
+    const sep = document.createElement('span');
+    sep.textContent = '·';
+    sep.style.cssText = 'color:var(--text-3);margin:0 4px;font-size:14px;font-weight:bold;';
+    container.appendChild(sep);
+  }
+  
+  templates.slice(0, 8).forEach(t => {
+    const btn = document.createElement('button');
+    btn.className = 'qr-btn';
+    const label = [t.style, t.budget, t.body_type].filter(Boolean).join(' · ');
+    btn.textContent = label || t.occasion;
+    btn.onclick = () => sendTemplate(t);
+    container.appendChild(btn);
+  });
+}
+
+// ── SEND TEMPLATE ──
+async function sendTemplate(template) {
+  if (!activeSession) return;
+  const btn = document.getElementById('sendBtn');
+  btn.disabled = true;
+  
+  try {
+    if (template.image_url) {
+      const messageContent = template.caption + '\n' + template.image_url;
+      await sb.from('messages').insert({
+        session_id: activeSession, sender:'admin',
+        message: messageContent, message_type:'image'
+      });
+      renderBubble({ sender:'admin', message: messageContent, message_type:'image', created_at: new Date().toISOString() });
+    } else {
+      await sb.from('messages').insert({
+        session_id: activeSession, sender:'admin',
+        message: template.caption, message_type:'text'
+      });
+      renderBubble({ sender:'admin', message: template.caption, message_type:'text', created_at: new Date().toISOString() });
+    }
+    
+    await sb.from('outfit_templates').update({ usage_count: (template.usage_count || 0) + 1 }).eq('id', template.id);
+    scrollBottom();
+    toast('Outfit sent! ⚡');
+  } catch (err) {
+    console.error('Send error:', err);
+    toast('Send failed', true);
+  } finally {
+    btn.disabled = false;
+  }
 }
 
 async function loadSessions() {
@@ -568,6 +721,7 @@ async function deleteSession(sessionId) {
   if (activeSession === sessionId) {
     activeSession = null;
     document.getElementById('inputWrapper').style.display = 'none';
+    document.getElementById('quickResponses').style.display = 'none';
     document.getElementById('headerActions').style.display = 'none';
     document.getElementById('headerContent').innerHTML = '<span class="h-empty">Select a conversation</span>';
     document.getElementById('profileBar').classList.remove('visible');
@@ -591,8 +745,13 @@ async function openSession(sessionId) {
       <div class="h-avatar"><span class="h-avatar-initials">${initials}</span></div>
       <div><div class="h-name">${esc(name)}</div><div class="h-sub">Active session</div></div>
     </div>`;
-  if (s && s.meta) renderProfileBar(s.meta);
-  else document.getElementById('profileBar').classList.remove('visible');
+  if (s && s.meta) {
+    renderProfileBar(s.meta);
+    setTimeout(() => renderQuickResponses(s.meta), 400);
+  } else {
+    document.getElementById('profileBar').classList.remove('visible');
+    document.getElementById('quickResponses').style.display = 'none';
+  }
   const chatArea = document.getElementById('chatArea');
   chatArea.innerHTML = '<div class="empty-state"><div class="spinner" style="width:18px;height:18px;margin:auto;"></div></div>';
   const { data, error } = await sb.from('messages').select('*').eq('session_id', sessionId).order('created_at', { ascending: true });
@@ -634,9 +793,29 @@ function renderBubble(msg) {
   const row = document.createElement('div'); row.className = 'brow ' + msg.sender;
   const bub = document.createElement('div'); bub.className = 'bubble ' + msg.sender;
   if (msg.message_type === 'image' && msg.message) {
-    const img = document.createElement('img'); img.src = msg.message; img.alt = 'Image';
-    img.onclick = () => openLightbox(msg.message); bub.appendChild(img);
-  } else { bub.textContent = msg.message || ''; }
+    // Split caption and image URL
+    const lines = msg.message.split('\n');
+    const urlPart = lines[lines.length - 1];
+    if (urlPart && urlPart.startsWith('http')) {
+      const caption = lines.slice(0, -1).join('\n');
+      if (caption.trim()) {
+        bub.textContent = caption;
+        const img = document.createElement('img');
+        img.src = urlPart; img.alt = 'Outfit';
+        img.onclick = () => openLightbox(urlPart);
+        bub.appendChild(img);
+      } else {
+        const img = document.createElement('img');
+        img.src = urlPart; img.alt = 'Outfit';
+        img.onclick = () => openLightbox(urlPart);
+        bub.appendChild(img);
+      }
+    } else {
+      bub.textContent = msg.message;
+    }
+  } else { 
+    bub.textContent = msg.message || ''; 
+  }
   const meta = document.createElement('div'); meta.className = 'bmeta';
   const label = msg.sender === 'user' ? 'Client' : 'You';
   const t = msg.created_at ? new Date(msg.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '';
@@ -702,7 +881,10 @@ sb.channel('admin-rt')
       renderBubble(msg); seenIds.add(msg.id); scrollBottom();
       const s = allSessions.find(x => x.id === msg.session_id);
       if (s) { s.hasUnread = false; renderSessions(allSessions); }
-      if (msg.message_type === 'meta' && s && s.meta) renderProfileBar(s.meta);
+      if (msg.message_type === 'meta' && s && s.meta) {
+        renderProfileBar(s.meta);
+        setTimeout(() => renderQuickResponses(s.meta), 300);
+      }
     }
   })
   .subscribe();
@@ -726,7 +908,8 @@ function openLightbox(src) { document.getElementById('lightboxImg').src=src; doc
 function closeLightbox()   { document.getElementById('lightbox').classList.remove('open'); }
 function toggleSidebar()   { document.getElementById('sidebar').classList.toggle('mobile-open'); }
 
-loadSessions();
+// ── INIT ──
+loadTemplates().then(() => loadSessions());
 </script>
 </body>
 </html>
