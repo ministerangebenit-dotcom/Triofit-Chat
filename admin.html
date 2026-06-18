@@ -245,20 +245,20 @@ body {
 
 /* ── QUICK RESPONSE TEMPLATES ── */
 .quick-responses {
-  display:flex; flex-wrap:wrap; gap:6px;
+  display:flex; flex-direction:column; gap:4px;
   padding:8px 16px;
   background:var(--s2);
   border-top:1px solid var(--border);
-  overflow-x:auto;
+  max-height:250px; overflow-y:auto;
 }
-.quick-responses::-webkit-scrollbar { height:3px; }
+.quick-responses::-webkit-scrollbar { width:3px; }
 .quick-responses::-webkit-scrollbar-thumb { background:rgba(255,255,255,.1); border-radius:3px; }
 .qr-btn {
-  padding:7px 14px;
+  padding:6px 12px;
   background:var(--s3);
   border:1px solid var(--gold-bd);
   border-radius:20px;
-  font-size:12px; font-weight:500;
+  font-size:11px; font-weight:500;
   color:var(--gold);
   cursor:pointer;
   white-space:nowrap;
@@ -493,6 +493,11 @@ let seenIds       = new Set();
 let pendingFiles  = [];
 let outfitTemplates = [];
 
+// ── CASCADING FILTER STATE ──
+let selectedOccasion = null;
+let selectedStyle = null;
+let selectedBudget = null;
+
 // ── LOAD OUTFIT TEMPLATES ──
 async function loadTemplates() {
   const { data, error } = await sb.from('outfit_templates').select('*').order('usage_count', { ascending: false });
@@ -562,65 +567,171 @@ function detectOccasion() {
   if (lastMsg.includes('soirée') || lastMsg.includes('party') || lastMsg.includes('sortie') || lastMsg.includes('night')) return 'party';
   if (lastMsg.includes('bureau') || lastMsg.includes('travail') || lastMsg.includes('work') || lastMsg.includes('office')) return 'bureau';
   if (lastMsg.includes('entretien') || lastMsg.includes('interview')) return 'entretien';
-  if (lastMsg.includes('mariage') || lastMsg.includes('cérémonie') || lastMsg.includes('wedding') || lastMsg.includes('ceremony')) return 'mariage';
+  if (lastMsg.includes('mariage') || lastMsg.includes('cérémonie') || lastMsg.includes('wedding')) return 'mariage';
   if (lastMsg.includes('date') || lastMsg.includes('rendez-vous') || lastMsg.includes('rencard')) return 'date';
-  if (lastMsg.includes('sport') || lastMsg.includes('fitness') || lastMsg.includes('training')) return 'sport';
-  if (lastMsg.includes('église') || lastMsg.includes('religieux') || lastMsg.includes('church') || lastMsg.includes('dimanche')) return 'religieux';
+  if (lastMsg.includes('sport') || lastMsg.includes('fitness')) return 'sport';
+  if (lastMsg.includes('église') || lastMsg.includes('religieux') || lastMsg.includes('church')) return 'religieux';
   return null;
 }
 
-// ── RENDER QUICK RESPONSES ──
+// ── RENDER QUICK RESPONSES (CASCADING) ──
 function renderQuickResponses(meta) {
   const container = document.getElementById('quickResponses');
   if (!outfitTemplates.length) { container.style.display = 'none'; return; }
   
-  const occasion = detectOccasion();
   const gender = meta?.['Genre'] || '';
+  const detectedOccasion = detectOccasion();
   
-  let templates = outfitTemplates.filter(t => {
-    if (gender && t.gender && t.gender !== gender) return false;
-    if (occasion && t.occasion !== occasion) return false;
-    return true;
-  });
-  
-  if (!templates.length && occasion) {
-    templates = outfitTemplates.filter(t => {
-      if (gender && t.gender && t.gender !== gender) return false;
-      return true;
-    });
+  if (detectedOccasion && !selectedOccasion) {
+    selectedOccasion = detectedOccasion;
   }
-  
-  if (!templates.length) { container.style.display = 'none'; return; }
   
   container.style.display = 'flex';
   container.innerHTML = '';
   
+  // ── ROW 1: OCCASIONS ──
   const occasions = [...new Set(outfitTemplates.map(t => t.occasion))];
+  const occRow = document.createElement('div');
+  occRow.style.cssText = 'display:flex;flex-wrap:wrap;gap:5px;width:100%;';
+  
+  const allBtn = document.createElement('button');
+  allBtn.className = 'qr-btn' + (!selectedOccasion ? ' occasion-btn' : '');
+  allBtn.textContent = 'Tous';
+  allBtn.onclick = () => { selectedOccasion = null; selectedStyle = null; selectedBudget = null; renderQuickResponses(meta); };
+  occRow.appendChild(allBtn);
+  
   occasions.forEach(occ => {
     const btn = document.createElement('button');
-    btn.className = 'qr-btn occasion-btn';
+    btn.className = 'qr-btn' + (selectedOccasion === occ ? ' occasion-btn' : '');
     btn.textContent = occ.charAt(0).toUpperCase() + occ.slice(1);
-    btn.onclick = () => {
-      const filtered = outfitTemplates.filter(t => t.occasion === occ && (!gender || !t.gender || t.gender === gender));
-      if (filtered.length) sendTemplate(filtered[0]);
-    };
-    container.appendChild(btn);
+    btn.onclick = () => { selectedOccasion = occ; selectedStyle = null; selectedBudget = null; renderQuickResponses(meta); };
+    occRow.appendChild(btn);
+  });
+  container.appendChild(occRow);
+  
+  let filtered = outfitTemplates.filter(t => {
+    if (gender && t.gender && t.gender !== gender) return false;
+    if (selectedOccasion && t.occasion !== selectedOccasion) return false;
+    return true;
   });
   
-  if (templates.length && occasions.length) {
-    const sep = document.createElement('span');
-    sep.textContent = '·';
-    sep.style.cssText = 'color:var(--text-3);margin:0 4px;font-size:14px;font-weight:bold;';
-    container.appendChild(sep);
+  // ── ROW 2: STYLES ──
+  if (selectedOccasion && filtered.length) {
+    const styles = [...new Set(filtered.map(t => t.style).filter(Boolean))];
+    if (styles.length > 1) {
+      const styleRow = document.createElement('div');
+      styleRow.style.cssText = 'display:flex;flex-wrap:wrap;gap:5px;width:100%;margin-top:2px;';
+      
+      const allStyleBtn = document.createElement('button');
+      allStyleBtn.className = 'qr-btn' + (!selectedStyle ? ' occasion-btn' : '');
+      allStyleBtn.textContent = 'Tous styles';
+      allStyleBtn.onclick = () => { selectedStyle = null; selectedBudget = null; renderQuickResponses(meta); };
+      styleRow.appendChild(allStyleBtn);
+      
+      styles.forEach(st => {
+        const btn = document.createElement('button');
+        btn.className = 'qr-btn' + (selectedStyle === st ? ' occasion-btn' : '');
+        btn.textContent = st.charAt(0).toUpperCase() + st.slice(1);
+        btn.onclick = () => { selectedStyle = st; selectedBudget = null; renderQuickResponses(meta); };
+        styleRow.appendChild(btn);
+      });
+      container.appendChild(styleRow);
+    }
+    
+    if (selectedStyle) {
+      filtered = filtered.filter(t => t.style === selectedStyle);
+    }
   }
   
-  templates.slice(0, 8).forEach(t => {
-    const btn = document.createElement('button');
-    btn.className = 'qr-btn';
-    const label = [t.style, t.budget, t.body_type].filter(Boolean).join(' · ');
-    btn.textContent = label || t.occasion;
-    btn.onclick = () => sendTemplate(t);
-    container.appendChild(btn);
+  // ── ROW 3: BUDGETS ──
+  if (selectedStyle && filtered.length) {
+    const budgets = [...new Set(filtered.map(t => t.budget).filter(Boolean))];
+    if (budgets.length > 1) {
+      const budgetRow = document.createElement('div');
+      budgetRow.style.cssText = 'display:flex;flex-wrap:wrap;gap:5px;width:100%;margin-top:2px;';
+      
+      const allBudgetBtn = document.createElement('button');
+      allBudgetBtn.className = 'qr-btn' + (!selectedBudget ? ' occasion-btn' : '');
+      allBudgetBtn.textContent = 'Tous budgets';
+      allBudgetBtn.onclick = () => { selectedBudget = null; renderQuickResponses(meta); };
+      budgetRow.appendChild(allBudgetBtn);
+      
+      budgets.forEach(b => {
+        const btn = document.createElement('button');
+        btn.className = 'qr-btn' + (selectedBudget === b ? ' occasion-btn' : '');
+        btn.textContent = b;
+        btn.onclick = () => { selectedBudget = b; renderQuickResponses(meta); };
+        budgetRow.appendChild(btn);
+      });
+      container.appendChild(budgetRow);
+    }
+    
+    if (selectedBudget) {
+      filtered = filtered.filter(t => t.budget === selectedBudget);
+    }
+  }
+  
+  // ── ROW 4: MATCHING TEMPLATES ──
+  if (filtered.length) {
+    const sep = document.createElement('div');
+    sep.style.cssText = 'width:100%;height:1px;background:var(--border);margin:2px 0;';
+    container.appendChild(sep);
+    
+    const templateRow = document.createElement('div');
+    templateRow.style.cssText = 'display:flex;flex-wrap:wrap;gap:5px;width:100%;';
+    
+    filtered.slice(0, 10).forEach(t => {
+      const btn = document.createElement('button');
+      btn.className = 'qr-btn';
+      const label = [t.body_type, t.age_range].filter(Boolean).join(' · ');
+      btn.textContent = label || t.style;
+      btn.onclick = () => previewTemplate(t);
+      templateRow.appendChild(btn);
+    });
+    container.appendChild(templateRow);
+  }
+}
+
+// ── PREVIEW BEFORE SENDING ──
+function previewTemplate(template) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;';
+  
+  const card = document.createElement('div');
+  card.style.cssText = 'background:var(--s1);border:1px solid var(--gold-bd);border-radius:16px;padding:20px;max-width:400px;width:100%;max-height:80vh;overflow-y:auto;';
+  
+  let imageHTML = '';
+  if (template.image_url) {
+    imageHTML = `<img src="${template.image_url}" style="width:100%;border-radius:10px;margin-bottom:12px;" alt="Outfit">`;
+  }
+  
+  card.innerHTML = `
+    ${imageHTML}
+    <div style="color:var(--text-2);font-size:11px;margin-bottom:8px;">
+      ${template.occasion} · ${template.style || '—'} · ${template.budget || '—'} · ${template.body_type || '—'}
+    </div>
+    <textarea id="previewCaption" style="width:100%;min-height:120px;background:var(--s2);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:12px;font-size:13px;font-family:inherit;resize:vertical;line-height:1.5;">${template.caption}</textarea>
+    <div style="display:flex;gap:8px;margin-top:12px;">
+      <button id="cancelPreview" style="flex:1;padding:10px;background:var(--s3);border:1px solid var(--border);border-radius:10px;color:var(--text-2);cursor:pointer;font-family:inherit;font-size:13px;">Cancel</button>
+      <button id="confirmSend" style="flex:1;padding:10px;background:var(--gold);border:none;border-radius:10px;color:#080808;cursor:pointer;font-weight:600;font-family:inherit;font-size:13px;">Send ✦</button>
+    </div>
+  `;
+  
+  overlay.appendChild(card);
+  document.body.appendChild(overlay);
+  
+  document.getElementById('cancelPreview').onclick = () => overlay.remove();
+  document.getElementById('confirmSend').onclick = () => {
+    const editedCaption = document.getElementById('previewCaption').value.trim();
+    if (editedCaption) {
+      template.caption = editedCaption;
+    }
+    overlay.remove();
+    sendTemplate(template);
+  };
+  
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.remove();
   });
 }
 
@@ -733,6 +844,7 @@ async function deleteSession(sessionId) {
 
 async function openSession(sessionId) {
   activeSession = sessionId;
+  selectedOccasion = null; selectedStyle = null; selectedBudget = null;
   document.getElementById('inputWrapper').style.display = 'block';
   document.getElementById('headerActions').style.display = 'flex';
   const s = allSessions.find(x => x.id === sessionId);
@@ -793,23 +905,15 @@ function renderBubble(msg) {
   const row = document.createElement('div'); row.className = 'brow ' + msg.sender;
   const bub = document.createElement('div'); bub.className = 'bubble ' + msg.sender;
   if (msg.message_type === 'image' && msg.message) {
-    // Split caption and image URL
     const lines = msg.message.split('\n');
     const urlPart = lines[lines.length - 1];
     if (urlPart && urlPart.startsWith('http')) {
       const caption = lines.slice(0, -1).join('\n');
-      if (caption.trim()) {
-        bub.textContent = caption;
-        const img = document.createElement('img');
-        img.src = urlPart; img.alt = 'Outfit';
-        img.onclick = () => openLightbox(urlPart);
-        bub.appendChild(img);
-      } else {
-        const img = document.createElement('img');
-        img.src = urlPart; img.alt = 'Outfit';
-        img.onclick = () => openLightbox(urlPart);
-        bub.appendChild(img);
-      }
+      if (caption.trim()) bub.textContent = caption;
+      const img = document.createElement('img');
+      img.src = urlPart; img.alt = 'Outfit';
+      img.onclick = () => openLightbox(urlPart);
+      bub.appendChild(img);
     } else {
       bub.textContent = msg.message;
     }
