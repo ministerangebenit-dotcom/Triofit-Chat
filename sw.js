@@ -1,14 +1,10 @@
-const CACHE_NAME = 'triofit-v5';
+const CACHE_NAME = 'triofit-v7';
 
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
       return cache.addAll([
-        './',
-        './index.html',
-        './admin.html',
-        './manifest.json',
-        './logo.jpg'
+        './', './index.html', './admin.html', './manifest.json', './logo.jpg'
       ]).catch(err => console.warn('Cache addAll:', err));
     })
   );
@@ -37,5 +33,48 @@ self.addEventListener('fetch', event => {
         return response;
       })
       .catch(() => caches.match(event.request))
+  );
+});
+
+// ── PUSH NOTIFICATIONS ──
+self.addEventListener('push', event => {
+  let data = { title: 'TRIOFIT', body: 'You have a new message', icon: 'logo.jpg' };
+  
+  if (event.data) {
+    try {
+      const parsed = event.data.json();
+      data = { ...data, ...parsed };
+    } catch (e) {
+      data.body = event.data.text();
+    }
+  }
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: data.icon,
+      badge: 'logo.jpg',
+      tag: 'triofit',
+      requireInteraction: true,
+      vibrate: [200, 100, 200],
+      data: { url: data.url || './' }
+    })
+  );
+});
+
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  const url = event.notification.data?.url || './';
+  event.waitUntil(
+    clients.matchAll({ type: 'window' }).then(windowClients => {
+      for (const client of windowClients) {
+        if (client.url.includes(url) && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      if (clients.openWindow) {
+        return clients.openWindow(url);
+      }
+    })
   );
 });
