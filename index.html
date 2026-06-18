@@ -109,9 +109,7 @@ body {
 .bmeta { font-size:10px; color:var(--text-muted); margin-top:4px; padding:0 2px; letter-spacing:.02em; }
 
 .typing-bub { background:var(--surface2); border:1px solid rgba(255,255,255,.04); border-radius:16px; border-bottom-left-radius:3px; padding:13px 17px; display:inline-flex; gap:5px; align-items:center; animation:bIn .28s ease both; }
-.tdot { width:6px; height:6px; background:var(--text-muted); border-radius:50%; animation:td 1.2s ease infinite; }
-.tdot:nth-child(2){animation-delay:.15s}.tdot:nth-child(3){animation-delay:.3s}
-@keyframes td{0%,60%,100%{transform:translateY(0);opacity:.35}30%{transform:translateY(-5px);opacity:1}}
+.typing-text { font-size:13px; color:var(--text-dim); font-style:italic; }
 
 .qr-row { display:flex; flex-wrap:wrap; gap:7px; padding:2px 0 4px; }
 .qr-btn { padding:8px 15px; background:var(--surface2); border:1px solid var(--gold-border); border-radius:20px; font-size:12px; font-weight:500; color:var(--gold); cursor:pointer; font-family:inherit; -webkit-appearance:none; letter-spacing:.02em; transition:all .2s; }
@@ -221,6 +219,11 @@ const STATUS_TEXT = {
   en: { free: 'FREE MODE', thinking: 'Thinking…' }
 };
 
+const TYPING_TEXT = {
+  fr: 'Préparation du style qui vous correspond…',
+  en: 'Preparing the style that suits you…'
+};
+
 function setStatus(mode) {
   const el = document.getElementById('ch-status');
   const container = document.getElementById('chatStatus');
@@ -325,7 +328,22 @@ function beginSession() {
   sb.channel('chat-'+sessionId)
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'}, payload=>{
       const m = payload.new;
-      if (m.session_id===sessionId && m.sender==='admin') { removeTyping(); if (m.message_type==='image') addAdminImg(m.message); else addAdminBubble(m.message); }
+      if (m.session_id===sessionId && m.sender==='admin') { 
+        removeTyping(); 
+        if (m.message_type==='image') {
+          const lines = m.message.split('\n');
+          const urlPart = lines[lines.length - 1];
+          if (urlPart && (urlPart.startsWith('http://') || urlPart.startsWith('https://'))) {
+            const caption = lines.slice(0, -1).join('\n');
+            if (caption.trim()) addAdminBubble(caption);
+            addAdminImg(urlPart);
+          } else {
+            addAdminImg(m.message);
+          }
+        } else {
+          addAdminBubble(m.message);
+        }
+      }
     })
     .subscribe();
 }
@@ -369,7 +387,7 @@ function showTyping() {
   if (typingRow) return;
   const m = document.getElementById('messages');
   const row = document.createElement('div'); row.className='mrow admin'; row.id='typingRow';
-  row.innerHTML='<div class="typing-bub"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>';
+  row.innerHTML=`<div class="typing-bub"><span class="typing-text">${TYPING_TEXT[lang]}</span></div>`;
   m.appendChild(row); typingRow=row; scrollM();
   document.getElementById('chatAvatar').classList.add('thinking');
   setStatus('thinking');
