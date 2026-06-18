@@ -486,7 +486,38 @@ const SUPABASE_URL    = 'https://ahckbchulymvbhrpynyy.supabase.co';
 const SUPABASE_KEY    = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFoY2tiY2h1bHltdmJocnB5bnl5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4MTI5MTQsImV4cCI6MjA5NjM4ODkxNH0.aBq-qHBBTrzWf_OHpkYmQLLPeS1iywBbX47tLRqRQ1k';
 const STORAGE_BUCKET  = 'chat-images';
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
+// ── SEND PUSH TO USER ──
+async function sendPushToUser(sid, title, body) {
+  const { data: subs, error } = await sb
+    .from('push_subscriptions')
+    .select('*')
+    .eq('session_id', sid)
+    .eq('type', 'user');
+  
+  if (error || !subs || !subs.length) {
+    console.log('No push subscription for this user');
+    return;
+  }
+  
+  for (const sub of subs) {
+    try {
+      await fetch(sub.endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: title || 'TRIOFIT',
+          body: body || 'Your outfit recommendation is ready!',
+          icon: 'logo.jpg',
+          badge: 'logo.jpg',
+          requireInteraction: true
+        })
+      });
+      console.log('Push sent');
+    } catch (e) {
+      console.error('Push send failed:', e);
+    }
+  }
+}
 let activeSession = null;
 let allSessions   = [];
 let seenIds       = new Set();
@@ -756,7 +787,7 @@ async function sendTemplate(template) {
       });
       renderBubble({ sender:'admin', message: template.caption, message_type:'text', created_at: new Date().toISOString() });
     }
-    
+    sendPushToUser(activeSession, 'TRIOFIT', 'Your outfit recommendation is ready!');
     await sb.from('outfit_templates').update({ usage_count: (template.usage_count || 0) + 1 }).eq('id', template.id);
     scrollBottom();
     toast('Outfit sent! ⚡');
@@ -960,6 +991,9 @@ async function sendMessage() {
       });
       if (error) { toast('Send failed', true); return; }
       renderBubble({ sender:'admin', message:text, message_type:'text', created_at:new Date().toISOString() });
+
+      sendPushToUser(activeSession, 'TRIOFIT', 'Your stylist replied!');
+      
       toast('Sent');
     }
     scrollBottom();
