@@ -314,7 +314,6 @@ function submitName() { profile.name = nameInput.value.trim(); beginSession(); }
 function beginSession() {
   const saved = loadProfile();
   
-  // Reuse existing session ID for returning users
   const savedSessionId = localStorage.getItem('triofit_session');
   if (savedSessionId && saved && saved.name === profile.name) {
     sessionId = savedSessionId;
@@ -327,7 +326,6 @@ function beginSession() {
   goTo('chat');
   pushMeta();
   
-  // Load previous messages if returning
   if (saved && saved.name === profile.name) {
     sb.from('messages')
       .select('*')
@@ -360,6 +358,7 @@ function beginSession() {
     Object.assign(profile, saved);
     profileComplete = true;
     setTimeout(()=>{ showTyping(); setTimeout(()=>{ removeTyping(); addAdminBubble(COPY[lang].returning(profile)); showQR(COPY[lang].ret_qr()); }, 1400); }, 500);
+    setTimeout(() => showNotificationPrompt(), 5000);
   } else {
     profileComplete = false;
     askNext();
@@ -400,6 +399,7 @@ function handleFlowAnswer(text) {
   if (step.key !== '__done__') { profile[step.key] = text; }
   flowStep++;
   if (flowStep < steps.length) { askNext(); }
+  else { setTimeout(() => showNotificationPrompt(), 4000); }
 }
 
 const chatInput = document.getElementById('chatInput');
@@ -437,6 +437,36 @@ function removeTyping() { if(typingRow){typingRow.remove();typingRow=null;} docu
 function showQR(list) { const m=document.getElementById('messages'); const d=document.createElement('div'); d.className='qr-row'; d.id='qrRow'; list.forEach(r=>{ const b=document.createElement('button'); b.className='qr-btn'; b.textContent=r; b.onclick=()=>sendMsg(r); d.appendChild(b); }); m.appendChild(d); scrollM(); }
 function removeQR() { const e=document.getElementById('qrRow'); if(e) e.remove(); }
 
+// ── NOTIFICATION PROMPT ──
+function showNotificationPrompt() {
+  if (document.getElementById('notifPrompt')) return;
+  const m = document.getElementById('messages');
+  const row = document.createElement('div');
+  row.className = 'mrow admin';
+  row.id = 'notifPrompt';
+  row.innerHTML = `
+    <div style="background:var(--gold-dim);border:1px solid var(--gold-bd);border-radius:16px;padding:14px 16px;text-align:center;cursor:pointer;max-width:78%;" onclick="enableNotifications()">
+      <div style="font-size:14px;color:var(--gold);margin-bottom:6px;">🔔 ${lang==='fr' ? 'Activer les notifications' : 'Enable notifications'}</div>
+      <div style="font-size:11px;color:var(--text-dim);">${lang==='fr' ? 'Soyez alerté quand votre styliste répond' : 'Get alerted when your stylist replies'}</div>
+    </div>
+  `;
+  m.appendChild(row);
+  scrollM();
+}
+
+async function enableNotifications() {
+  const prompt = document.getElementById('notifPrompt');
+  if (prompt) prompt.remove();
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission === 'granted') {
+      await subscribeToPush();
+    }
+  } catch (err) {
+    console.log('Notification setup failed:', err);
+  }
+}
+
 async function pushMeta() { 
   const meta = `[PROFIL] Nom: ${profile.name} | Genre: ${profile.gender||'—'} | Âge: ${profile.age||'—'} | Style: ${profile.style||'—'} | Couleurs: ${profile.colors||'—'} | Taille: ${profile.height||'—'} | Morpho: ${profile.bodyType||'—'} | Ville: ${profile.town||'—'}`; 
   await sb.from('messages').insert({ session_id:sessionId, sender:'user', message:meta, message_type:'meta' });
@@ -461,42 +491,21 @@ async function subscribeToPush() {
     console.log('Push not supported');
     return;
   }
-
   const registration = await navigator.serviceWorker.ready;
   let subscription = await registration.pushManager.getSubscription();
-  
   if (!subscription) {
-    try {
-      const permission = await Notification.requestPermission();
-      if (permission !== 'granted') {
-        console.log('Notification permission denied');
-        return;
-      }
-      
-      subscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
-      });
-      
-      console.log('Push subscribed');
-    } catch (err) {
-      console.error('Push subscription failed:', err);
-      return;
-    }
+    subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+    });
   }
-  
   if (subscription && sessionId) {
     const key = subscription.getKey('p256dh') ? btoa(String.fromCharCode(...new Uint8Array(subscription.getKey('p256dh')))) : '';
     const authKey = subscription.getKey('auth') ? btoa(String.fromCharCode(...new Uint8Array(subscription.getKey('auth')))) : '';
-    
     await sb.from('push_subscriptions').upsert({
-      session_id: sessionId,
-      endpoint: subscription.endpoint,
-      p256dh: key,
-      auth: authKey,
-      type: 'user'
+      session_id: sessionId, endpoint: subscription.endpoint,
+      p256dh: key, auth: authKey, type: 'user'
     }, { onConflict: 'session_id' });
-    
     console.log('Push subscription saved');
   }
 }
@@ -506,19 +515,9 @@ function urlBase64ToUint8Array(base64String) {
   const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
   const rawData = atob(base64);
   const outputArray = new Uint8Array(rawData.length);
-  for (let i = 0; i < rawData.length; ++i) {
-    outputArray[i] = rawData.charCodeAt(i);
-  }
+  for (let i = 0; i < rawData.length; ++i) { outputArray[i] = rawData.charCodeAt(i); }
   return outputArray;
 }
-
-// Subscribe to push after session is confirmed
-const pushInterval = setInterval(() => {
-  if (sessionId) {
-    subscribeToPush().catch(err => console.log('Push setup delayed:', err));
-    clearInterval(pushInterval);
-  }
-}, 1000);
 
 (function init() {
   const saved = loadProfile();
