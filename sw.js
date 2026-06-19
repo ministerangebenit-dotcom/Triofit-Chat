@@ -1,4 +1,4 @@
-const CACHE_NAME = 'triofit-v7';
+const CACHE_NAME = 'triofit-v8';
 
 self.addEventListener('install', event => {
   event.waitUntil(
