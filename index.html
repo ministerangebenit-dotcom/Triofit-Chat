@@ -312,46 +312,50 @@ nameInput.addEventListener('keydown', function(e){ if (e.key==='Enter'){ e.preve
 function submitName() { profile.name = nameInput.value.trim(); beginSession(); }
 
 function beginSession() {
- // Reuse existing session ID for returning users
-const savedSessionId = localStorage.getItem('triofit_session');
-if (savedSessionId && saved?.name === profile.name) {
-  sessionId = savedSessionId;
-} else {
-  sessionId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2,8);
-  localStorage.setItem('triofit_session', sessionId);
-}
-  // Load previous messages if returning
-if (saved && saved.name === profile.name) {
-  sb.from('messages')
-    .select('*')
-    .eq('session_id', sessionId)
-    .order('created_at', { ascending: true })
-    .limit(100)
-    .then(({ data }) => {
-      if (data && data.length > 0) {
-        data.forEach(m => {
-          if (m.sender === 'user') addUserBubble(m.message);
-          else if (m.message_type === 'image') {
-            const lines = m.message.split('\n');
-            const urlPart = lines[lines.length - 1];
-            if (urlPart && urlPart.startsWith('http')) {
-              const caption = lines.slice(0, -1).join('\n');
-              if (caption.trim()) addAdminBubble(caption);
-              addAdminImg(urlPart);
-            } else {
-              addAdminImg(m.message);
-            }
-          } else {
-            addAdminBubble(m.message);
-          }
-        });
-      }
-    });
-}
-  flowStep  = 0;
+  const saved = loadProfile();
+  
+  // Reuse existing session ID for returning users
+  const savedSessionId = localStorage.getItem('triofit_session');
+  if (savedSessionId && saved && saved.name === profile.name) {
+    sessionId = savedSessionId;
+  } else {
+    sessionId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2,8);
+    localStorage.setItem('triofit_session', sessionId);
+  }
+  
+  flowStep = 0;
   goTo('chat');
   pushMeta();
-  const saved = loadProfile();
+  
+  // Load previous messages if returning
+  if (saved && saved.name === profile.name) {
+    sb.from('messages')
+      .select('*')
+      .eq('session_id', sessionId)
+      .order('created_at', { ascending: true })
+      .limit(100)
+      .then(({ data }) => {
+        if (data && data.length > 0) {
+          data.forEach(m => {
+            if (m.sender === 'user') addUserBubble(m.message);
+            else if (m.message_type === 'image') {
+              const lines = m.message.split('\n');
+              const urlPart = lines[lines.length - 1];
+              if (urlPart && urlPart.startsWith('http')) {
+                const caption = lines.slice(0, -1).join('\n');
+                if (caption.trim()) addAdminBubble(caption);
+                addAdminImg(urlPart);
+              } else {
+                addAdminImg(m.message);
+              }
+            } else {
+              addAdminBubble(m.message);
+            }
+          });
+        }
+      });
+  }
+  
   if (saved && saved.name === profile.name) {
     Object.assign(profile, saved);
     profileComplete = true;
@@ -360,6 +364,7 @@ if (saved && saved.name === profile.name) {
     profileComplete = false;
     askNext();
   }
+  
   sb.channel('chat-'+sessionId)
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'}, payload=>{
       const m = payload.new;
@@ -447,7 +452,8 @@ function closeLb(){ document.getElementById('lightbox').classList.remove('open')
 document.getElementById('lightbox').addEventListener('click', closeLb);
 
 setStatus('free');
- // ── PUSH NOTIFICATIONS ──
+
+// ── PUSH NOTIFICATIONS ──
 const VAPID_PUBLIC_KEY = 'BPIWlyjvmlzXuTPVQCe0mjx9JahV51_HIFMLZrD_mgdb8BjP_E7h6QoX-1onlawjqUhEtNvDEbAZs3AEvHVZWV0';
 
 async function subscribeToPush() {
@@ -506,10 +512,14 @@ function urlBase64ToUint8Array(base64String) {
   return outputArray;
 }
 
-// Subscribe to push after session starts
-setTimeout(() => {
-  if (sessionId) subscribeToPush();
-}, 4000); 
+// Subscribe to push after session is confirmed
+const pushInterval = setInterval(() => {
+  if (sessionId) {
+    subscribeToPush().catch(err => console.log('Push setup delayed:', err));
+    clearInterval(pushInterval);
+  }
+}, 1000);
+
 (function init() {
   const saved = loadProfile();
   if (saved && saved.name) { Object.assign(profile, saved); goTo('namescreen'); document.getElementById('nameInput').value = saved.name; document.getElementById('nameBtn').disabled = false; }
