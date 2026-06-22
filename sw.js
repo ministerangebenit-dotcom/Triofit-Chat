@@ -1,4 +1,4 @@
-const CACHE_NAME = 'triofit-v8';
+const CACHE_NAME = 'triofit-v9';
 
 self.addEventListener('install', event => {
   event.waitUntil(
@@ -36,27 +36,15 @@ self.addEventListener('fetch', event => {
   );
 });
 
-// ── PUSH NOTIFICATIONS ──
 self.addEventListener('push', event => {
   let data = { title: 'TRIOFIT', body: 'You have a new message', icon: 'logo.jpg' };
-  
   if (event.data) {
-    try {
-      const parsed = event.data.json();
-      data = { ...data, ...parsed };
-    } catch (e) {
-      data.body = event.data.text();
-    }
+    try { const parsed = event.data.json(); data = { ...data, ...parsed }; } catch (e) { data.body = event.data.text(); }
   }
-
   event.waitUntil(
     self.registration.showNotification(data.title, {
-      body: data.body,
-      icon: data.icon,
-      badge: 'logo.jpg',
-      tag: 'triofit',
-      requireInteraction: true,
-      vibrate: [200, 100, 200],
+      body: data.body, icon: data.icon, badge: 'logo.jpg',
+      tag: 'triofit', requireInteraction: true, vibrate: [200, 100, 200],
       data: { url: data.url || './' }
     })
   );
@@ -68,13 +56,9 @@ self.addEventListener('notificationclick', event => {
   event.waitUntil(
     clients.matchAll({ type: 'window' }).then(windowClients => {
       for (const client of windowClients) {
-        if (client.url.includes(url) && 'focus' in client) {
-          return client.focus();
-        }
+        if (client.url.includes(url) && 'focus' in client) return client.focus();
       }
-      if (clients.openWindow) {
-        return clients.openWindow(url);
-      }
+      if (clients.openWindow) return clients.openWindow(url);
     })
   );
 });
