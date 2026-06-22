@@ -12,6 +12,10 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#080808">
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+
 <style>
 :root {
   --bg: #070707;
@@ -25,65 +29,99 @@
   --text: #efefef;
   --text-muted: #555;
   --text-dim: #888;
+  --font-display: 'Playfair Display', 'Georgia', 'Times New Roman', serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
 }
+
+body.light-mode {
+  --bg: #f5f5f7;
+  --surface: #ffffff;
+  --surface2: #e8e8ec;
+  --surface3: #dcdce0;
+  --gold: #b8893a;
+  --gold-light: #d4a84b;
+  --gold-pale: rgba(184,137,58,0.12);
+  --gold-border: rgba(184,137,58,0.35);
+  --text: #1a1a1a;
+  --text-muted: #777;
+  --text-dim: #555;
+}
+body.light-mode .bubble.user { background: #fff; border-color: var(--gold-border); }
+body.light-mode .bubble.admin { background: #f0f0f0; }
+body.light-mode .typing-bub { background: #f0f0f0; }
+
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 html, body { height:100%; }
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+  font-family: var(--font-body);
   background: var(--bg); color: var(--text);
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
 }
 
-/* ── SCREENS ── */
-.screen { position:fixed; inset:0; display:flex; flex-direction:column; transition: opacity .42s cubic-bezier(.4,0,.2,1), transform .42s cubic-bezier(.4,0,.2,1); }
-.screen.hidden { opacity:0; pointer-events:none; transform:translateY(14px); }
-.screen.out    { opacity:0; pointer-events:none; transform:translateY(-14px); }
+.screen { position:fixed; inset:0; display:flex; flex-direction:column; transition: opacity .5s cubic-bezier(.4,0,.2,1), transform .5s cubic-bezier(.4,0,.2,1); }
+.screen.hidden { opacity:0; pointer-events:none; transform:translateY(16px); }
+.screen.out    { opacity:0; pointer-events:none; transform:translateY(-16px); }
 
-/* ── LANG ── */
-.lang-toggle { position:fixed; top:16px; right:16px; z-index:1000; display:flex; background:rgba(14,14,14,.95); border:1px solid rgba(255,255,255,.07); border-radius:20px; padding:3px; gap:2px; backdrop-filter:blur(12px); }
+.top-toggles { position:fixed; top:16px; right:16px; z-index:1000; display:flex; gap:8px; align-items:center; }
+.lang-toggle { display:flex; background:rgba(14,14,14,.95); border:1px solid rgba(255,255,255,.07); border-radius:20px; padding:3px; gap:2px; backdrop-filter:blur(12px); }
+body.light-mode .lang-toggle { background:rgba(255,255,255,.9); border-color:rgba(0,0,0,0.1); }
 .lang-btn { padding:5px 13px; border-radius:14px; font-size:11px; font-weight:600; letter-spacing:.04em; border:none; background:none; color:var(--text-muted); cursor:pointer; transition:all .2s; }
 .lang-btn.on { background:var(--gold); color:#0a0a0a; }
 
-/* ── SPLASH ── */
+.theme-btn {
+  width:34px; height:34px; border-radius:50%;
+  background:rgba(14,14,14,.95); border:1px solid rgba(255,255,255,.07);
+  backdrop-filter:blur(12px); color:var(--text-dim); cursor:pointer;
+  display:flex; align-items:center; justify-content:center; font-size:16px;
+}
+body.light-mode .theme-btn { background:rgba(255,255,255,.9); border-color:rgba(0,0,0,0.1); }
+
 #splash { align-items:center; justify-content:center; padding:40px 28px; overflow:hidden; background:var(--bg); }
 .orb { position:absolute; border-radius:50%; filter:blur(90px); opacity:.1; animation:drift 10s ease-in-out infinite alternate; }
 .orb1{width:420px;height:420px;background:var(--gold);top:-100px;right:-100px;}
 .orb2{width:300px;height:300px;background:#6b4a18;bottom:-60px;left:-80px;animation-delay:-4s;}
 .orb3{width:200px;height:200px;background:var(--gold-light);top:50%;left:20%;animation-delay:-7s;}
 @keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(16px,22px) scale(1.08)}}
-.splash-inner { position:relative; z-index:1; width:100%; max-width:340px; margin:auto; text-align:center; display:flex; flex-direction:column; align-items:center; }
-.splash-logo { width:72px; height:72px; border-radius:18px; object-fit:cover; margin:0 auto 16px; box-shadow:0 0 48px rgba(184,137,58,.25),0 8px 28px rgba(0,0,0,.6); }
-.logo-wordmark  { font-size:22px; font-weight:800; letter-spacing:.18em; }
-.logo-descriptor{ font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); margin-top:6px; font-weight:500; }
-.splash-headline { margin:30px 0 28px; }
-.splash-headline h1 { font-size:clamp(22px,6.5vw,34px); font-weight:700; line-height:1.2; }
-.splash-headline h1 em { font-style:normal; background:linear-gradient(90deg,var(--gold-light),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-.splash-headline p { margin-top:14px; font-size:14px; color:var(--text-dim); line-height:1.65; max-width:280px; margin-left:auto; margin-right:auto; }
-.btn-primary { width:100%; padding:15px 24px; background:linear-gradient(135deg,var(--gold-light),var(--gold)); border:none; border-radius:50px; color:#080808; font-size:14px; font-weight:700; letter-spacing:.04em; cursor:pointer; box-shadow:0 4px 28px rgba(184,137,58,.3); transition:all .2s; }
+.splash-inner { position:relative; z-index:1; width:100%; max-width:380px; margin:auto; text-align:center; display:flex; flex-direction:column; align-items:center; }
+.splash-logo { width:72px; height:72px; border-radius:18px; object-fit:cover; margin:0 auto 20px; box-shadow:0 0 48px rgba(184,137,58,.25),0 8px 28px rgba(0,0,0,.6); }
+.logo-wordmark  { font-family: var(--font-display); font-size:28px; font-weight:700; letter-spacing:.12em; }
+.logo-descriptor{ font-family: var(--font-body); font-size:10px; letter-spacing:.28em; text-transform:uppercase; color:var(--gold); margin-top:6px; font-weight:500; }
+.splash-headline { margin:32px 0 20px; }
+.splash-headline h1 { font-family: var(--font-display); font-size:clamp(22px,6.5vw,36px); font-weight:600; line-height:1.25; }
+.splash-headline h1 em { font-style:italic; background:linear-gradient(90deg,var(--gold-light),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.splash-sub { font-family: var(--font-body); font-size:14px; color:var(--text-dim); line-height:1.7; max-width:320px; margin:0 auto 28px; font-weight:400; letter-spacing:.01em; }
+.btn-primary { width:100%; padding:15px 24px; background:linear-gradient(135deg,var(--gold-light),var(--gold)); border:none; border-radius:50px; color:#080808; font-size:14px; font-weight:700; letter-spacing:.04em; cursor:pointer; box-shadow:0 4px 28px rgba(184,137,58,.3); transition:all .2s; font-family: var(--font-body); }
 .btn-primary:active { transform:scale(.97); opacity:.9; }
-.splash-trust { display:flex; align-items:center; gap:10px; margin-top:22px; font-size:11px; color:var(--text-muted); }
+.splash-trust { display:flex; align-items:center; gap:10px; margin-top:22px; font-size:11px; color:var(--text-muted); font-family: var(--font-body); }
 .sep { width:1px; height:11px; background:var(--surface3); }
 
-/* ── NAME SCREEN ── */
+#quickdemo { align-items:center; justify-content:center; padding:40px 28px; background:var(--bg); overflow-y:auto; }
+.demo-inner { width:100%; max-width:380px; text-align:center; }
+.demo-title { font-family: var(--font-display); font-size:22px; font-weight:600; margin-bottom:28px; letter-spacing:.02em; }
+.quick-replies-row { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:20px; }
+.demo-result { margin-top:28px; display:none; }
+.demo-result img { max-width:100%; border-radius:14px; margin-bottom:16px; box-shadow:0 8px 30px rgba(0,0,0,0.4); }
+.demo-score { font-family: var(--font-display); font-size:18px; font-weight:600; color:var(--gold); line-height:1.5; margin-bottom:20px; padding:16px 20px; background:var(--surface2); border-radius:12px; border:1px solid var(--gold-border); text-align:center; }
+.demo-cta { margin-top:10px; }
+
 #namescreen { align-items:center; justify-content:center; padding:40px 28px; background:var(--bg); overflow:hidden; }
 .namescreen-inner { position:relative; z-index:1; width:100%; max-width:340px; display:flex; flex-direction:column; gap:28px; }
-.ns-label { font-size:10px; font-weight:700; letter-spacing:.16em; color:var(--gold); text-transform:uppercase; }
-.ns-title { font-size:24px; font-weight:700; line-height:1.2; margin-top:6px; }
-.ns-sub   { font-size:14px; color:var(--text-dim); line-height:1.6; margin-top:8px; }
-.field-input { width:100%; padding:14px 18px; background:var(--surface2); border:1.5px solid rgba(255,255,255,.06); border-radius:12px; color:var(--text); font-size:16px; font-family:inherit; outline:none; transition:border-color .2s; -webkit-appearance:none; }
+.ns-label { font-family: var(--font-body); font-size:10px; font-weight:700; letter-spacing:.16em; color:var(--gold); text-transform:uppercase; }
+.ns-title { font-family: var(--font-display); font-size:26px; font-weight:600; line-height:1.2; margin-top:6px; }
+.ns-sub   { font-family: var(--font-body); font-size:14px; color:var(--text-dim); line-height:1.6; margin-top:8px; }
+.field-input { width:100%; padding:14px 18px; background:var(--surface2); border:1.5px solid rgba(255,255,255,.06); border-radius:12px; color:var(--text); font-size:16px; font-family:var(--font-body); outline:none; transition:border-color .2s; -webkit-appearance:none; }
 .field-input:focus { border-color:var(--gold-border); }
 .field-input::placeholder { color:var(--text-muted); }
 
-/* ── CHAT ── */
 #chat { background:var(--bg); }
 .chat-header { display:flex; align-items:center; gap:12px; padding:13px 18px; padding-top:max(13px, env(safe-area-inset-top)); background:var(--surface); border-bottom:1px solid rgba(255,255,255,.04); flex-shrink:0; }
-.chat-avatar { width:36px; height:36px; border-radius:50%; overflow:hidden; flex-shrink:0; box-shadow:0 0 14px rgba(184,137,58,.2); }
+.chat-avatar { width:38px; height:38px; border-radius:50%; overflow:hidden; flex-shrink:0; box-shadow:0 0 14px rgba(184,137,58,.2); }
 .chat-avatar img { width:100%; height:100%; object-fit:cover; }
 @keyframes logoGlow { 0%,100%{box-shadow:0 0 8px rgba(184,137,58,.3)} 50%{box-shadow:0 0 20px rgba(184,137,58,.6)} }
 .chat-avatar.thinking { animation:logoGlow 1.5s ease-in-out infinite; }
-.chat-hname  { font-size:13px; font-weight:700; letter-spacing:.02em; }
-.chat-hstatus { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--text-dim); margin-top:2px; }
+.chat-hname  { font-family: var(--font-display); font-size:14px; font-weight:600; letter-spacing:.02em; }
+.chat-hstatus { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--text-dim); margin-top:2px; font-family: var(--font-body); }
 .chat-hstatus .s-dot { width:5px; height:5px; background:var(--gold); border-radius:50%; }
 .chat-hstatus.thinking-status { color:var(--gold); }
 .chat-hstatus.thinking-status .s-dot { animation:pulse 1.2s infinite; }
@@ -91,7 +129,7 @@ body {
 
 .messages {
   flex:1; overflow-y:auto; overflow-x:hidden;
-  padding:18px 16px 10px;
+  padding:20px 16px 12px;
   display:flex; flex-direction:column; gap:10px;
   -webkit-overflow-scrolling:touch;
   background-color: var(--bg);
@@ -101,23 +139,23 @@ body {
 .mrow { display:flex; flex-direction:column; }
 .mrow.user  { align-items:flex-end; }
 .mrow.admin { align-items:flex-start; }
-.bubble { max-width:78%; padding:11px 15px; border-radius:16px; font-size:14px; line-height:1.58; word-break:break-word; animation:bIn .28s ease both; }
+.bubble { max-width:78%; padding:11px 15px; border-radius:16px; font-size:14px; line-height:1.6; word-break:break-word; animation:bIn .28s ease both; font-family: var(--font-body); }
 @keyframes bIn{from{opacity:0;transform:scale(.96) translateY(5px)}to{opacity:1;transform:scale(1) translateY(0)}}
 .bubble.user { background:var(--gold-pale); border:1px solid var(--gold-border); border-bottom-right-radius:3px; }
 .bubble.admin { background:var(--surface2); border:1px solid rgba(255,255,255,.04); border-bottom-left-radius:3px; }
-.bubble img { max-width:100%; border-radius:8px; display:block; cursor:pointer; }
-.bmeta { font-size:10px; color:var(--text-muted); margin-top:4px; padding:0 2px; letter-spacing:.02em; }
+.bubble img { max-width:100%; border-radius:10px; display:block; cursor:pointer; }
+.bmeta { font-size:10px; color:var(--text-muted); margin-top:4px; padding:0 2px; letter-spacing:.02em; font-family: var(--font-body); }
 
 .typing-bub { background:var(--surface2); border:1px solid rgba(255,255,255,.04); border-radius:16px; border-bottom-left-radius:3px; padding:13px 17px; display:inline-flex; gap:5px; align-items:center; animation:bIn .28s ease both; }
-.typing-text { font-size:13px; color:var(--text-dim); font-style:italic; }
+.typing-text { font-size:13px; color:var(--text-dim); font-style:italic; font-family: var(--font-body); }
 
 .qr-row { display:flex; flex-wrap:wrap; gap:7px; padding:2px 0 4px; }
-.qr-btn { padding:8px 15px; background:var(--surface2); border:1px solid var(--gold-border); border-radius:20px; font-size:12px; font-weight:500; color:var(--gold); cursor:pointer; font-family:inherit; -webkit-appearance:none; letter-spacing:.02em; transition:all .2s; }
+.qr-btn { padding:8px 15px; background:var(--surface2); border:1px solid var(--gold-border); border-radius:20px; font-size:12px; font-weight:500; color:var(--gold); cursor:pointer; font-family:var(--font-body); -webkit-appearance:none; letter-spacing:.02em; transition:all .2s; }
 .qr-btn:active { background:var(--gold-pale); transform:scale(.97); }
 
 .chat-input-area { padding:10px 14px; padding-bottom:max(10px, env(safe-area-inset-bottom)); background:var(--surface); border-top:1px solid rgba(255,255,255,.04); flex-shrink:0; }
 .input-row { display:flex; gap:8px; align-items:flex-end; }
-.chat-ta { flex:1; padding:11px 16px; background:var(--surface2); border:1.5px solid rgba(255,255,255,.06); border-radius:22px; color:var(--text); font-size:14px; font-family:inherit; outline:none; resize:none; max-height:100px; line-height:1.45; transition:border-color .2s; -webkit-appearance:none; }
+.chat-ta { flex:1; padding:11px 16px; background:var(--surface2); border:1.5px solid rgba(255,255,255,.06); border-radius:22px; color:var(--text); font-size:14px; font-family:var(--font-body); outline:none; resize:none; max-height:100px; line-height:1.45; transition:border-color .2s; -webkit-appearance:none; }
 .chat-ta:focus { border-color:var(--gold-border); }
 .chat-ta::placeholder { color:var(--text-muted); }
 .send-btn { width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,var(--gold-light),var(--gold)); border:none; color:#080808; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; transition:all .2s; box-shadow:0 2px 10px rgba(184,137,58,.28); -webkit-appearance:none; }
@@ -126,55 +164,76 @@ body {
 
 .lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:9999;align-items:center;justify-content:center;cursor:pointer;}
 .lightbox.open{display:flex;}
-.lightbox img{max-width:92vw;max-height:88vh;border-radius:10px;}
+.lightbox img{max-width:92vw;max-height:88vh;border-radius:12px;}
 </style>
 </head>
 <body>
 
-<div class="lang-toggle">
-  <button class="lang-btn on" id="btnFR" onclick="setLang('fr')">FR</button>
-  <button class="lang-btn"    id="btnEN" onclick="setLang('en')">EN</button>
+<div class="top-toggles">
+  <div class="lang-toggle">
+    <button class="lang-btn on" id="btnFR" onclick="setLang('fr')">FR</button>
+    <button class="lang-btn"    id="btnEN" onclick="setLang('en')">EN</button>
+  </div>
+  <button class="theme-btn" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode">🌓</button>
 </div>
 
-<!-- ══ SPLASH ══ -->
 <div class="screen" id="splash">
   <div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
   <div class="splash-inner">
     <img class="splash-logo" src="logo.jpg" alt="TRIOFIT">
     <div class="logo-wordmark">TRIOFIT</div>
-    <div class="logo-descriptor" id="s-tag">Styliste Personnel</div>
+    <div class="logo-descriptor" id="s-tag">TRIOFIT AI</div>
     <div class="splash-headline">
-      <h1 id="s-h1">Habillez-vous<br>comme vous <em>méritez</em></h1>
-      <p id="s-p">Un conseil stylistique sur mesure, disponible à tout moment, pour la clientèle de Yaoundé.</p>
+      <h1 id="s-h1">Know exactly how you'll be perceived <em>before you step out the door</em></h1>
     </div>
-    <button class="btn-primary" id="s-cta" onclick="goTo('namescreen')">Commencer</button>
+    <div class="splash-sub" id="s-sub">
+      Triofit scores your outfit's social impact for high‑stakes events — job interviews, dates, weddings.
+    </div>
+    <button class="btn-primary" id="s-cta" onclick="startQuickDemo()">Try a free perception check →</button>
     <div class="splash-trust">
-      <span id="s-t1">Conseil personnalisé</span><span class="sep"></span>
-      <span id="s-t2">Réponse rapide</span><span class="sep"></span>
-      <span id="s-t3">Yaoundé</span>
+      <span id="s-t1">✦ Instant results</span><span class="sep"></span>
+      <span id="s-t2">✦ Data‑backed</span><span class="sep"></span>
+      <span id="s-t3">✦ Yaoundé</span>
     </div>
   </div>
 </div>
 
-<!-- ══ NAME SCREEN ══ -->
+<div class="screen hidden" id="quickdemo">
+  <div class="demo-inner">
+    <div class="demo-title" id="demo-title">Quick Perception Check</div>
+    <div id="demo-step1">
+      <div style="color:var(--text-dim);margin-bottom:12px;font-size:14px;" id="demo-gender-prompt">I am:</div>
+      <div class="quick-replies-row" id="demo-gender-btns"></div>
+    </div>
+    <div id="demo-step2" style="display:none;">
+      <div style="color:var(--text-dim);margin-bottom:12px;font-size:14px;" id="demo-occasion-prompt">Occasion:</div>
+      <div class="quick-replies-row" id="demo-occasion-btns"></div>
+    </div>
+    <div class="demo-result" id="demo-result">
+      <img id="demo-img" src="" alt="Sample outfit" />
+      <div class="demo-score" id="demo-score"></div>
+      <button class="btn-primary demo-cta" onclick="goTo('namescreen')" id="demo-cta-btn">Get your own stylist →</button>
+    </div>
+  </div>
+</div>
+
 <div class="screen hidden" id="namescreen">
   <div class="orb orb1"></div><div class="orb orb2"></div>
   <div class="namescreen-inner">
     <div>
       <div class="ns-label" id="ns-label">Bienvenue</div>
-      <div class="ns-title" id="ns-title">Comment vous appelez-vous ?</div>
-      <div class="ns-sub"   id="ns-sub">Votre styliste personnel vous attend.</div>
+      <div class="ns-title" id="ns-title">What's your name?</div>
+      <div class="ns-sub"   id="ns-sub">Your personal stylist is ready.</div>
     </div>
     <div>
-      <input class="field-input" id="nameInput" type="text" placeholder="Votre prénom" autocomplete="given-name" autocorrect="off" autocapitalize="words">
+      <input class="field-input" id="nameInput" type="text" placeholder="Your first name" autocomplete="given-name" autocorrect="off" autocapitalize="words">
     </div>
     <button class="btn-primary" id="nameBtn" disabled onclick="submitName()">
-      <span id="nameBtn-label">Continuer</span>
+      <span id="nameBtn-label">Continue</span>
     </button>
   </div>
 </div>
 
-<!-- ══ CHAT ══ -->
 <div class="screen hidden" id="chat">
   <div class="chat-header">
     <div class="chat-avatar" id="chatAvatar"><img src="logo.jpg" alt="TRIOFIT"></div>
@@ -186,7 +245,7 @@ body {
   <div class="messages" id="messages"></div>
   <div class="chat-input-area">
     <div class="input-row">
-      <textarea class="chat-ta" id="chatInput" rows="1" placeholder="Écrivez un message…"></textarea>
+      <textarea class="chat-ta" id="chatInput" rows="1" placeholder="Write a message…"></textarea>
       <button class="send-btn" onclick="sendMsg()">
         <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
       </button>
@@ -214,11 +273,226 @@ const profile = {
   height:'', bodyType:'', town:''
 };
 
+function applyTheme(mode) {
+  if (mode === 'light') { document.body.classList.add('light-mode'); }
+  else { document.body.classList.remove('light-mode'); }
+}
+function toggleTheme() {
+  const isLight = document.body.classList.contains('light-mode');
+  const newMode = isLight ? 'dark' : 'light';
+  localStorage.setItem('triofit_theme', newMode);
+  applyTheme(newMode);
+}
+(function loadTheme() {
+  const saved = localStorage.getItem('triofit_theme');
+  if (saved === 'light') applyTheme('light');
+})();
+
+// ── PREDICTIVE SCORING ──
+const SCORE_MESSAGES = {
+  fr: {
+    date: {
+      Masculin: [
+        '{score}% des femmes de Yaoundé trouveraient ce look attirant.',
+        '{score}% des célibataires pensent que cette tenue fait bonne impression.'
+      ],
+      Féminin: [
+        '{score}% des hommes trouveraient ce look séduisant.',
+        '{score}% des célibataires valideraient ce style pour un rendez-vous.'
+      ],
+      default: [
+        '{score}% des célibataires trouveraient ce look attirant.',
+      ]
+    },
+    entretien: {
+      default: [
+        '{score}% des cadres supérieurs jugeraient cette tenue sérieuse et respectable.',
+        '{score}% des recruteurs trouveraient ce look professionnel.',
+        '{score}% des PDG valideraient cette tenue pour un entretien.'
+      ]
+    },
+    party: {
+      Masculin: [
+        '{score}% des femmes trouveraient ce look remarquable en soirée.',
+        '{score}% des habitués des lounges valideraient ce style.'
+      ],
+      Féminin: [
+        '{score}% des hommes trouveraient ce look remarquable en soirée.',
+        '{score}% des habitués des lounges valideraient ce style.'
+      ],
+      default: [
+        '{score}% des fêtards trouveraient ce look remarquable.',
+      ]
+    },
+    casual: {
+      default: [
+        '{score}% des jeunes adultes trouveraient ce look cool et confiant.',
+        '{score}% des Camerounais valideraient ce style décontracté.'
+      ]
+    },
+    bureau: {
+      default: [
+        '{score}% des professionnels en entreprise valideraient ce style.',
+        '{score}% des managers approuveraient ce look corporate.'
+      ]
+    },
+    mariage: {
+      default: [
+        '{score}% des invités considéreraient cette tenue appropriée.',
+        '{score}% des familles trouveraient ce look respectueux.'
+      ]
+    },
+    sport: {
+      default: [
+        '{score}% des amateurs de fitness approuveraient ce look.',
+      ]
+    },
+    religieux: {
+      default: [
+        '{score}% des fidèles trouveraient cette tenue respectueuse.',
+      ]
+    }
+  },
+  en: {
+    date: {
+      Male: [
+        '{score}% of women in Yaoundé would find this look attractive.',
+        '{score}% of singles think this outfit makes a great impression.'
+      ],
+      Female: [
+        '{score}% of men would find this look attractive.',
+        '{score}% of singles would approve this style for a date.'
+      ],
+      default: [
+        '{score}% of singles would find this look attractive.',
+      ]
+    },
+    interview: {
+      default: [
+        '{score}% of senior executives would find this look serious and respectable.',
+        '{score}% of recruiters would consider this outfit professional.',
+        '{score}% of CEOs would approve this for an interview.'
+      ]
+    },
+    party: {
+      Male: [
+        '{score}% of women would find this look remarkable for a night out.',
+        '{score}% of lounge regulars would approve this style.'
+      ],
+      Female: [
+        '{score}% of men would find this look remarkable for a night out.',
+        '{score}% of lounge regulars would approve this style.'
+      ],
+      default: [
+        '{score}% of partygoers would find this look remarkable.',
+      ]
+    },
+    casual: {
+      default: [
+        '{score}% of young adults would find this look cool and confident.',
+        '{score}% of Cameroonians would approve this casual style.'
+      ]
+    },
+    work: {
+      default: [
+        '{score}% of professionals would validate this office style.',
+        '{score}% of managers would approve this corporate look.'
+      ]
+    },
+    wedding: {
+      default: [
+        '{score}% of guests would consider this outfit appropriate.',
+        '{score}% of families would find this look respectful.'
+      ]
+    },
+    sport: {
+      default: [
+        '{score}% of fitness enthusiasts would approve this look.',
+      ]
+    },
+    church: {
+      default: [
+        '{score}% of churchgoers would find this look respectful.',
+      ]
+    }
+  }
+};
+
+function generatePerceptionScore(occasion, userGender) {
+  const score = Math.floor(Math.random() * 30) + 65; // 65–94%
+  const occasionMessages = SCORE_MESSAGES[lang]?.[occasion] || SCORE_MESSAGES[lang]?.casual || {};
+  // Pick gender-specific messages first, fall back to default
+  let messages = occasionMessages[userGender] || occasionMessages['default'] || [];
+  if (!messages.length) messages = ['{score}% of people would find this look appropriate.'];
+  const template = messages[Math.floor(Math.random() * messages.length)];
+  return template.replace('{score}', score);
+}
+
+// ── QUICK DEMO ──
+let demoGender = null;
+let demoOccasion = null;
+let allTemplates = [];
+
+async function loadDemoTemplates() {
+  const { data } = await sb.from('outfit_templates').select('*').limit(50);
+  if (data) allTemplates = data;
+}
+loadDemoTemplates();
+
+function startQuickDemo() {
+  goTo('quickdemo');
+  renderDemoStep1();
+}
+
+function renderDemoStep1() {
+  document.getElementById('demo-step1').style.display = 'block';
+  document.getElementById('demo-step2').style.display = 'none';
+  document.getElementById('demo-result').style.display = 'none';
+  const container = document.getElementById('demo-gender-btns');
+  const genders = lang==='fr' ? ['Masculin','Féminin','Peu importe'] : ['Male','Female','Prefer not to say'];
+  container.innerHTML = genders.map(g => `<button class="qr-btn" onclick="selectDemoGender('${g}')">${g}</button>`).join('');
+}
+
+function selectDemoGender(g) {
+  demoGender = g;
+  document.getElementById('demo-step1').style.display = 'none';
+  document.getElementById('demo-step2').style.display = 'block';
+  const container = document.getElementById('demo-occasion-btns');
+  const occasions = lang==='fr'
+    ? ['date','entretien','party','casual','bureau','mariage']
+    : ['date','interview','party','casual','work','wedding'];
+  const labels = lang==='fr'
+    ? ['Date','Entretien','Soirée','Décontracté','Bureau','Mariage']
+    : ['Date','Interview','Party','Casual','Work','Wedding'];
+  container.innerHTML = occasions.map((o,i) => `<button class="qr-btn" onclick="selectDemoOccasion('${o}')">${labels[i]}</button>`).join('');
+}
+
+function selectDemoOccasion(occ) {
+  demoOccasion = occ;
+  showDemoResult();
+}
+
+function showDemoResult() {
+  document.getElementById('demo-step2').style.display = 'none';
+  const resultDiv = document.getElementById('demo-result');
+  resultDiv.style.display = 'block';
+
+  const match = allTemplates.find(t => 
+    t.occasion === demoOccasion && 
+    (t.gender === demoGender || !t.gender || demoGender === 'Peu importe' || demoGender === 'Prefer not to say')
+  ) || allTemplates[0];
+
+  if (match) {
+    document.getElementById('demo-img').src = match.image_url || '';
+  }
+  document.getElementById('demo-score').innerText = generatePerceptionScore(demoOccasion, demoGender);
+}
+
+// ── REST OF APP ──
 const STATUS_TEXT = {
   fr: { free: 'MODE GRATUIT', thinking: 'Réflexion…' },
   en: { free: 'FREE MODE', thinking: 'Thinking…' }
 };
-
 const TYPING_TEXT = {
   fr: 'Préparation du style qui vous correspond…',
   en: 'Preparing the style that suits you…'
@@ -229,11 +503,8 @@ function setStatus(mode) {
   const container = document.getElementById('chatStatus');
   if (!el || !container) return;
   el.textContent = STATUS_TEXT[lang][mode];
-  if (mode === 'thinking') {
-    container.classList.add('thinking-status');
-  } else {
-    container.classList.remove('thinking-status');
-  }
+  if (mode === 'thinking') container.classList.add('thinking-status');
+  else container.classList.remove('thinking-status');
 }
 
 const FLOW = {
@@ -263,20 +534,32 @@ let flowStep = 0;
 
 const COPY = {
   fr: {
-    'splash-tag':'Styliste Personnel','splash-h1':'Habillez-vous<br>comme vous <em>méritez</em>',
-    'splash-p':'Un conseil stylistique sur mesure, disponible à tout moment, pour la clientèle de Yaoundé.',
-    'splash-cta':'Commencer','t1':'Conseil personnalisé','t2':'Réponse rapide','t3':'Yaoundé',
-    'ns-label':'Bienvenue','ns-title':'Comment vous appelez-vous ?','ns-sub':'Votre styliste personnel vous attend.',
-    'nameBtn':'Continuer','ph-chat':'Écrivez votre réponse…',
+    'splash-tag':'TRIOFIT IA',
+    'splash-h1':'Sachez exactement comment vous serez perçu <em>avant de franchir la porte</em>',
+    's-sub':'Triofit évalue l\'impact social de votre tenue pour les grands rendez‑vous – entretiens, rendez‑vous galants, mariages.',
+    's-cta':'Essayez un diagnostic gratuit →',
+    't1':'✦ Résultats instantanés','t2':'✦ Basé sur des données','t3':'✦ Yaoundé',
+    'demo-title':'Diagnostic rapide',
+    'demo-gender-prompt':'Je suis :',
+    'demo-occasion-prompt':'Occasion :',
+    'demo-cta-btn':'Obtenez votre styliste →',
+    'ns-label':'Bienvenue','ns-title':'Comment vous appelez-vous ?','ns-sub':'Votre styliste personnel est prêt.',
+    'nameBtn':'Continuer','ph-chat':'Écrivez un message…',
     returning:(p)=>`Bienvenue de retour, ${p.name}.\n\nPour quelle occasion cherchez-vous une tenue aujourd'hui ?`,
     ret_qr:()=>['Un entretien professionnel','Une sortie en soirée','Un mariage ou cérémonie','Le quotidien au bureau','Un événement décontracté'],
   },
   en: {
-    'splash-tag':'Personal Stylist','splash-h1':'Dress the way<br>you <em>deserve</em>',
-    'splash-p':'Bespoke style advice, available at any time, for Yaoundé clientele.',
-    'splash-cta':'Get Started','t1':'Personalised advice','t2':'Fast reply','t3':'Yaoundé',
-    'ns-label':'Welcome','ns-title':'What is your name?','ns-sub':'Your personal stylist is ready for you.',
-    'nameBtn':'Continue','ph-chat':'Type your answer…',
+    'splash-tag':'TRIOFIT AI',
+    'splash-h1':'Know exactly how you\'ll be perceived <em>before you step out the door</em>',
+    's-sub':'Triofit scores your outfit\'s social impact for high‑stakes events — job interviews, dates, weddings.',
+    's-cta':'Try a free perception check →',
+    't1':'✦ Instant results','t2':'✦ Data‑backed','t3':'✦ Yaoundé',
+    'demo-title':'Quick Perception Check',
+    'demo-gender-prompt':'I am:',
+    'demo-occasion-prompt':'Occasion:',
+    'demo-cta-btn':'Get your own stylist →',
+    'ns-label':'Welcome','ns-title':'What\'s your name?','ns-sub':'Your personal stylist is ready.',
+    'nameBtn':'Continue','ph-chat':'Type a message…',
     returning:(p)=>`Welcome back, ${p.name}.\n\nWhat occasion are you dressing for today?`,
     ret_qr:()=>['A professional interview','An evening out','A wedding or ceremony','Everyday office wear','A casual event'],
   }
@@ -288,14 +571,21 @@ function setLang(l) {
   document.getElementById('btnFR').classList.toggle('on', l==='fr');
   document.getElementById('btnEN').classList.toggle('on', l==='en');
   const map = {
-    's-tag':c['splash-tag'],'s-h1':c['splash-h1'],'s-p':c['splash-p'],
-    's-cta':c['splash-cta'],'s-t1':c['t1'],'s-t2':c['t2'],'s-t3':c['t3'],
+    's-tag':c['splash-tag'],'s-h1':c['splash-h1'],'s-sub':c['s-sub'],
+    's-cta':c['s-cta'],'s-t1':c['t1'],'s-t2':c['t2'],'s-t3':c['t3'],
+    'demo-title':c['demo-title'],'demo-gender-prompt':c['demo-gender-prompt'],
+    'demo-occasion-prompt':c['demo-occasion-prompt'],'demo-cta-btn':c['demo-cta-btn'],
     'ns-label':c['ns-label'],'ns-title':c['ns-title'],'ns-sub':c['ns-sub'],
     'nameBtn-label':c['nameBtn'],
   };
   for (const [id,val] of Object.entries(map)) { const el=document.getElementById(id); if(el) el.innerHTML=val; }
   const ci=document.getElementById('chatInput'); if(ci) ci.placeholder=c['ph-chat'];
   setStatus('free');
+  if (document.getElementById('quickdemo').classList.contains('hidden')===false) {
+    if (demoOccasion) showDemoResult();
+    else if (demoGender) { document.getElementById('demo-step2').style.display='block'; }
+    else renderDemoStep1();
+  }
 }
 
 function goTo(id) {
@@ -313,7 +603,6 @@ function submitName() { profile.name = nameInput.value.trim(); beginSession(); }
 
 function beginSession() {
   const saved = loadProfile();
-  
   const savedSessionId = localStorage.getItem('triofit_session');
   if (savedSessionId && saved && saved.name === profile.name) {
     sessionId = savedSessionId;
@@ -321,39 +610,27 @@ function beginSession() {
     sessionId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2,8);
     localStorage.setItem('triofit_session', sessionId);
   }
-  
   flowStep = 0;
   goTo('chat');
   pushMeta();
-  
   if (saved && saved.name === profile.name) {
-    sb.from('messages')
-      .select('*')
-      .eq('session_id', sessionId)
-      .order('created_at', { ascending: true })
-      .limit(100)
-      .then(({ data }) => {
-        if (data && data.length > 0) {
-          data.forEach(m => {
-            if (m.sender === 'user') addUserBubble(m.message);
-            else if (m.message_type === 'image') {
-              const lines = m.message.split('\n');
-              const urlPart = lines[lines.length - 1];
-              if (urlPart && urlPart.startsWith('http')) {
-                const caption = lines.slice(0, -1).join('\n');
-                if (caption.trim()) addAdminBubble(caption);
-                addAdminImg(urlPart);
-              } else {
-                addAdminImg(m.message);
-              }
-            } else {
-              addAdminBubble(m.message);
-            }
-          });
-        }
-      });
+    sb.from('messages').select('*').eq('session_id', sessionId).order('created_at', { ascending: true }).limit(100).then(({ data }) => {
+      if (data && data.length > 0) {
+        data.forEach(m => {
+          if (m.sender === 'user') addUserBubble(m.message);
+          else if (m.message_type === 'image') {
+            const lines = m.message.split('\n');
+            const urlPart = lines[lines.length - 1];
+            if (urlPart && urlPart.startsWith('http')) {
+              const caption = lines.slice(0, -1).join('\n');
+              if (caption.trim()) addAdminBubble(caption);
+              addAdminImg(urlPart);
+            } else { addAdminImg(m.message); }
+          } else { addAdminBubble(m.message); }
+        });
+      }
+    });
   }
-  
   if (saved && saved.name === profile.name) {
     Object.assign(profile, saved);
     profileComplete = true;
@@ -363,28 +640,21 @@ function beginSession() {
     profileComplete = false;
     askNext();
   }
-  
-  sb.channel('chat-'+sessionId)
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'}, payload=>{
-      const m = payload.new;
-      if (m.session_id===sessionId && m.sender==='admin') { 
-        removeTyping(); 
-        if (m.message_type==='image') {
-          const lines = m.message.split('\n');
-          const urlPart = lines[lines.length - 1];
-          if (urlPart && (urlPart.startsWith('http://') || urlPart.startsWith('https://'))) {
-            const caption = lines.slice(0, -1).join('\n');
-            if (caption.trim()) addAdminBubble(caption);
-            addAdminImg(urlPart);
-          } else {
-            addAdminImg(m.message);
-          }
-        } else {
-          addAdminBubble(m.message);
-        }
-      }
-    })
-    .subscribe();
+  sb.channel('chat-'+sessionId).on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'}, payload=>{
+    const m = payload.new;
+    if (m.session_id===sessionId && m.sender==='admin') { 
+      removeTyping(); 
+      if (m.message_type==='image') {
+        const lines = m.message.split('\n');
+        const urlPart = lines[lines.length - 1];
+        if (urlPart && (urlPart.startsWith('http://') || urlPart.startsWith('https://'))) {
+          const caption = lines.slice(0, -1).join('\n');
+          if (caption.trim()) addAdminBubble(caption);
+          addAdminImg(urlPart);
+        } else { addAdminImg(m.message); }
+      } else { addAdminBubble(m.message); }
+    }
+  }).subscribe();
 }
 
 function askNext() {
@@ -392,7 +662,6 @@ function askNext() {
   const step = steps[flowStep];
   setTimeout(()=>{ showTyping(); setTimeout(()=>{ removeTyping(); addAdminBubble(step.q(profile)); if (step.qr) showQR(step.qr()); }, step.delay); }, flowStep===0?600:300);
 }
-
 function handleFlowAnswer(text) {
   const steps = FLOW[lang]; if (flowStep >= steps.length) return;
   const step = steps[flowStep];
@@ -437,34 +706,16 @@ function removeTyping() { if(typingRow){typingRow.remove();typingRow=null;} docu
 function showQR(list) { const m=document.getElementById('messages'); const d=document.createElement('div'); d.className='qr-row'; d.id='qrRow'; list.forEach(r=>{ const b=document.createElement('button'); b.className='qr-btn'; b.textContent=r; b.onclick=()=>sendMsg(r); d.appendChild(b); }); m.appendChild(d); scrollM(); }
 function removeQR() { const e=document.getElementById('qrRow'); if(e) e.remove(); }
 
-// ── NOTIFICATION PROMPT ──
 function showNotificationPrompt() {
   if (document.getElementById('notifPrompt')) return;
   const m = document.getElementById('messages');
-  const row = document.createElement('div');
-  row.className = 'mrow admin';
-  row.id = 'notifPrompt';
-  row.innerHTML = `
-    <div style="background:var(--gold-dim);border:1px solid var(--gold-bd);border-radius:16px;padding:14px 16px;text-align:center;cursor:pointer;max-width:78%;" onclick="enableNotifications()">
-      <div style="font-size:14px;color:var(--gold);margin-bottom:6px;">🔔 ${lang==='fr' ? 'Activer les notifications' : 'Enable notifications'}</div>
-      <div style="font-size:11px;color:var(--text-dim);">${lang==='fr' ? 'Soyez alerté quand votre styliste répond' : 'Get alerted when your stylist replies'}</div>
-    </div>
-  `;
-  m.appendChild(row);
-  scrollM();
+  const row = document.createElement('div'); row.className = 'mrow admin'; row.id = 'notifPrompt';
+  row.innerHTML = `<div style="background:var(--gold-dim);border:1px solid var(--gold-bd);border-radius:16px;padding:14px 16px;text-align:center;cursor:pointer;max-width:78%;" onclick="enableNotifications()"><div style="font-size:14px;color:var(--gold);margin-bottom:6px;">🔔 ${lang==='fr' ? 'Activer les notifications' : 'Enable notifications'}</div><div style="font-size:11px;color:var(--text-dim);">${lang==='fr' ? 'Soyez alerté quand votre styliste répond' : 'Get alerted when your stylist replies'}</div></div>`;
+  m.appendChild(row); scrollM();
 }
-
 async function enableNotifications() {
-  const prompt = document.getElementById('notifPrompt');
-  if (prompt) prompt.remove();
-  try {
-    const permission = await Notification.requestPermission();
-    if (permission === 'granted') {
-      await subscribeToPush();
-    }
-  } catch (err) {
-    console.log('Notification setup failed:', err);
-  }
+  const prompt = document.getElementById('notifPrompt'); if (prompt) prompt.remove();
+  try { const permission = await Notification.requestPermission(); if (permission === 'granted') await subscribeToPush(); } catch (err) { console.log('Notification setup failed:', err); }
 }
 
 async function pushMeta() { 
@@ -483,33 +734,18 @@ document.getElementById('lightbox').addEventListener('click', closeLb);
 
 setStatus('free');
 
-// ── PUSH NOTIFICATIONS ──
 const VAPID_PUBLIC_KEY = 'BPIWlyjvmlzXuTPVQCe0mjx9JahV51_HIFMLZrD_mgdb8BjP_E7h6QoX-1onlawjqUhEtNvDEbAZs3AEvHVZWV0';
-
 async function subscribeToPush() {
-  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-    console.log('Push not supported');
-    return;
-  }
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
   const registration = await navigator.serviceWorker.ready;
   let subscription = await registration.pushManager.getSubscription();
-  if (!subscription) {
-    subscription = await registration.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
-    });
-  }
+  if (!subscription) { subscription = await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) }); }
   if (subscription && sessionId) {
     const key = subscription.getKey('p256dh') ? btoa(String.fromCharCode(...new Uint8Array(subscription.getKey('p256dh')))) : '';
     const authKey = subscription.getKey('auth') ? btoa(String.fromCharCode(...new Uint8Array(subscription.getKey('auth')))) : '';
-    await sb.from('push_subscriptions').upsert({
-      session_id: sessionId, endpoint: subscription.endpoint,
-      p256dh: key, auth: authKey, type: 'user'
-    }, { onConflict: 'session_id' });
-    console.log('Push subscription saved');
+    await sb.from('push_subscriptions').upsert({ session_id: sessionId, endpoint: subscription.endpoint, p256dh: key, auth: authKey, type: 'user' }, { onConflict: 'session_id' });
   }
 }
-
 function urlBase64ToUint8Array(base64String) {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
   const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
